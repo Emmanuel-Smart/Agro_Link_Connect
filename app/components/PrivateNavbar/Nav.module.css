@@ -1,0 +1,120 @@
+/* Navbar Container */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2E7D32;
+    /* Dark Green */
+    padding: 15px 30px;
+    position: relative;
+    color: white;
+}
+
+/* Logo */
+.logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+/* Menu */
+.menu {
+    display: flex;
+    list-style: none;
+    gap: 25px;
+}
+
+.menu li a {
+    text-decoration: none;
+    color: white;
+    font-size: 1rem;
+    transition: 0.3s;
+}
+
+.menu li a:hover {
+    color: #A5D6A7;
+    /* Light Green */
+}
+
+/* Logout Button */
+.logoutButton {
+    background-color: white;
+    color: #2E7D32;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.logoutButton:hover {
+    background-color: #A5D6A7;
+}
+
+/* Hamburger Menu */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    gap: 5px;
+}
+
+.hamburger span {
+    width: 25px;
+    height: 3px;
+    background-color: white;
+    transition: 0.3s;
+}
+
+/* Hamburger animation when active */
+.hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+    .hamburger {
+        display: flex;
+    }
+
+    .menu {
+        position: absolute;
+        top: 60px;
+        left: -100%;
+        flex-direction: column;
+        width: 100%;
+        background-color: #2E7D32;
+        transition: 0.3s;
+    }
+
+    .menu.menuActive {
+        left: 0;
+    }
+
+    .menu li {
+        text-align: center;
+        padding: 15px 0;
+    }
+}
+
+.linkButton {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.linkButton:hover {
+    color: #A5D6A7;
+    /* lighter green on hover */
+}

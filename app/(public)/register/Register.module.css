@@ -1,0 +1,206 @@
+.pageBackground {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg,
+            #f0fdf4 0%,
+            /* light green tint */
+            #dcfce7 100%
+            /* slightly deeper green */
+        );
+}
+
+.container {
+    max-width: 420px;
+    margin: 5rem auto;
+    background-color: #fff;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #15803d;
+}
+
+.subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form input {
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    color: #222;
+    /* darker text color */
+    background-color: #fff;
+}
+
+.form input::placeholder {
+    color: #e0dcdc;
+    /* darker placeholder text */
+}
+
+.form input:focus {
+    outline: none;
+    border-color: #15803d;
+}
+
+.submitBtn {
+    background-color: #15803d;
+    color: white;
+    border: none;
+    padding: 0.8rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.8s ease;
+}
+
+.submitBtn:hover {
+    background-color: #05b147;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 1.5rem 0;
+    color: #999;
+    font-size: 0.9rem;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #ddd;
+    margin: 0 1rem;
+}
+
+/* .googleBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    border: 1px solid #ccc;
+    background-color: white;
+    padding: 0.8rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.googleBtn:hover {
+    background-color: #f9fafb;
+}
+
+.googleIcon {
+    width: 20px;
+    height: 20px;
+} */
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.formGroup label {
+    font-weight: 700;
+    color: #43474e;
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+    letter-spacing: 0.2px;
+}
+
+.googleBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    border: 1px solid #ccc;
+    background-color: white;
+    padding: 0.8rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.8s ease;
+    color: #444;
+}
+
+.googleBtn:hover {
+    background-color: #046e29;
+    border-color: #fff3f3;
+    color: white;
+}
+
+.googleIcon {
+    width: 25px;
+    height: 25px;
+    justify-content: center;
+    align-items: center;
+
+}
+
+
+
+/* Mobile screens (<= 480px) */
+@media (max-width: 480px) {
+    .pageBackground {
+        padding: 1.5rem 0.8rem;
+    }
+
+    .container {
+        padding: 1.8rem 1rem;
+        max-width: 100%;
+        border-radius: 10px;
+    }
+
+    .title {
+        font-size: 1.4rem;
+    }
+
+    .subtitle {
+        font-size: 0.85rem;
+    }
+
+    .formGroup label {
+        font-size: 0.9rem;
+    }
+
+    .form input {
+        font-size: 0.9rem;
+        padding: 0.75rem 0.9rem;
+    }
+
+    .submitBtn {
+        font-size: 0.9rem;
+        padding: 0.8rem;
+    }
+
+    .googleBtn {
+        font-size: 0.9rem;
+        padding: 0.75rem;
+    }
+
+    .googleIcon {
+        width: 18px;
+        height: 18px;
+    }
+}

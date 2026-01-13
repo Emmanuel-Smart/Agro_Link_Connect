@@ -1,0 +1,189 @@
+/* === Page Background === */
+.pageBackground {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    padding: 2rem 1rem;
+}
+
+/* === Container === */
+.container {
+    width: 100%;
+    max-width: 420px;
+    background-color: #fff;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e5e5;
+}
+
+/* === Titles === */
+.title {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #15803d;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    text-align: center;
+    color: #555;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* === Form Layout === */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.formGroup label {
+    font-weight: 700;
+    color: #0a0a0a;
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+    letter-spacing: 0.2px;
+}
+
+/* === Inputs === */
+.form input {
+    padding: 0.85rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    color: #111;
+    background-color: #fff;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.form input::placeholder {
+    color: #666;
+}
+
+.form input:focus {
+    outline: none;
+    border-color: #15803d;
+    background-color: #f9f9f9;
+}
+
+/* === Buttons === */
+.submitBtn {
+    background-color: #15803d;
+    color: white;
+    border: none;
+    padding: 0.9rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submitBtn:hover {
+    background-color: #166534;
+}
+
+/* === Divider === */
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 1.5rem 0;
+    color: #999;
+    font-size: 0.9rem;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #ddd;
+    margin: 0 1rem;
+}
+
+/* === Google Sign-In === */
+.googleBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    border: 1px solid #ccc;
+    background-color: white;
+    padding: 0.8rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #444;
+}
+
+.googleBtn:hover {
+    background-color: #f9fafb;
+    border-color: #bbb;
+}
+
+.googleIcon {
+    width: 20px;
+    height: 20px;
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+    .container {
+        max-width: 90%;
+        padding: 2rem 1.5rem;
+    }
+
+    .title {
+        font-size: 1.6rem;
+    }
+
+    .form input {
+        font-size: 0.95rem;
+    }
+
+    .submitBtn {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .pageBackground {
+        padding: 1.5rem 0.8rem;
+    }
+
+    .container {
+        padding: 1.8rem 1rem;
+        max-width: 100%;
+        border-radius: 10px;
+    }
+
+    .title {
+        font-size: 1.4rem;
+    }
+
+    .formGroup label {
+        font-size: 0.9rem;
+    }
+
+    .form input {
+        font-size: 0.9rem;
+    }
+
+    .googleIcon {
+        width: 18px;
+        height: 18px;
+    }
+}
