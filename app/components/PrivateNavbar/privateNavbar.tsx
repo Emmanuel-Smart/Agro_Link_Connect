@@ -35,10 +35,11 @@ export default function PrivateNavbar() {
 
             <ul className={`${styles.menu} ${menuOpen ? styles.menuActive : ""}`}>
                 <li>
-                    <button onClick={handleHomeReload} className={styles.linkButton}>
+                    {/* <button onClick={handleHomeReload} className={styles.linkButton}>
                         Home
-                    </button>
+                    </button> */}
                 </li>
+                <li><Link href="/home">Home</Link></li>
                 <li><Link href="/news">News</Link></li>
                 <li><Link href="/community">Community</Link></li>
                 <li><Link href="/tools">Tools</Link></li>

@@ -1,0 +1,534 @@
+/* ================= ROOT ================= */
+:root {
+    --bg: #f6fdf7;
+    --card: #ffffff;
+    --accent: #16a34a;
+    --accent-light: #22c55e;
+    --text: #1f2937;
+    --subtext: #6b7280;
+    --border: #e5e7eb;
+    --danger: #ef4444;
+}
+
+/* ================= BASE ================= */
+.container {
+    display: flex;
+    min-height: 100vh;
+    background: var(--bg);
+    font-family: "Inter", sans-serif;
+    color: var(--text);
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar {
+    width: 280px;
+
+    /* 🌿 NEW PROFESSIONAL AGRO BACKGROUND */
+    background: linear-gradient(180deg,
+            #ecfdf5 0%,
+            #d1fae5 100%);
+
+    border-right: 1px solid #bbf7d0;
+
+    padding: 25px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    /* ✨ FLOATING PANEL EFFECT */
+    border-radius: 0 20px 20px 0;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05);
+
+    transition: all 0.3s ease;
+}
+
+/* ================= PROFILE HEADER ================= */
+.profileHeader {
+    text-align: center;
+}
+
+/* 🌿 AVATAR IMPROVED */
+.avatarCircle {
+    width: 85px;
+    height: 85px;
+    border-radius: 50%;
+
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 32px;
+    font-weight: bold;
+
+    margin: 0 auto 10px;
+
+    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+
+    transition: transform 0.3s ease;
+}
+
+.avatarCircle:hover {
+    transform: scale(1.05);
+}
+
+.profileName {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.profileFarm {
+    font-size: 14px;
+    color: var(--subtext);
+}
+
+/* ================= DETAILS ================= */
+.profileDetails {
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* ================= BIO ================= */
+.profileBio {
+    font-size: 14px;
+    color: var(--subtext);
+    line-height: 1.5;
+
+    background: rgba(255, 255, 255, 0.6);
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* ================= ACTIONS ================= */
+.actions {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.actions a,
+.actions button {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+/* CALL */
+.actions a[href^="tel"] {
+    background: #2563eb;
+    color: white;
+}
+
+/* WHATSAPP */
+.actions a[href*="wa.me"] {
+    background: var(--accent);
+    color: white;
+}
+
+/* EDIT */
+.actions button:nth-of-type(1) {
+    background: #f59e0b;
+    color: white;
+}
+
+/* DELETE */
+.actions button:nth-of-type(2) {
+    background: var(--danger);
+    color: white;
+}
+
+/* HOVER EFFECT */
+.actions a:hover,
+.actions button:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+/* ================= MAIN ================= */
+.main {
+    flex: 1;
+    padding: 30px;
+}
+
+/* HEADER */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    font-size: 24px;
+}
+
+/* ADD BUTTON */
+.addBtn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.addBtn:hover {
+    background: var(--accent-light);
+    transform: translateY(-1px);
+}
+
+/* ================= GRID ================= */
+.grid {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+/* FUTURE CARD STYLE */
+.card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 15px;
+    border: 1px solid var(--border);
+
+    transition: 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+}
+
+/* ================= FORM ================= */
+.formCard {
+    background: var(--card);
+    padding: 25px;
+    border-radius: 10px;
+    max-width: 500px;
+    border: 1px solid var(--border);
+}
+
+.formTitle {
+    font-size: 22px;
+    margin-bottom: 15px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form input,
+.form textarea {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 14px;
+}
+
+/* FOCUS */
+.form input:focus,
+.form textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+/* SUBMIT */
+.form button[type="submit"] {
+    background: var(--accent);
+    color: white;
+    font-weight: 600;
+}
+
+/* CANCEL */
+.form button[type="button"] {
+    background: #9ca3af;
+    color: white;
+}
+
+/* ================= LOADING ================= */
+.loading {
+    text-align: center;
+    padding: 50px;
+    font-size: 18px;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+    background: #f6fef8;
+    font-family: Arial, sans-serif;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 300px;
+    background: linear-gradient(180deg, #e6f4ea, #d1fae5);
+    padding: 30px 20px;
+    border-right: 2px solid #bbf7d0;
+}
+
+/* HEADER */
+.profileHeader {
+    text-align: center;
+}
+
+/* AVATAR */
+.avatarWrapper {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.avatarImage {
+    width: 95px;
+    height: 95px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #22c55e;
+}
+
+.avatarCircle {
+    width: 95px;
+    height: 95px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #22c55e, #15803d);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    color: white;
+    font-weight: bold;
+}
+
+.fileInput {
+    display: none;
+}
+
+.avatarOverlay {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 12px;
+    padding: 5px;
+    border-bottom-left-radius: 50%;
+    border-bottom-right-radius: 50%;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.avatarWrapper:hover .avatarOverlay {
+    opacity: 1;
+}
+
+/* TEXT */
+.profileName {
+    margin-top: 10px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.profileFarm {
+    color: #16a34a;
+    font-size: 14px;
+}
+
+.profileDetails {
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.profileBio {
+    margin-top: 15px;
+    font-size: 13px;
+    background: #ecfdf5;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* BUTTONS */
+.actions {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.actions a,
+.actions button {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+}
+
+.actions a {
+    background: #22c55e;
+    color: white;
+}
+
+.actions button {
+    background: #f1f5f9;
+}
+
+.actions button:hover {
+    background: #e2e8f0;
+}
+
+/* MAIN */
+.main {
+    flex: 1;
+    padding: 30px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.addBtn {
+    background: #16a34a;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+}
+
+/* GRID */
+.grid {
+    margin-top: 20px;
+}
+
+/* FORM */
+.formCard {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    width: 400px;
+}
+
+.form input,
+.form textarea {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.form button {
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    background: #22c55e;
+    color: white;
+}
+
+.loading {
+    text-align: center;
+    padding: 50px;
+}
+
+/* ================================================= */
+/* ============== RESPONSIVE ADDITION ============== */
+/* ================================================= */
+
+/* 📱 Tablets */
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 260px;
+        padding: 20px;
+    }
+
+    .main {
+        padding: 20px;
+    }
+
+    .grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+}
+
+/* 📱 Mobile (stack layout) */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 2px solid #bbf7d0;
+        border-radius: 0;
+        align-items: center;
+        text-align: center;
+    }
+
+    .main {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .addBtn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .formCard {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* 📲 Small phones */
+@media (max-width: 480px) {
+
+    .avatarImage,
+    .avatarCircle {
+        width: 75px;
+        height: 75px;
+        font-size: 26px;
+    }
+
+    .profileName {
+        font-size: 18px;
+    }
+
+    .profileBio {
+        font-size: 12px;
+    }
+
+    .actions a,
+    .actions button {
+        font-size: 13px;
+        padding: 9px;
+    }
+
+    .header h1 {
+        font-size: 20px;
+    }
+}
