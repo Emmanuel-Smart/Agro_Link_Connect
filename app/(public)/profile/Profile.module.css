@@ -532,3 +532,83 @@
         font-size: 20px;
     }
 }
+
+
+/* ================= NEW PROFILE FEATURES ================= */
+
+/* ROLE ICONS */
+.roles {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+}
+
+.roleTag {
+    background: #dcfce7;
+    color: #166534;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 500;
+}
+
+/* CROPS / TAGS */
+.crops {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+}
+
+.cropTag {
+    background: #f0fdf4;
+    color: #15803d;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid #bbf7d0;
+}
+
+/* ================= RESPONSIVE IMPROVEMENTS ================= */
+
+/* Tablets */
+@media (max-width: 1024px) {
+
+    .roles,
+    .crops {
+        justify-content: flex-start;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+    .roles,
+    .crops {
+        justify-content: center;
+    }
+
+    .roleTag,
+    .cropTag {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+
+    .roles,
+    .crops {
+        gap: 4px;
+    }
+
+    .roleTag,
+    .cropTag {
+        font-size: 10px;
+        padding: 3px 7px;
+    }
+}

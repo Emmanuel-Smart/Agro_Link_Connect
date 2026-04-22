@@ -4,126 +4,198 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
+import styles from "./AddProduct.module.css";
 
 export default function AddProductPage() {
     const { user } = useAuth();
     const router = useRouter();
 
-    const [formData, setFormData] = useState({
-        name: "",
-        price: "",
-        location: "",
-        description: "",
-    });
-
-    const [image, setImage] = useState<File | null>(null);
-    const [preview, setPreview] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
-    // HANDLE INPUT
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+    const [formData, setFormData] = useState({
+        crop_type: "",
+        price: "",
+        quantity: "",
+        unit: "Bag",
+        location: "",
+        description: "",
+        harvest_status: "ready",
+        is_perishable: false,
+    });
+
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [preview, setPreview] = useState<string | null>(null);
+
+    // INPUT CHANGE
+    const handleChange = (
+        e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    ) => {
+        const { name, value, type } = e.target;
+
+        if (type === "checkbox") {
+            setFormData({
+                ...formData,
+                [name]: (e.target as HTMLInputElement).checked,
+            });
+        } else {
+            setFormData({ ...formData, [name]: value });
+        }
     };
 
-    // HANDLE IMAGE
-    const handleImage = (e: ChangeEvent<HTMLInputElement>) => {
+    // IMAGE
+    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        setImage(file);
+        setImageFile(file);
         setPreview(URL.createObjectURL(file));
     };
 
-    // SUBMIT PRODUCT
+    const removeImage = () => {
+        setImageFile(null);
+        setPreview(null);
+    };
+
+    // SUBMIT
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        if (!user || !image) return alert("Please select image");
+        if (!user) return alert("Login first");
 
         setLoading(true);
 
-        // 1. Upload image
-        const fileExt = image.name.split(".").pop();
-        const filePath = `${user.id}-${Date.now()}.${fileExt}`;
+        let imagePath = null;
 
-        const { error: uploadError } = await supabase.storage
-            .from("products")
-            .upload(filePath, image);
+        // UPLOAD IMAGE
+        if (imageFile) {
+            const fileExt = imageFile.name.split(".").pop();
+            const fileName = `${user.id}-${Date.now()}.${fileExt}`;
 
-        if (uploadError) {
-            alert("Image upload failed");
-            setLoading(false);
-            return;
+            const { error: uploadError } = await supabase.storage
+                .from("products")
+                .upload(fileName, imageFile, { upsert: true });
+
+            if (uploadError) {
+                alert("Image upload failed");
+                setLoading(false);
+                return;
+            }
+
+            imagePath = fileName;
         }
 
-        // 2. Save product in DB
+        // INSERT DATA
         const { error } = await supabase.from("products").insert([
             {
                 user_id: user.id,
-                name: formData.name,
-                price: formData.price,
+                crop_type: formData.crop_type,
+                price: Number(formData.price),
+                quantity: Number(formData.quantity),
+                unit: formData.unit,
                 location: formData.location,
                 description: formData.description,
-                image_url: filePath,
+                harvest_status: formData.harvest_status,
+                is_perishable: formData.is_perishable,
+                image_url: imagePath,
             },
         ]);
 
         setLoading(false);
 
-        if (!error) {
-            alert("Product added!");
-            router.push("/profile");
+        if (error) {
+            console.error(error);
+            alert("Error adding product");
         } else {
-            alert("Error saving product");
+            alert("Product added successfully");
+            router.push("/profile");
         }
     };
 
     return (
-        <div style={{ padding: 30 }}>
+        <div className={styles.container}>
             <h1>Add Product</h1>
 
-            <form onSubmit={handleSubmit} style={{ maxWidth: 400, display: "flex", flexDirection: "column", gap: 10 }}>
+            <form className={styles.form} onSubmit={handleSubmit}>
 
-                <input
-                    name="name"
-                    placeholder="Product name (e.g Cocoa)"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                />
+                {/* CROP */}
+                <select name="crop_type" onChange={handleChange} required>
+                    <option value="">Select Crop</option>
+                    <option>Maize</option>
+                    <option>Beans</option>
+                    <option>Potatoes</option>
+                    <option>Vegetables</option>
+                </select>
 
+                {/* PRICE */}
                 <input
                     name="price"
-                    placeholder="Price (e.g 5000 FCFA)"
-                    value={formData.price}
+                    type="number"
+                    placeholder="Price (FCFA)"
                     onChange={handleChange}
                     required
                 />
 
+                {/* QUANTITY */}
+                <input
+                    name="quantity"
+                    type="number"
+                    placeholder="Quantity (e.g 10)"
+                    onChange={handleChange}
+                    required
+                />
+
+                {/* UNIT */}
+                <select name="unit" onChange={handleChange}>
+                    <option>Bag</option>
+                    <option>Bucket</option>
+                    <option>Kg</option>
+                    <option>Crate</option>
+                </select>
+
+                {/* LOCATION */}
                 <input
                     name="location"
-                    placeholder="Location (e.g Bamenda)"
-                    value={formData.location}
+                    placeholder="Location (e.g Mile 8)"
                     onChange={handleChange}
                 />
 
+                {/* HARVEST STATUS */}
+                <select name="harvest_status" onChange={handleChange}>
+                    <option value="ready">Ready Now</option>
+                    <option value="pre">Pre-Harvest</option>
+                </select>
+
+                {/* PERISHABLE */}
+                <label>
+                    <input
+                        type="checkbox"
+                        name="is_perishable"
+                        onChange={handleChange}
+                    />
+                    Perishable (e.g Tomatoes)
+                </label>
+
+                {/* DESCRIPTION */}
                 <textarea
                     name="description"
                     placeholder="Describe your product..."
-                    value={formData.description}
                     onChange={handleChange}
                 />
 
-                <input type="file" accept="image/*" onChange={handleImage} />
+                {/* IMAGE */}
+                <input type="file" accept="image/*" onChange={handleImageChange} />
 
                 {preview && (
-                    <img
-                        src={preview}
-                        style={{ width: "100%", borderRadius: 10 }}
-                    />
+                    <div>
+                        <img src={preview} className={styles.preview} />
+                        <button type="button" onClick={removeImage}>
+                            Remove Image
+                        </button>
+                    </div>
                 )}
 
+                {/* SUBMIT */}
                 <button type="submit" disabled={loading}>
-                    {loading ? "Uploading..." : "Add Product"}
+                    {loading ? "Adding..." : "Add Product"}
                 </button>
             </form>
         </div>
