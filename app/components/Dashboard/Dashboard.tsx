@@ -19,7 +19,7 @@ export default function Dashboard() {
                 .from("products")
                 .select("*, profiles(whatsapp, phone)")
                 .order("created_at", { ascending: false })
-                .limit(25);
+                .limit(12);
             
             if (data) setProducts(data);
             setLoading(false);

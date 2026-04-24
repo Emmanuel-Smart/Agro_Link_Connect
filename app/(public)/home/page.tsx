@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
+import { useRouter } from "next/navigation";
 import styles from "./Home.module.css";
 import Link from "next/link";
 
@@ -34,6 +35,7 @@ const getPerishabilityState = (availableDate: string, isPerishable: boolean) => 
 };
 
 export default function HomePage() {
+    const router = useRouter();
     const { user } = useAuth();
     const [profile, setProfile] = useState<any>(null);
     const [products, setProducts] = useState<any[]>([]);
@@ -159,6 +161,14 @@ export default function HomePage() {
         }
     };
 
+    const handleContactGuard = (e: React.MouseEvent) => {
+        if (!user) {
+            e.preventDefault();
+            alert("🔒 Access Restricted: Please Sign Up or Login to contact farmers and view full market details.");
+            router.push("/register");
+        }
+    };
+
     if (initialLoading) return <div className={styles.loading}>Loading Regional Marketplace...</div>;
 
     return (
@@ -280,14 +290,14 @@ export default function HomePage() {
                                     {/* Phase 5: Direct P2P Closing */}
                                     <div className={styles.actions}>
                                         {item.profiles?.whatsapp ? (
-                                            <a href={`https://wa.me/${item.profiles.whatsapp}`} target="_blank" className={styles.btnWhatsapp}>
+                                            <a onClick={handleContactGuard} href={`https://wa.me/${item.profiles.whatsapp}`} target="_blank" className={styles.btnWhatsapp}>
                                                 💬 WhatsApp
                                             </a>
                                         ) : (
                                             <button disabled className={styles.btnDisabled}>No WhatsApp</button>
                                         )}
                                         {item.profiles?.phone && (
-                                            <a href={`tel:${item.profiles.phone}`} className={styles.btnCall}>
+                                            <a onClick={handleContactGuard} href={`tel:${item.profiles.phone}`} className={styles.btnCall}>
                                                 📞 Call
                                             </a>
                                         )}
