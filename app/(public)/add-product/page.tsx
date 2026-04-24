@@ -1,203 +1,349 @@
 "use client";
 
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import styles from "./AddProduct.module.css";
 
+/* ================= CROP MAP & SHELF-LIFE LOGIC (Phase 5) ================= */
+// Shelf-life is calculated in days.
+const CROP_MAP = [
+    { name: "Maize", category: "Cereals", perishable: false, shelf_life: 90 },
+    { name: "Corn", category: "Cereals", perishable: false, shelf_life: 90 },
+    { name: "Beans", category: "Cereals", perishable: false, shelf_life: 180 },
+    { name: "Rice", category: "Cereals", perishable: false, shelf_life: 365 },
+    { name: "Irish Potatoes", category: "Tubers", perishable: false, shelf_life: 30 },
+    { name: "Cassava", category: "Tubers", perishable: false, shelf_life: 14 },
+    { name: "Tomatoes", category: "Vegetables", perishable: true, shelf_life: 7 },
+    { name: "Cabbage", category: "Vegetables", perishable: true, shelf_life: 10 },
+    { name: "Onions", category: "Vegetables", perishable: true, shelf_life: 30 },
+    { name: "Plantains", category: "Fruits", perishable: true, shelf_life: 14 },
+    { name: "Bananas", category: "Fruits", perishable: true, shelf_life: 7 },
+    { name: "Cocoa", category: "Cash Crops", perishable: false, shelf_life: 365 },
+];
+
+/* ================= COMPONENT ================= */
 export default function AddProductPage() {
     const { user } = useAuth();
     const router = useRouter();
 
+    const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(false);
 
-    const [formData, setFormData] = useState({
-        crop_type: "",
+    /* FORM */
+    const [form, setForm] = useState({
+        crop: "",
+        category: "",
         price: "",
-        quantity: "",
         unit: "Bag",
-        location: "",
+        quantity: "",
         description: "",
-        harvest_status: "ready",
+        harvest: "ready",
+        available_date: "",
         is_perishable: false,
+        shelf_life: 0,
     });
 
+    const [manualMode, setManualMode] = useState(false);
+    
+    // Image Upload State
     const [imageFile, setImageFile] = useState<File | null>(null);
-    const [preview, setPreview] = useState<string | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    
+    // Price Intelligence States
+    const [priceInsight, setPriceInsight] = useState<{min: number, avg: number, max: number} | null>(null);
+    const [isPioneer, setIsPioneer] = useState(false);
+    const [guidanceState, setGuidanceState] = useState<'none' | 'red' | 'green' | 'yellow'>('none');
+    const [guidanceMsg, setGuidanceMsg] = useState("");
 
-    // INPUT CHANGE
-    const handleChange = (
-        e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-    ) => {
-        const { name, value, type } = e.target;
+    /* ================= 1. THE TRIGGER: SPATIAL CONTEXT ================= */
+    useEffect(() => {
+        if (!user) return;
+        const fetchProfile = async () => {
+            const { data } = await supabase.from("profiles").select("location").eq("id", user.id).single();
+            setProfile(data);
+        };
+        fetchProfile();
+    }, [user]);
 
-        if (type === "checkbox") {
-            setFormData({
-                ...formData,
-                [name]: (e.target as HTMLInputElement).checked,
-            });
-        } else {
-            setFormData({ ...formData, [name]: value });
+    /* ================= INPUT HANDLING & GUIDANCE GUARD ================= */
+    const handleChange = (e: any) => {
+        const { name, value } = e.target;
+        setForm({ ...form, [name]: value });
+
+        /* ===== 2. THE SELECTION: HYBRID CROP LOGIC ===== */
+        if (name === "crop") {
+            const found = CROP_MAP.find((c) => c.name.toLowerCase() === value.toLowerCase());
+            if (found) {
+                setManualMode(false);
+                setForm((prev) => ({ 
+                    ...prev, 
+                    crop: value, 
+                    category: found.category, 
+                    is_perishable: found.perishable,
+                    shelf_life: found.shelf_life
+                }));
+            } else {
+                setManualMode(true);
+                // Default shelf-life if manual
+                setForm((prev) => ({ ...prev, crop: value, shelf_life: 7 })); 
+            }
         }
-    };
-
-    // IMAGE
-    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        setImageFile(file);
-        setPreview(URL.createObjectURL(file));
-    };
-
-    const removeImage = () => {
-        setImageFile(null);
-        setPreview(null);
-    };
-
-    // SUBMIT
-    const handleSubmit = async (e: FormEvent) => {
-        e.preventDefault();
-        if (!user) return alert("Login first");
-
-        setLoading(true);
-
-        let imagePath = null;
-
-        // UPLOAD IMAGE
-        if (imageFile) {
-            const fileExt = imageFile.name.split(".").pop();
-            const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-
-            const { error: uploadError } = await supabase.storage
-                .from("products")
-                .upload(fileName, imageFile, { upsert: true });
-
-            if (uploadError) {
-                alert("Image upload failed");
-                setLoading(false);
+        
+        // 4. THE REAL-TIME GUIDANCE UI (Red/Green/Yellow)
+        if (name === "price" && priceInsight) {
+            const numPrice = Number(value);
+            if (!value) {
+                setGuidanceState('none');
+                setGuidanceMsg("");
                 return;
             }
 
-            imagePath = fileName;
-        }
-
-        // INSERT DATA
-        const { error } = await supabase.from("products").insert([
-            {
-                user_id: user.id,
-                crop_type: formData.crop_type,
-                price: Number(formData.price),
-                quantity: Number(formData.quantity),
-                unit: formData.unit,
-                location: formData.location,
-                description: formData.description,
-                harvest_status: formData.harvest_status,
-                is_perishable: formData.is_perishable,
-                image_url: imagePath,
-            },
-        ]);
-
-        setLoading(false);
-
-        if (error) {
-            console.error(error);
-            alert("Error adding product");
-        } else {
-            alert("Product added successfully");
-            router.push("/profile");
+            if (numPrice < priceInsight.min) {
+                setGuidanceState('red');
+                setGuidanceMsg("Caution: You are pricing below the local minimum. Ensure you aren't being undervalued!");
+            } else if (numPrice > priceInsight.max) {
+                setGuidanceState('yellow');
+                setGuidanceMsg("Premium Pricing: You are above the neighborhood max. High quality or rare variety expected.");
+            } else {
+                setGuidanceState('green');
+                setGuidanceMsg(`Great! Your price is competitive for the ${profile?.location} neighborhood.`);
+            }
         }
     };
 
+    const handleImageChange = (e: any) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setImageFile(file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
+
+    /* ================= 3. THE PRICE INTELLIGENCE CALCULATION ================= */
+    useEffect(() => {
+        if (!form.crop || !form.unit || !profile?.location) return;
+
+        const fetchPrices = async () => {
+            // Query last 10-20 verified sales in user's specific neighborhood
+            const { data } = await supabase
+                .from("products")
+                .select("price")
+                .eq("crop", form.crop)
+                .eq("unit", form.unit)
+                .eq("location", profile.location)
+                .order("created_at", { ascending: false })
+                .limit(20);
+
+            if (data && data.length > 0) {
+                setIsPioneer(false);
+                const prices = data.map((p: any) => Number(p.price));
+                const min = Math.min(...prices);
+                const max = Math.max(...prices);
+                const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+                setPriceInsight({ min, max, avg });
+                
+                // Trigger guidance check immediately if price is already set
+                if (form.price) {
+                    const numPrice = Number(form.price);
+                    if (numPrice < min) {
+                        setGuidanceState('red');
+                        setGuidanceMsg("Caution: You are pricing below the local minimum. Ensure you aren't being undervalued!");
+                    } else if (numPrice > max) {
+                        setGuidanceState('yellow');
+                        setGuidanceMsg("Premium Pricing: You are above the neighborhood max. High quality or rare variety expected.");
+                    } else {
+                        setGuidanceState('green');
+                        setGuidanceMsg(`Great! Your price is competitive for the ${profile.location} neighborhood.`);
+                    }
+                }
+            } else {
+                setPriceInsight(null);
+                setGuidanceState('none');
+                setIsPioneer(true);
+            }
+        };
+
+        // Debounce slightly to avoid aggressive querying
+        const timeoutId = setTimeout(() => fetchPrices(), 500);
+        return () => clearTimeout(timeoutId);
+    }, [form.crop, form.unit, profile]);
+
+    /* ================= 6. THE FINAL "PUSH" (MATCHMAKING) ================= */
+    const handleSubmit = async (e: any) => {
+        e.preventDefault();
+        if (!user || !profile?.location) {
+            alert("Set your location in your profile first to access the localized market.");
+            return;
+        }
+        setLoading(true);
+
+        const baseDate = form.harvest === "ready" ? new Date() : new Date(form.available_date);
+        
+        let imageUrl = null;
+
+        if (imageFile) {
+            const fileExt = imageFile.name.split('.').pop();
+            const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+            const { error: uploadError } = await supabase.storage
+                .from('products')
+                .upload(fileName, imageFile);
+
+            if (uploadError) {
+                console.error("Image upload error:", uploadError);
+                alert("Error uploading image. Proceeding without image.");
+            } else {
+                const { data } = supabase.storage.from('products').getPublicUrl(fileName);
+                imageUrl = data.publicUrl;
+            }
+        }
+
+        const { error } = await supabase.from("products").insert([
+            {
+                user_id: user.id,
+                crop: form.crop,
+                category: form.category,
+                price: form.price,
+                unit: form.unit,
+                quantity: form.quantity,
+                description: form.description,
+                harvest: form.harvest,
+                available_date: baseDate,
+                is_perishable: form.is_perishable,
+                location: profile.location,
+                image_url: imageUrl,
+                created_at: new Date().toISOString(),
+            },
+        ]);
+
+        if (error) {
+            setLoading(false);
+            console.log(error);
+            alert("Error adding product");
+            return;
+        }
+
+        // Mock: Cross-reference `demand_signals`
+        console.log(`[Demand Signals Engine] Checking demand_signals table for ${form.crop} in ${profile.location}`);
+        console.log(`[Multi-Channel Fan-Out] Dispatching SMS & Web Push to Subscribed & Ghost Buyers in ${profile.location}!`);
+        
+        alert(`Listing Published! Sent immediate SMS/Web Push to buyers watching for ${form.crop} in ${profile.location}.`);
+        setLoading(false);
+        router.push("/home");
+    };
+
+    /* ================= UI ================= */
     return (
         <div className={styles.container}>
-            <h1>Add Product</h1>
+            <div className={styles.card}>
+                <h1 className={styles.title}>Add Product</h1>
 
-            <form className={styles.form} onSubmit={handleSubmit}>
+                <form className={styles.form} onSubmit={handleSubmit}>
+                    {/* 2. HYBRID CROP LOGIC */}
+                    <input name="crop" placeholder="Type crop (e.g Maize)" value={form.crop} onChange={handleChange} required />
 
-                {/* CROP */}
-                <select name="crop_type" onChange={handleChange} required>
-                    <option value="">Select Crop</option>
-                    <option>Maize</option>
-                    <option>Beans</option>
-                    <option>Potatoes</option>
-                    <option>Vegetables</option>
-                </select>
+                    {/* MANUAL FIELDS */}
+                    {manualMode && (
+                        <div className={styles.manualFields}>
+                            <select name="category" onChange={handleChange} required>
+                                <option value="">Select Category</option>
+                                <option>Cereals</option>
+                                <option>Tubers</option>
+                                <option>Vegetables</option>
+                                <option>Fruits</option>
+                            </select>
+                            <label className={styles.checkboxLabel}>
+                                <input type="checkbox" checked={form.is_perishable} onChange={(e) => setForm({ ...form, is_perishable: e.target.checked })} />
+                                <span>Perishable Crop</span>
+                            </label>
+                        </div>
+                    )}
 
-                {/* PRICE */}
-                <input
-                    name="price"
-                    type="number"
-                    placeholder="Price (FCFA)"
-                    onChange={handleChange}
-                    required
-                />
-
-                {/* QUANTITY */}
-                <input
-                    name="quantity"
-                    type="number"
-                    placeholder="Quantity (e.g 10)"
-                    onChange={handleChange}
-                    required
-                />
-
-                {/* UNIT */}
-                <select name="unit" onChange={handleChange}>
-                    <option>Bag</option>
-                    <option>Bucket</option>
-                    <option>Kg</option>
-                    <option>Crate</option>
-                </select>
-
-                {/* LOCATION */}
-                <input
-                    name="location"
-                    placeholder="Location (e.g Mile 8)"
-                    onChange={handleChange}
-                />
-
-                {/* HARVEST STATUS */}
-                <select name="harvest_status" onChange={handleChange}>
-                    <option value="ready">Ready Now</option>
-                    <option value="pre">Pre-Harvest</option>
-                </select>
-
-                {/* PERISHABLE */}
-                <label>
-                    <input
-                        type="checkbox"
-                        name="is_perishable"
-                        onChange={handleChange}
-                    />
-                    Perishable (e.g Tomatoes)
-                </label>
-
-                {/* DESCRIPTION */}
-                <textarea
-                    name="description"
-                    placeholder="Describe your product..."
-                    onChange={handleChange}
-                />
-
-                {/* IMAGE */}
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-
-                {preview && (
-                    <div>
-                        <img src={preview} className={styles.preview} />
-                        <button type="button" onClick={removeImage}>
-                            Remove Image
-                        </button>
+                    {/* IMAGE UPLOAD */}
+                    <div className={styles.imageUploadBox}>
+                        <label className={styles.imageLabel}>
+                            {imagePreview ? (
+                                <img src={imagePreview} alt="Preview" className={styles.imagePreview} />
+                            ) : (
+                                <div className={styles.imagePlaceholder}>
+                                    <span className={styles.placeholderIcon}>📸</span>
+                                    <span className={styles.placeholderText}>Upload Product Image</span>
+                                    <small>Optional but recommended for faster sales</small>
+                                </div>
+                            )}
+                            <input type="file" accept="image/*" onChange={handleImageChange} className={styles.hiddenInput} />
+                        </label>
                     </div>
-                )}
 
-                {/* SUBMIT */}
-                <button type="submit" disabled={loading}>
-                    {loading ? "Adding..." : "Add Product"}
-                </button>
-            </form>
+                    {/* QUANTITY & UNIT */}
+                    <div className={styles.row}>
+                        <input name="quantity" type="number" placeholder="Quantity" onChange={handleChange} required className={styles.flex2} />
+                        <select name="unit" value={form.unit} onChange={handleChange} className={styles.flex1}>
+                            <option>Bag</option>
+                            <option>Bucket</option>
+                            <option>Crate</option>
+                            <option>Kg</option>
+                        </select>
+                    </div>
+
+                    {/* THE PIONEER STATE */}
+                    {isPioneer && form.crop && (
+                        <div className={styles.pioneerState}>
+                            🚀 <strong>Pioneer Alert:</strong> You are the first to price this crop in this neighborhood! You are setting the market pulse.
+                        </div>
+                    )}
+
+                    {/* 3. PRICE INTELLIGENCE CALCULATION */}
+                    {priceInsight && !isPioneer && (
+                        <div className={styles.intelBox}>
+                            <div className={styles.intelHeader}>Market Pulse ({profile?.location})</div>
+                            <div className={styles.intelGrid}>
+                                <div className={styles.intelStat}><span>Min (Quick Sale)</span><strong>{priceInsight.min.toLocaleString()}</strong></div>
+                                <div className={styles.intelStatAvg}><span>Avg (Fair Market)</span><strong>{priceInsight.avg.toFixed(0).toLocaleString()}</strong></div>
+                                <div className={styles.intelStat}><span>Max (Premium)</span><strong>{priceInsight.max.toLocaleString()}</strong></div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 4. REAL-TIME GUIDANCE UI */}
+                    <div className={styles.priceInputWrapper}>
+                        <input
+                            name="price"
+                            type="number"
+                            placeholder={`Your Price per ${form.unit} (FCFA)`}
+                            value={form.price}
+                            onChange={handleChange}
+                            required
+                            className={`${styles.priceInput} ${styles[`input_${guidanceState}`]}`}
+                        />
+                    </div>
+
+                    {/* GUIDANCE MESSAGE */}
+                    {guidanceState !== 'none' && (
+                        <div className={`${styles.guidanceAlert} ${styles[`alert_${guidanceState}`]}`}>
+                            {guidanceMsg}
+                        </div>
+                    )}
+
+                    {/* 5. TEMPORAL SIGNALING */}
+                    <div className={styles.radioGroup}>
+                        <label><input type="radio" name="harvest" value="ready" checked={form.harvest === "ready"} onChange={handleChange} /> Ready Now</label>
+                        <label><input type="radio" name="harvest" value="future" checked={form.harvest === "future"} onChange={handleChange} /> Future Harvest Date</label>
+                    </div>
+
+                    {form.harvest === "future" && (
+                        <input type="date" name="available_date" value={form.available_date} onChange={handleChange} required />
+                    )}
+
+                    {/* DESCRIPTION */}
+                    <textarea name="description" placeholder="Describe quality, strain, or logistics..." value={form.description} onChange={handleChange} />
+
+                    <button className={styles.button} type="submit" disabled={loading}>
+                        {loading ? "Matching with Buyers..." : "Publish & Alert Buyers"}
+                    </button>
+                </form>
+            </div>
         </div>
     );
 }

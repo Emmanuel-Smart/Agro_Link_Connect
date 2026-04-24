@@ -1,86 +1,113 @@
+/* ========================================
+   REGISTER PAGE — AgroLink Pro UI
+   ======================================== */
+
 .pageBackground {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg,
-            #f0fdf4 0%,
-            /* light green tint */
-            #dcfce7 100%
-            /* slightly deeper green */
-        );
+    background: linear-gradient(135deg, #0f172a 0%, #14532d 100%);
+    padding: 2rem 1rem;
+    font-family: 'Inter', system-ui, sans-serif;
 }
 
 .container {
     max-width: 420px;
-    margin: 5rem auto;
-    background-color: #fff;
-    padding: 2.5rem;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    background: #fff;
+    padding: 44px 36px;
+    border-radius: 20px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+    border: 1px solid #e2e8f0;
+    margin: 0;
 }
 
 .title {
     text-align: center;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #15803d;
+    font-size: 1.65rem;
+    font-weight: 900;
+    color: #14532d;
+    margin-bottom: 6px;
+    letter-spacing: -0.03em;
 }
 
 .subtitle {
     text-align: center;
-    color: #666;
-    margin-bottom: 1.5rem;
-    font-size: 0.95rem;
+    color: #64748b;
+    margin-bottom: 32px;
+    font-size: 0.9rem;
+    line-height: 1.5;
 }
 
 .form {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 18px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.formGroup label {
+    font-weight: 800;
+    color: #1e293b;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
 }
 
 .form input {
-    padding: 0.8rem 1rem;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
-    color: #222;
-    /* darker text color */
-    background-color: #fff;
+    padding: 14px 16px;
+    border-radius: 10px;
+    border: 1.5px solid #e2e8f0;
+    font-size: 0.95rem;
+    color: #0f172a;
+    background: #f8fafc;
+    transition: all 0.2s;
+    outline: none;
 }
 
 .form input::placeholder {
-    color: #e0dcdc;
-    /* darker placeholder text */
+    color: #94a3b8;
 }
 
 .form input:focus {
-    outline: none;
-    border-color: #15803d;
+    border-color: #16a34a;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
 }
 
 .submitBtn {
-    background-color: #15803d;
+    background: linear-gradient(135deg, #15803d, #16a34a);
     color: white;
     border: none;
-    padding: 0.8rem;
-    border-radius: 8px;
-    font-weight: 600;
+    padding: 15px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 0.95rem;
     cursor: pointer;
-    transition: background-color 0.8s ease;
+    transition: all 0.2s;
+    box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+    letter-spacing: 0.02em;
 }
 
 .submitBtn:hover {
-    background-color: #05b147;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(22, 163, 74, 0.4);
+    filter: brightness(1.05);
 }
 
 .divider {
     display: flex;
     align-items: center;
-    margin: 1.5rem 0;
-    color: #999;
-    font-size: 0.9rem;
+    margin: 8px 0;
+    color: #94a3b8;
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
 .divider::before,
@@ -88,119 +115,39 @@
     content: "";
     flex: 1;
     height: 1px;
-    background: #ddd;
-    margin: 0 1rem;
-}
-
-/* .googleBtn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.6rem;
-    border: 1px solid #ccc;
-    background-color: white;
-    padding: 0.8rem;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.googleBtn:hover {
-    background-color: #f9fafb;
-}
-
-.googleIcon {
-    width: 20px;
-    height: 20px;
-} */
-
-.formGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-}
-
-.formGroup label {
-    font-weight: 700;
-    color: #43474e;
-    font-size: 1rem;
-    margin-bottom: 0.2rem;
-    letter-spacing: 0.2px;
+    background: #e2e8f0;
+    margin: 0 14px;
 }
 
 .googleBtn {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.6rem;
-    border: 1px solid #ccc;
-    background-color: white;
-    padding: 0.8rem;
-    border-radius: 8px;
-    font-weight: 600;
+    gap: 10px;
+    border: 1.5px solid #e2e8f0;
+    background: #fff;
+    padding: 13px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
     cursor: pointer;
-    transition: all 0.8s ease;
-    color: #444;
+    transition: all 0.2s;
+    color: #334155;
 }
 
 .googleBtn:hover {
-    background-color: #046e29;
-    border-color: #fff3f3;
-    color: white;
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
 .googleIcon {
-    width: 25px;
-    height: 25px;
-    justify-content: center;
-    align-items: center;
-
+    width: 22px;
+    height: 22px;
 }
 
-
-
-/* Mobile screens (<= 480px) */
 @media (max-width: 480px) {
-    .pageBackground {
-        padding: 1.5rem 0.8rem;
-    }
-
-    .container {
-        padding: 1.8rem 1rem;
-        max-width: 100%;
-        border-radius: 10px;
-    }
-
-    .title {
-        font-size: 1.4rem;
-    }
-
-    .subtitle {
-        font-size: 0.85rem;
-    }
-
-    .formGroup label {
-        font-size: 0.9rem;
-    }
-
-    .form input {
-        font-size: 0.9rem;
-        padding: 0.75rem 0.9rem;
-    }
-
-    .submitBtn {
-        font-size: 0.9rem;
-        padding: 0.8rem;
-    }
-
-    .googleBtn {
-        font-size: 0.9rem;
-        padding: 0.75rem;
-    }
-
-    .googleIcon {
-        width: 18px;
-        height: 18px;
-    }
+    .pageBackground { padding: 1.5rem 0.8rem; }
+    .container { padding: 32px 24px; max-width: 100%; border-radius: 16px; }
+    .title { font-size: 1.4rem; }
 }
