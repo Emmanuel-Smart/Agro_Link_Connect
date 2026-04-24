@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import styles from "./Dashboard.module.css";
 import Link from "next/link";
+import Footer from "../Footer/Footer";
 
 export default function Dashboard() {
     const { user } = useAuth();
@@ -118,30 +119,7 @@ export default function Dashboard() {
                 </div>
             </section>
 
-            {/* FOOTER */}
-            <footer className={styles.footer}>
-                <div className={styles.footerGrid}>
-                    <div className={styles.footerBrand}>
-                        <h3>AgroLink</h3>
-                        <p>Empowering African agriculture through digital transparency.</p>
-                    </div>
-                    <div className={styles.footerLinks}>
-                        <h4>Marketplace</h4>
-                        <Link href="/home">Discovery Feed</Link>
-                        <Link href="/register">Become a Provider</Link>
-                        <Link href="/login">Farmer Login</Link>
-                    </div>
-                    <div className={styles.footerLinks}>
-                        <h4>Platform</h4>
-                        <Link href="/About">About Us</Link>
-                        <Link href="/Community">Community</Link>
-                        <Link href="/Tools">Pro Tools</Link>
-                    </div>
-                </div>
-                <div className={styles.footerBottom}>
-                    <p>© 2026 AgroLink Connect. All rights reserved.</p>
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 }

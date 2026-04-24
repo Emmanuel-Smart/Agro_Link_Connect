@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import styles from "./Home.module.css";
 import Link from "next/link";
+import Footer from "../../components/Footer/Footer";
 
 const formatTimeAgo = (dateString: string) => {
     if (!dateString) return "Recently";
@@ -333,6 +334,7 @@ export default function HomePage() {
                     )}
                 </section>
             </div>
+            <Footer />
         </main>
     );
 }
