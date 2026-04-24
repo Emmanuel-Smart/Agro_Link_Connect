@@ -241,18 +241,41 @@ export default function AddProductPage() {
 
                 <form className={styles.form} onSubmit={handleSubmit}>
                     {/* 2. HYBRID CROP LOGIC */}
-                    <input name="crop" placeholder="Type crop (e.g Maize)" value={form.crop} onChange={handleChange} required />
+                    <div className={styles.formGroup}>
+                        <label>Crop Name</label>
+                        <input 
+                            name="crop" 
+                            type="text"
+                            placeholder="Type crop name (e.g. Maize, Beans...)" 
+                            value={form.crop} 
+                            onChange={handleChange} 
+                            required 
+                        />
+                    </div>
+                    
+                    {manualMode && form.crop && (
+                        <div className={styles.customCropHint}>
+                            ✨ <strong>Custom Crop Detected:</strong> You are adding a crop not currently in our catalog. Please specify its category below.
+                        </div>
+                    )}
+
+                    <div className={styles.formGroup}>
+                        <label>Crop Category</label>
+                        <select name="category" value={form.category} onChange={handleChange} required>
+                            <option value="">Select Category</option>
+                            <option>Cereals</option>
+                            <option>Tubers</option>
+                            <option>Vegetables</option>
+                            <option>Fruits</option>
+                            <option>Livestock</option>
+                            <option>Cash Crops</option>
+                            <option>Others</option>
+                        </select>
+                    </div>
 
                     {/* MANUAL FIELDS */}
                     {manualMode && (
                         <div className={styles.manualFields}>
-                            <select name="category" onChange={handleChange} required>
-                                <option value="">Select Category</option>
-                                <option>Cereals</option>
-                                <option>Tubers</option>
-                                <option>Vegetables</option>
-                                <option>Fruits</option>
-                            </select>
                             <label className={styles.checkboxLabel}>
                                 <input type="checkbox" checked={form.is_perishable} onChange={(e) => setForm({ ...form, is_perishable: e.target.checked })} />
                                 <span>Perishable Crop</span>

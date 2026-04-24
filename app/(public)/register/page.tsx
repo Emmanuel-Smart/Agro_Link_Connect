@@ -42,19 +42,6 @@ export default function RegisterPage() {
         }
     };
 
-    // Google OAuth registration/sign-in
-    const handleGoogleSignIn = async () => {
-        try {
-            const { data, error } = await supabase.auth.signInWithOAuth({
-                provider: "google",
-            });
-            if (error) throw error;
-            console.log("Redirecting to Google OAuth...");
-        } catch (error: any) {
-            alert(error.message);
-        }
-    };
-
 
     return (
         <div className={styles.pageBackground}>
@@ -108,19 +95,6 @@ export default function RegisterPage() {
                         Register
                     </button>
                 </form>
-
-                <div className={styles.divider}>
-                    <span>OR</span>
-                </div>
-
-                <button onClick={handleGoogleSignIn} className={styles.googleBtn}>
-                    <img
-                        src="/google-icon.svg"
-                        alt="Google"
-                        className={styles.googleIcon}
-                    />
-                    Sign in with Google
-                </button>
             </div>
         </div>
     );

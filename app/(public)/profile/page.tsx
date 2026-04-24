@@ -290,6 +290,7 @@ export default function ProfilePage() {
                                         <option>Vegetables</option>
                                         <option>Fruits</option>
                                         <option>Cash Crops</option>
+                                        <option>Others</option>
                                     </select>
                                 </div>
                             </div>

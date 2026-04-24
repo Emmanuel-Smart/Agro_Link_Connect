@@ -40,53 +40,126 @@ export default function HomePage() {
     const [alerts, setAlerts] = useState<any[]>([]);
     const [marketPulse, setMarketPulse] = useState<Record<string, {min: number, avg: number, max: number}>>({});
     const [loading, setLoading] = useState(true);
+    const [initialLoading, setInitialLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+
+    // Filter & Search State
+    const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+    const [category, setCategory] = useState("");
+    const [location, setLocation] = useState("");
+    const [allLocations, setAllLocations] = useState<string[]>([]);
+    
+    // Pagination
+    const [page, setPage] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
+    const PAGE_SIZE = 12;
 
     useEffect(() => {
-        const fetchInitialData = async () => {
-            let userLocation = null;
+        const fetchMetadata = async () => {
+            // Fetch unique locations for the filter
+            const { data } = await supabase.from("products").select("location");
+            if (data) {
+                const unique = Array.from(new Set(data.map(i => i.location))).filter(Boolean) as string[];
+                setAllLocations(unique.sort());
+            }
+
             if (user) {
                 const { data: profileData } = await supabase.from("profiles").select("*").eq("id", user.id).single();
                 if (profileData) {
                     setProfile(profileData);
-                    userLocation = profileData.location;
+                    // Fetch local alerts
+                    const { data: alertData } = await supabase.from("alerts").select("*").eq("location", profileData.location).order("created_at", { ascending: false });
+                    if (alertData) setAlerts(alertData);
                 }
             }
-
-            const { data: productData } = await supabase
-                .from("products")
-                .select("*, profiles(whatsapp, phone)")
-                .order("created_at", { ascending: false });
-                
-            if (productData) {
-                setProducts(productData);
-                
-                // Calculate Market Pulse dynamically
-                const pulse: Record<string, {min: number, avg: number, max: number}> = {};
-                productData.forEach(p => {
-                    const key = `${p.crop}_${p.location}_${p.unit}`;
-                    const similar = productData.filter(x => x.crop === p.crop && x.location === p.location && x.unit === p.unit);
-                    const prices = similar.map(x => Number(x.price));
-                    pulse[key] = {
-                        min: Math.min(...prices),
-                        avg: prices.reduce((a, b) => a + b, 0) / prices.length,
-                        max: Math.max(...prices)
-                    };
-                });
-                setMarketPulse(pulse);
-            }
-
-            if (userLocation) {
-                const { data: alertData } = await supabase.from("alerts").select("*").eq("location", userLocation).order("created_at", { ascending: false });
-                if (alertData) setAlerts(alertData);
-            }
-
-            setLoading(false);
+            setInitialLoading(false);
         };
-
-        fetchInitialData();
+        fetchMetadata();
     }, [user]);
 
-    if (loading) return <div className={styles.loading}>Loading Regional Marketplace...</div>;
+    // Debounce Search Logic
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearch(searchQuery);
+        }, 500);
+        return () => clearTimeout(handler);
+    }, [searchQuery]);
+
+    useEffect(() => {
+        fetchProducts(true);
+    }, [debouncedSearch, category, location]);
+
+    const fetchProducts = async (reset = false) => {
+        if (reset) {
+            setLoading(true);
+            setPage(0);
+        } else {
+            setLoadingMore(true);
+        }
+
+        const start = reset ? 0 : (page + 1) * PAGE_SIZE;
+        const end = start + PAGE_SIZE - 1;
+
+        let query = supabase
+            .from("products")
+            .select("*, profiles(whatsapp, phone)", { count: 'exact' })
+            .order("created_at", { ascending: false })
+            .range(start, end);
+
+        if (category) query = query.eq("category", category);
+        if (location) query = query.eq("location", location);
+        if (debouncedSearch) query = query.ilike("crop", `%${debouncedSearch}%`);
+
+        const { data, count, error } = await query;
+
+        if (error) {
+            console.error(error);
+        } else if (data) {
+            if (reset) {
+                setProducts(data);
+            } else {
+                setProducts([...products, ...data]);
+                setPage(page + 1);
+            }
+            setHasMore(count ? (reset ? data.length : products.length + data.length) < count : false);
+
+            // Update Market Pulse based on full system (or at least current batch)
+            const pulse: Record<string, {min: number, avg: number, max: number}> = { ...marketPulse };
+            data.forEach(p => {
+                const key = `${p.crop}_${p.location}_${p.unit}`;
+                const similar = data.filter(x => x.crop === p.crop && x.location === p.location && x.unit === p.unit);
+                const prices = similar.map(x => Number(x.price));
+                pulse[key] = {
+                    min: Math.min(...prices),
+                    avg: prices.reduce((a, b) => a + b, 0) / prices.length,
+                    max: Math.max(...prices)
+                };
+            });
+            setMarketPulse(pulse);
+        }
+
+        setLoading(false);
+        setLoadingMore(false);
+    };
+
+    const handleDemandCapture = async () => {
+        if (!debouncedSearch) return;
+        const { error } = await supabase.from("demand_signals").insert([{
+            user_id: user?.id,
+            crop: debouncedSearch,
+            location: location || profile?.location || "Unknown",
+            created_at: new Date().toISOString()
+        }]);
+        
+        if (!error) {
+            alert(`Signal captured! We will notify you when ${debouncedSearch} becomes available in ${location || profile?.location || "your area"}.`);
+        } else {
+            alert("Error saving interest. Please try again.");
+        }
+    };
+
+    if (initialLoading) return <div className={styles.loading}>Loading Regional Marketplace...</div>;
 
     return (
         <main className={styles.container}>
@@ -98,11 +171,42 @@ export default function HomePage() {
                 </div>
             </section>
 
+            <section className={styles.discoveryBar}>
+                <div className={styles.searchGroup}>
+                    <span className={styles.searchIcon}>🔍</span>
+                    <input 
+                        type="text" 
+                        placeholder="Search crops, farmers, or keywords..." 
+                        className={styles.searchInput}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+                <div className={styles.filterGroup}>
+                    <select className={styles.filterSelect} value={category} onChange={(e) => setCategory(e.target.value)}>
+                        <option value="">All Categories</option>
+                        <option>Tubers</option>
+                        <option>Cereals</option>
+                        <option>Vegetables</option>
+                        <option>Fruits</option>
+                        <option>Livestock</option>
+                        <option>Cash Crops</option>
+                        <option>Others</option>
+                    </select>
+                    <select className={styles.filterSelect} value={location} onChange={(e) => setLocation(e.target.value)}>
+                        <option value="">All Regions</option>
+                        {allLocations.map(loc => (
+                            <option key={loc} value={loc}>{loc}</option>
+                        ))}
+                    </select>
+                </div>
+            </section>
+
             <div className={styles.contentWrapper}>
                 {/* Phase 4: Geofenced Hub */}
-                {alerts.length > 0 && (
+                {alerts.length > 0 && !searchQuery && !category && !location && (
                     <section className={styles.broadcastHub}>
-                        <h2 className={styles.sectionTitle}>📡 Official Bulletin ({profile.location})</h2>
+                        <h2 className={styles.sectionTitle}>📡 Official Bulletin ({profile?.location})</h2>
                         <div className={styles.alertGrid}>
                             {alerts.map(alert => (
                                 <div key={alert.id} className={styles.alertCard}>
@@ -115,7 +219,10 @@ export default function HomePage() {
                 )}
 
                 <section className={styles.marketplace}>
-                    <h2 className={styles.sectionTitle}>Live Listings</h2>
+                    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px'}}>
+                        <h2 className={styles.sectionTitle} style={{margin: 0}}>Live Listings</h2>
+                        {loading && !initialLoading && <span style={{fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600}}>Updating results...</span>}
+                    </div>
                     
                     <div className={styles.grid}>
                         {products.map(item => {
@@ -188,7 +295,32 @@ export default function HomePage() {
                                 </div>
                             );
                         })}
+
+                        {products.length === 0 && !loading && (
+                            <div className={styles.emptyState}>
+                                <span className={styles.emptyIcon}>🚜</span>
+                                <h3>No matching crops found</h3>
+                                <p>We couldn't find any results for "{debouncedSearch}" in this region.</p>
+                                {debouncedSearch && (
+                                    <button className={styles.demandBtn} onClick={handleDemandCapture}>
+                                        Notify me when "{debouncedSearch}" is available
+                                    </button>
+                                )}
+                            </div>
+                        )}
                     </div>
+
+                    {hasMore && (
+                        <div className={styles.loadMoreContainer}>
+                            <button 
+                                className={styles.btnLoadMore} 
+                                onClick={() => fetchProducts(false)}
+                                disabled={loadingMore}
+                            >
+                                {loadingMore ? "Loading..." : "View More Listings"}
+                            </button>
+                        </div>
+                    )}
                 </section>
             </div>
         </main>

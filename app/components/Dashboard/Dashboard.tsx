@@ -1,108 +1,147 @@
 "use client";
 
-import styles from "./Dashboard.module.css";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
-// import Nav from "@/app/components/Nav";
+import styles from "./Dashboard.module.css";
+import Link from "next/link";
 
 export default function Dashboard() {
+    const { user } = useAuth();
     const router = useRouter();
+    const [products, setProducts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    // Sample crop data
-    const crops = [
-        // { name: "Cocoa", price: "$2000/ton", region: "North" },
-        // { name: "Cotton", price: "$1500/ton", region: "East" },
-        // { name: "Rubber", price: "$1800/ton", region: "South" },
-        // { name: "Maize", price: "$1200/ton", region: "West" },
-        // { name: "Wheat", price: "$1100/ton", region: "Central" },
-        // { name: "Coffee", price: "$2500/ton", region: "North-East" },
-        // { name: "Rice", price: "$1400/ton", region: "South-West" },
-        // { name: "Soybeans", price: "$1300/ton", region: "North-West" },
-        // { name: "Banana", price: "$900/ton", region: "Central-East" },
-        // { name: "Palm Oil", price: "$1700/ton", region: "South-East" },
-    ];
+    useEffect(() => {
+        const fetchLatestProducts = async () => {
+            const { data } = await supabase
+                .from("products")
+                .select("*, profiles(whatsapp, phone)")
+                .order("created_at", { ascending: false })
+                .limit(25);
+            
+            if (data) setProducts(data);
+            setLoading(false);
+        };
+        fetchLatestProducts();
+    }, []);
 
-    const weather = [
-        // { region: "North", temp: "28°C", condition: "Sunny" },
-        // { region: "East", temp: "26°C", condition: "Rainy" },
-        // { region: "South", temp: "30°C", condition: "Sunny" },
-        // { region: "West", temp: "27°C", condition: "Cloudy" },
-    ];
+    const handleContactGuard = (e: React.MouseEvent) => {
+        if (!user) {
+            e.preventDefault();
+            alert("🔒 Access Restricted: Please Sign Up or Login to contact farmers and view full market details.");
+            router.push("/register");
+        }
+    };
 
     return (
-        <>
-            <main className={styles.container}>
-                {/* HERO SECTION */}
-                <section className={styles.hero}>
-                    <div className={styles.heroContent}>
-                        <h1>Welcome to AgroLink 🌾</h1>
-                        <p>Connecting Farmers, Buyers, and Logistics Partners Directly.</p>
-                        <div className={styles.buttonGroup}>
-                            <button
-                                className={styles.registerBtn}
-                                onClick={() => router.push("/register")}
-                            >
-                                Register
-                            </button>
-                            <button
-                                className={styles.loginBtn}
-                                onClick={() => router.push("/login")}
-                            >
-                                Login
-                            </button>
-                        </div>
+        <div className={styles.landingContainer}>
+            {/* HERO SECTION */}
+            <section className={styles.hero}>
+                <div className={styles.heroOverlay}></div>
+                <div className={styles.heroContent}>
+                    <span className={styles.badge}>#1 Agricultural Network</span>
+                    <h1>The Future of Bamenda</h1>
+                    <p>Agro-Link Intelligence. Direct from the farm to your warehouse. Eliminate middlemen, reduce waste, and increase profits.</p>
+                    <div className={styles.ctaGroup}>
+                        <Link href="/register" className={styles.btnPrimary}>Start Trading Now</Link>
+                        <Link href="/About" className={styles.btnSecondary}>Learn How It Works</Link>
                     </div>
-                </section>
+                    <div className={styles.trustSignals}>
+                        <span>✅ Verified Producers</span>
+                        <span>🚛 Logistics Tracking</span>
+                        <span>📊 Live Market Rates</span>
+                    </div>
+                </div>
+            </section>
 
-                {/* CROPS SECTION */}
-                {/* <section className={styles.cropsSection}>
-                    <h2>Crop Rates Across 10 Regions</h2>
-                    <div className={styles.cropsGrid}>
-                        {crops.map((crop, idx) => (
-                            <div key={idx} className={styles.cropCard}>
-                                <h3>{crop.name}</h3>
-                                <p>Region: {crop.region}</p>
-                                <p>Price: {crop.price}</p>
+            {/* LIVE MARKET PREVIEW */}
+            <section className={styles.previewSection}>
+                <div className={styles.sectionHeader}>
+                    <div>
+                        <h2>Live Market Preview</h2>
+                        <p>Real-time listings from local farmers across the region.</p>
+                    </div>
+                    <Link href="/home" className={styles.viewAll}>View Full Marketplace →</Link>
+                </div>
+
+                {loading ? (
+                    <div className={styles.loading}>Scanning market floor...</div>
+                ) : (
+                    <div className={styles.grid}>
+                        {products.map((item) => (
+                            <div key={item.id} className={styles.card}>
+                                {item.image_url && (
+                                    <div className={styles.imageBox}>
+                                        <img src={item.image_url} alt={item.crop} />
+                                    </div>
+                                )}
+                                <div className={styles.cardBody}>
+                                    <div className={styles.cardTags}>
+                                        <span className={styles.tag}>{item.category}</span>
+                                        <span className={styles.location}>📍 {item.location}</span>
+                                    </div>
+                                    <h3>{item.crop}</h3>
+                                    <div className={styles.price}>
+                                        <strong>{Number(item.price).toLocaleString()} FCFA</strong> / {item.unit}
+                                    </div>
+                                    <div className={styles.actions}>
+                                        <button onClick={handleContactGuard} className={styles.btnAction}>💬 WhatsApp</button>
+                                        <button onClick={handleContactGuard} className={styles.btnActionSecondary}>📞 Call Farmer</button>
+                                    </div>
+                                </div>
                             </div>
                         ))}
                     </div>
-                </section> */}
+                )}
+            </section>
 
-                {/* WEATHER SECTION */}
-                {/* <section className={styles.weatherSection}>
-                    <h2>Weather Updates</h2>
-                    <div className={styles.weatherGrid}>
-                        {weather.map((w, idx) => (
-                            <div key={idx} className={styles.weatherCard}>
-                                <h3>{w.region}</h3>
-                                <p>Temperature: {w.temp}</p>
-                                <p>Condition: {w.condition}</p>
-                            </div>
-                        ))}
+            {/* WHY AGROLINK */}
+            <section className={styles.features}>
+                <div className={styles.featureGrid}>
+                    <div className={styles.featureCard}>
+                        <div className={styles.icon}>🌾</div>
+                        <h3>For Farmers</h3>
+                        <p>Set your own prices and reach thousands of buyers instantly via SMS and Web.</p>
                     </div>
-                </section> */}
+                    <div className={styles.featureCard}>
+                        <div className={styles.icon}>💰</div>
+                        <h3>For Buyers</h3>
+                        <p>Access transparent market rates and purchase directly from the source.</p>
+                    </div>
+                    <div className={styles.featureCard}>
+                        <div className={styles.icon}>📦</div>
+                        <h3>For Logistics</h3>
+                        <p>Partner with producers to transport crops and minimize post-harvest loss.</p>
+                    </div>
+                </div>
+            </section>
 
-                {/* COMMUNITY SECTION */}
-                {/* <section className={styles.communitySection}>
-                    <h2>Farmers, Buyers & Logistics</h2>
-                    <div className={styles.communityGrid}>
-                        <div className={styles.communityCard}>
-                            <h3>Farmers</h3>
-                            <p>Connect with local farmers and share best practices.</p>
-                            <button>Explore Farmers</button>
-                        </div>
-                        <div className={styles.communityCard}>
-                            <h3>Buyers</h3>
-                            <p>Find trusted buyers and manage orders efficiently.</p>
-                            <button>Explore Buyers</button>
-                        </div>
-                        <div className={styles.communityCard}>
-                            <h3>Logistics</h3>
-                            <p>Access transportation and storage solutions for your crops.</p>
-                            <button>Explore Logistics</button>
-                        </div>
+            {/* FOOTER */}
+            <footer className={styles.footer}>
+                <div className={styles.footerGrid}>
+                    <div className={styles.footerBrand}>
+                        <h3>AgroLink</h3>
+                        <p>Empowering African agriculture through digital transparency.</p>
                     </div>
-                </section> */}
-            </main>
-        </>
+                    <div className={styles.footerLinks}>
+                        <h4>Marketplace</h4>
+                        <Link href="/home">Discovery Feed</Link>
+                        <Link href="/register">Become a Provider</Link>
+                        <Link href="/login">Farmer Login</Link>
+                    </div>
+                    <div className={styles.footerLinks}>
+                        <h4>Platform</h4>
+                        <Link href="/About">About Us</Link>
+                        <Link href="/Community">Community</Link>
+                        <Link href="/Tools">Pro Tools</Link>
+                    </div>
+                </div>
+                <div className={styles.footerBottom}>
+                    <p>© 2026 AgroLink Connect. All rights reserved.</p>
+                </div>
+            </footer>
+        </div>
     );
 }

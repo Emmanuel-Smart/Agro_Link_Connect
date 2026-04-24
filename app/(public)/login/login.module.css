@@ -80,6 +80,20 @@
     box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
 }
 
+.forgotLink {
+    align-self: flex-end;
+    font-size: 0.82rem;
+    color: #64748b;
+    font-weight: 600;
+    text-decoration: none;
+    margin-top: -4px;
+    transition: color 0.2s;
+}
+
+.forgotLink:hover {
+    color: #16a34a;
+}
+
 .submitBtn {
     background: linear-gradient(135deg, #15803d, #16a34a);
     color: white;

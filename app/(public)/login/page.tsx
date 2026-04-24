@@ -4,6 +4,7 @@ import { useState } from "react";
 import styles from "./login.module.css";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import Link from "next/link";
 
 
 
@@ -40,19 +41,7 @@ export default function LoginPage() {
     };
 
 
-    const handleGoogleSignIn = async () => {
-        try {
-            const { data, error } = await supabase.auth.signInWithOAuth({
-                provider: "google",
-            });
-            if (error) throw error;
 
-            // The user will be redirected to Supabase's OAuth callback URL
-            // After callback, you can also redirect them to dashboard if needed
-        } catch (error: any) {
-            alert(error.message);
-        }
-    };
 
 
     return (
@@ -88,6 +77,7 @@ export default function LoginPage() {
                             onChange={handleChange}
                             required
                         />
+                        <Link href="/forgot-password" className={styles.forgotLink}>Forgot Password?</Link>
                     </div>
 
                     <button type="submit" className={styles.submitBtn}>
@@ -95,18 +85,7 @@ export default function LoginPage() {
                     </button>
                 </form>
 
-                <div className={styles.divider}>
-                    <span>OR</span>
-                </div>
 
-                <button onClick={handleGoogleSignIn} className={styles.googleBtn}>
-                    <img
-                        src="/google-icon.svg"
-                        alt="Google"
-                        className={styles.googleIcon}
-                    />
-                    Sign in with Google
-                </button>
             </div>
         </div>
     );
