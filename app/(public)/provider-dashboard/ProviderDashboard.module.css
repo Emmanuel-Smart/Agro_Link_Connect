@@ -65,6 +65,22 @@
     outline: none; border-color: #3b82f6;
 }
 
+.locationInputGroup {
+    display: flex; gap: 10px;
+}
+
+.locationInputGroup input {
+    flex: 1;
+}
+
+.btnSmall {
+    background: #334155; color: white; padding: 0 16px;
+    border-radius: 8px; font-weight: 600; border: none; cursor: pointer;
+    transition: background 0.2s; font-size: 0.8rem;
+}
+
+.btnSmall:hover { background: #475569; }
+
 .btnSubmit {
     background: #3b82f6; color: white; padding: 12px 24px;
     border-radius: 8px; font-weight: 700; border: none; cursor: pointer;
@@ -105,6 +121,59 @@
 
 .alertCard p {
     color: #cbd5e1; margin: 0; line-height: 1.5; font-size: 1rem;
+}
+
+.alertMainInfo {
+    display: flex; align-items: center; gap: 10px;
+}
+
+.targetBadge {
+    font-size: 0.8rem; color: #3b82f6; font-weight: 700;
+}
+
+.alertActions {
+    display: flex; justify-content: flex-end; gap: 10px;
+    margin-top: 15px; padding-top: 15px; border-top: 1px solid #334155;
+}
+
+.btnEdit, .btnDelete {
+    padding: 6px 12px; border-radius: 6px; font-size: 0.8rem;
+    font-weight: 700; cursor: pointer; border: none; transition: 0.2s;
+}
+
+.btnEdit { background: #334155; color: #f8fafc; }
+.btnEdit:hover { background: #475569; }
+
+.btnDelete { background: #450a0a; color: #fca5a5; }
+.btnDelete:hover { background: #7f1d1d; }
+
+/* --- Modal --- */
+.modalOverlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8); display: flex; justify-content: center;
+    align-items: center; z-index: 1000; padding: 20px;
+}
+
+.modalContent {
+    background: #1e293b; border: 1px solid #334155;
+    border-radius: 16px; padding: 30px; width: 100%; max-width: 500px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+.modalContent h2 { margin-top: 0; margin-bottom: 20px; }
+
+.modalActions {
+    display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px;
+}
+
+.btnCancel {
+    background: transparent; color: #94a3b8; border: none;
+    font-weight: 700; cursor: pointer;
+}
+
+.btnSave {
+    background: #3b82f6; color: white; padding: 10px 20px;
+    border-radius: 8px; font-weight: 700; border: none; cursor: pointer;
 }
 
 .emptyState {
