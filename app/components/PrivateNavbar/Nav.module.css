@@ -24,6 +24,12 @@
     margin: 0;
 }
 
+.navRight {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
 .menu {
     display: flex;
     list-style: none;
@@ -64,6 +70,28 @@
 .logoutButton:hover {
     background: rgba(255,255,255,0.2);
     border-color: rgba(255,255,255,0.4);
+}
+
+.navBadge {
+    background: #ef4444;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 99px;
+    margin-left: 4px;
+    vertical-align: middle;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
 }
 
 .linkButton {
@@ -110,33 +138,51 @@
     transform: rotate(-45deg) translate(5px, -5px);
 }
 
+.toastContainer {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 90%;
+    max-width: 600px;
+    background: #064e3b;
+    color: white;
+    padding: 16px 24px;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.2);
+    cursor: pointer;
+    animation: slideDown 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.toastContent {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.toastBadge {
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: #34d399;
+    letter-spacing: 1px;
+}
+
+.toastContent p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    font-weight: 600;
+}
+
+@keyframes slideDown {
+    from { top: -100px; opacity: 0; }
+    to { top: 20px; opacity: 1; }
+}
+
 @media screen and (max-width: 768px) {
     .navbar { padding: 0 20px; }
     .hamburger { display: flex; }
-
-    .menu {
-        position: absolute;
-        top: 60px;
-        left: -100%;
-        flex-direction: column;
-        width: 100%;
-        background: #14532d;
-        transition: left 0.3s;
-        padding: 12px 0;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-        gap: 0;
-    }
-
-    .menu.menuActive { left: 0; }
-
-    .menu li {
-        text-align: center;
-        padding: 0;
-    }
-
-    .menu li a, .linkButton {
-        display: block;
-        padding: 14px 20px;
-        border-radius: 0;
-    }
+    .toastContainer { width: 95%; top: 10px; }
 }

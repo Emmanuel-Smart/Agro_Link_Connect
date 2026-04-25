@@ -27,11 +27,12 @@ export default function ProviderDashboardPage() {
     const [type, setType] = useState("[WEATHER WARNING]");
     const [targetLocation, setTargetLocation] = useState("");
     const [message, setMessage] = useState("");
+    const [expiryDate, setExpiryDate] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Edit state
     const [editingAlert, setEditingAlert] = useState<any>(null);
-    const [editForm, setEditForm] = useState({ type: "", message: "", location: "" });
+    const [editForm, setEditForm] = useState({ type: "", message: "", location: "", expires_at: "" });
 
     useEffect(() => {
         if (!user) {
@@ -46,7 +47,9 @@ export default function ProviderDashboardPage() {
                 .eq("id", user.id)
                 .single();
 
-            if (!profileData?.is_approved_provider) {
+            const isAdmin = user.email?.toLowerCase().trim() === "nsamiemmanuelkongnyu@gmail.com";
+
+            if (!profileData?.is_approved_provider && !isAdmin) {
                 alert("Unauthorized. Only Approved Providers can access this dashboard.");
                 router.push("/profile");
                 return;
@@ -78,6 +81,7 @@ export default function ProviderDashboardPage() {
             location: targetLocation,
             type: type,
             message: message,
+            expires_at: expiryDate || null,
             created_at: new Date().toISOString()
         };
 
@@ -89,9 +93,35 @@ export default function ProviderDashboardPage() {
         if (error) {
             alert("Error broadcasting alert.");
         } else if (data) {
+            /* ================= 8. INTELLIGENCE ENGINE: OFFICIAL BROADCAST ================= */
+            try {
+                // Find all users in the target location
+                const { data: localUsers } = await supabase
+                    .from("profiles")
+                    .select("id")
+                    .eq("location", targetLocation);
+
+                if (localUsers && localUsers.length > 0) {
+                    const alertId = data[0].id;
+                    const notificationPayloads = localUsers.map(u => ({
+                        user_id: u.id,
+                        title: `📢 Official: ${type}`,
+                        message: message.substring(0, 100) + (message.length > 100 ? "..." : ""),
+                        link: `/news?id=${alertId}`,
+                        type: "report"
+                    }));
+
+                    await supabase.from("notifications").insert(notificationPayloads);
+                    console.log(`[Intelligence] Notified ${localUsers.length} users about official report.`);
+                }
+            } catch (notifyError) {
+                console.error("Report Notification Error:", notifyError);
+            }
+            /* ============================================================================== */
+
             setAlerts([data[0], ...alerts]);
             setMessage("");
-            alert("Bulletin Broadcasted to " + profile.location + "!");
+            alert("Bulletin Broadcasted to " + targetLocation + "!");
         }
         
         setIsSubmitting(false);
@@ -110,18 +140,44 @@ export default function ProviderDashboardPage() {
 
     const openEdit = (alert: any) => {
         setEditingAlert(alert);
-        setEditForm({ type: alert.type, message: alert.message, location: alert.location });
+        setEditForm({ 
+            type: alert.type, 
+            message: alert.message, 
+            location: alert.location,
+            expires_at: alert.expires_at ? new Date(alert.expires_at).toISOString().slice(0, 16) : ""
+        });
     };
 
     const handleUpdate = async (e: FormEvent) => {
         e.preventDefault();
         const { error } = await supabase
             .from("alerts")
-            .update({ type: editForm.type, message: editForm.message, location: editForm.location })
+            .update({ 
+                type: editForm.type, 
+                message: editForm.message, 
+                location: editForm.location,
+                expires_at: editForm.expires_at || null 
+            })
             .eq("id", editingAlert.id);
 
         if (!error) {
             setAlerts(alerts.map(a => a.id === editingAlert.id ? { ...a, ...editForm } : a));
+            
+            // --- SYNC NOTIFICATIONS (RE-NOTIFY USERS) ---
+            try {
+                await supabase
+                    .from("notifications")
+                    .update({ 
+                        message: `(UPDATED) ${editForm.message.substring(0, 100)}...`,
+                        is_read: false,
+                        created_at: new Date().toISOString()
+                    })
+                    .eq("link", `/news?id=${editingAlert.id}`);
+            } catch (syncError) {
+                console.error("Sync Error:", syncError);
+            }
+            // --------------------------------------------
+
             setEditingAlert(null);
         } else {
             alert("Error updating bulletin.");
@@ -169,6 +225,16 @@ export default function ProviderDashboardPage() {
                                     Reset to My Location
                                 </button>
                             </div>
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label>Alert Expiry (Deadline)</label>
+                            <input 
+                                type="datetime-local" 
+                                value={expiryDate} 
+                                onChange={(e) => setExpiryDate(e.target.value)} 
+                                className={styles.dateInput}
+                            />
+                            <small className={styles.helpText}>Leave empty if the report never expires.</small>
                         </div>
                         <div className={styles.formGroup}>
                             <label>Message Payload</label>
@@ -231,6 +297,10 @@ export default function ProviderDashboardPage() {
                             <div className={styles.formGroup}>
                                 <label>Target Location</label>
                                 <input type="text" value={editForm.location} onChange={(e) => setEditForm({...editForm, location: e.target.value})} required />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label>Expiry (Deadline)</label>
+                                <input type="datetime-local" value={editForm.expires_at} onChange={(e) => setEditForm({...editForm, expires_at: e.target.value})} />
                             </div>
                             <div className={styles.formGroup}>
                                 <label>Message</label>

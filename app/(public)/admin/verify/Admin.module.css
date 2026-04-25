@@ -110,15 +110,38 @@
 .statusActive { color: #22c55e; }
 .statusPending { color: #f59e0b; }
 
+.btnGroup {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
+
 .btn {
+    flex: 2;
+    padding: 12px;
+    border-radius: 12px;
     border: none;
-    padding: 10px 22px;
-    border-radius: 8px;
-    font-weight: 800;
-    font-size: 0.82rem;
-    letter-spacing: 0.02em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btnDelete {
+    flex: 1;
+    background: white;
+    color: #ef4444;
+    border: 2px solid #fee2e2;
+    padding: 10px;
+    border-radius: 12px;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.2s;
+}
+
+.btnDelete:hover {
+    background: #fef2f2;
+    border-color: #fecaca;
+    transform: translateY(-2px);
 }
 
 .btnApprove {

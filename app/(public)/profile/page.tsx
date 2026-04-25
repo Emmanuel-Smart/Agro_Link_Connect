@@ -162,9 +162,16 @@ export default function ProfilePage() {
         const { error } = await supabase.from("profiles").upsert({
             id: user?.id,
             ...formData,
-            updated_at: new Date()
+            updated_at: new Date().toISOString()
         });
-        if (!error) {
+        if (error) {
+            console.error("Profile Upsert Error:", error);
+            if (error.code === '23505') {
+                alert("Conflict: This Phone or WhatsApp number is already linked to another account.");
+            } else {
+                alert("Error updating profile. Please try again.");
+            }
+        } else {
             setProfile(formData);
             setIsInitialized(true);
             setIsEditingProfile(false);

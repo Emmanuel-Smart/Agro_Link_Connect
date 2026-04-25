@@ -55,6 +55,36 @@ export default function AdminVerifyPage() {
         }
     };
 
+    const handleReject = async (id: string) => {
+        if (!confirm("⚠️ REJECT PROVIDER: This will remove their provider status and PERMANENTLY WIPE all their official reports. The user account will remain. Proceed?")) return;
+        
+        // 1. Wipe their official reports
+        const { error: alertError } = await supabase
+            .from("alerts")
+            .delete()
+            .eq("provider_id", id);
+
+        if (alertError) {
+            console.error("Error wiping reports:", alertError);
+        }
+
+        // 2. Remove provider status
+        const { error: profileError } = await supabase
+            .from("profiles")
+            .update({ 
+                is_provider: false, 
+                is_approved_provider: false 
+            })
+            .eq("id", id);
+            
+        if (!profileError) {
+            setProviders(providers.filter(p => p.id !== id));
+            alert("Provider status removed and all reports wiped.");
+        } else {
+            alert("Error updating profile status.");
+        }
+    };
+
     if (loading) return <div className={styles.loading}>Authenticating Admin Gateway...</div>;
 
     return (
@@ -78,12 +108,20 @@ export default function AdminVerifyPage() {
                                 <div className={styles.status}>
                                     Status: {provider.is_approved_provider ? <span className={styles.statusActive}>Verified Source</span> : <span className={styles.statusPending}>Pending Review</span>}
                                 </div>
-                                <button 
-                                    className={`${styles.btn} ${provider.is_approved_provider ? styles.btnRevoke : styles.btnApprove}`}
-                                    onClick={() => handleApprove(provider.id, provider.is_approved_provider)}
-                                >
-                                    {provider.is_approved_provider ? "Revoke Access" : "Approve Provider"}
-                                </button>
+                                <div className={styles.btnGroup}>
+                                    <button 
+                                        className={`${styles.btn} ${provider.is_approved_provider ? styles.btnRevoke : styles.btnApprove}`}
+                                        onClick={() => handleApprove(provider.id, provider.is_approved_provider)}
+                                    >
+                                        {provider.is_approved_provider ? "Revoke Access" : "Approve Provider"}
+                                    </button>
+                                    <button 
+                                        className={styles.btnDelete}
+                                        onClick={() => handleReject(provider.id)}
+                                    >
+                                        🚫 Reject & Wipe
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))}

@@ -61,7 +61,7 @@ export default function AddProductPage() {
     useEffect(() => {
         if (!user) return;
         const fetchProfile = async () => {
-            const { data } = await supabase.from("profiles").select("location").eq("id", user.id).single();
+            const { data } = await supabase.from("profiles").select("location, whatsapp").eq("id", user.id).single();
             setProfile(data);
         };
         fetchProfile();
@@ -199,7 +199,7 @@ export default function AddProductPage() {
             }
         }
 
-        const { error } = await supabase.from("products").insert([
+        const { data: newProduct, error } = await supabase.from("products").insert([
             {
                 user_id: user.id,
                 crop: form.crop,
@@ -215,7 +215,7 @@ export default function AddProductPage() {
                 image_url: imageUrl,
                 created_at: new Date().toISOString(),
             },
-        ]);
+        ]).select();
 
         if (error) {
             setLoading(false);
@@ -224,11 +224,36 @@ export default function AddProductPage() {
             return;
         }
 
-        // Mock: Cross-reference `demand_signals`
-        console.log(`[Demand Signals Engine] Checking demand_signals table for ${form.crop} in ${profile.location}`);
-        console.log(`[Multi-Channel Fan-Out] Dispatching SMS & Web Push to Subscribed & Ghost Buyers in ${profile.location}!`);
+        /* ================= 7. INTELLIGENCE ENGINE: MATCHING ================= */
+        try {
+            // Find buyers interested in this crop + location
+            const { data: matches } = await supabase
+                .from("demand_signals")
+                .select("user_id")
+                .eq("crop", form.crop)
+                .eq("location", profile.location);
+
+            if (matches && matches.length > 0) {
+                const uniqueBuyers = Array.from(new Set(matches.map(m => m.user_id)));
+                const productId = newProduct?.[0]?.id;
+                
+                // Create notifications for each unique buyer
+                const notificationPayloads = uniqueBuyers.map(buyerId => ({
+                    user_id: buyerId,
+                    title: "💎 Fresh Match Found!",
+                    message: `Great news! ${form.quantity} ${form.unit}(s) of ${form.crop} just arrived in ${profile.location}.`,
+                    link: productId ? `/home?highlight=${productId}` : `/home?search=${form.crop}`,
+                    type: "match"
+                }));
+
+                await supabase.from("notifications").insert(notificationPayloads);
+                console.log(`[Intelligence] Notified ${uniqueBuyers.length} buyers about ${form.crop}`);
+            }
+        } catch (matchError) {
+            console.error("Match Engine Error:", matchError);
+        }
         
-        alert(`Listing Published! Sent immediate SMS/Web Push to buyers watching for ${form.crop} in ${profile.location}.`);
+        alert(`Listing Published! We've notified any buyers waiting for ${form.crop} in ${profile.location}.`);
         setLoading(false);
         router.push("/home");
     };

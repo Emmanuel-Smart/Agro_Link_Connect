@@ -35,6 +35,21 @@ const getPerishabilityState = (availableDate: string, isPerishable: boolean) => 
     return { state: 'red', text: `Critical: <1d left` };
 };
 
+const getHarvestCountdown = (availableDate: string) => {
+    if (!availableDate) return null;
+    const target = new Date(availableDate);
+    const now = new Date();
+    const diffMs = target.getTime() - now.getTime();
+    
+    if (diffMs <= 0) return "Ready for Harvest";
+    
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    
+    if (diffDays > 0) return `${diffDays}d ${diffHours}h left`;
+    return `${diffHours}h left`;
+};
+
 export default function HomePage() {
     const router = useRouter();
     const { user } = useAuth();
@@ -56,6 +71,7 @@ export default function HomePage() {
     // Pagination
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
+    const [userSubscriptions, setUserSubscriptions] = useState<Set<string>>(new Set());
     const PAGE_SIZE = 12;
 
     useEffect(() => {
@@ -74,6 +90,13 @@ export default function HomePage() {
                     // Fetch local alerts
                     const { data: alertData } = await supabase.from("alerts").select("*").eq("location", profileData.location).order("created_at", { ascending: false });
                     if (alertData) setAlerts(alertData);
+                }
+
+                // Fetch user subscriptions
+                const { data: subData } = await supabase.from("demand_signals").select("crop, location").eq("user_id", user.id);
+                if (subData) {
+                    const subSet = new Set(subData.map(s => `${s.crop}_${s.location}`));
+                    setUserSubscriptions(subSet);
                 }
             }
             setInitialLoading(false);
@@ -94,6 +117,9 @@ export default function HomePage() {
     }, [debouncedSearch, category, location]);
 
     const fetchProducts = async (reset = false) => {
+        const searchParams = new URLSearchParams(window.location.search);
+        const highlightId = searchParams.get("highlight");
+
         if (reset) {
             setLoading(true);
             setPage(0);
@@ -106,13 +132,17 @@ export default function HomePage() {
 
         let query = supabase
             .from("products")
-            .select("*, profiles(whatsapp, phone)", { count: 'exact' })
-            .order("created_at", { ascending: false })
-            .range(start, end);
+            .select("*, profiles(whatsapp, phone)", { count: 'exact' });
 
-        if (category) query = query.eq("category", category);
-        if (location) query = query.eq("location", location);
-        if (debouncedSearch) query = query.ilike("crop", `%${debouncedSearch}%`);
+        if (highlightId && reset) {
+            // Prioritize the highlighted product
+            query = query.eq("id", highlightId);
+        } else {
+            query = query.order("created_at", { ascending: false }).range(start, end);
+            if (category) query = query.eq("category", category);
+            if (location) query = query.eq("location", location);
+            if (debouncedSearch) query = query.ilike("crop", `%${debouncedSearch}%`);
+        }
 
         const { data, count, error } = await query;
 
@@ -146,19 +176,53 @@ export default function HomePage() {
         setLoadingMore(false);
     };
 
-    const handleDemandCapture = async () => {
-        if (!debouncedSearch) return;
+    const handleDemandCapture = async (cropParam?: string, locationParam?: string, isFutureHarvest = false) => {
+        const cropToSave = cropParam || debouncedSearch;
+        const locationToSave = locationParam || location || profile?.location || "Unknown";
+
+        if (!cropToSave) return;
+
+        // PROFILE CHECK: Must have phone/whatsapp and location for alerts to work
+        if (!profile?.whatsapp || !profile?.location) {
+            alert("🛠️ Profile Incomplete: Please set your WhatsApp number and Location in your Profile first so we know where to send your alerts!");
+            router.push("/profile");
+            return;
+        }
+        
         const { error } = await supabase.from("demand_signals").insert([{
             user_id: user?.id,
-            crop: debouncedSearch,
-            location: location || profile?.location || "Unknown",
+            crop: cropToSave,
+            location: locationToSave,
             created_at: new Date().toISOString()
         }]);
         
         if (!error) {
-            alert(`Signal captured! We will notify you when ${debouncedSearch} becomes available in ${location || profile?.location || "your area"}.`);
+            const msg = isFutureHarvest 
+                ? `Subscription Active! We will notify you on the harvest date and whenever new ${cropToSave} is posted in ${locationToSave}.`
+                : `Signal captured! We will notify you when ${cropToSave} becomes available in ${locationToSave}.`;
+            alert(msg);
+            setUserSubscriptions(prev => new Set(prev).add(`${cropToSave}_${locationToSave}`));
+        } else if (error.code === '23505') {
+            alert(`You're already on the list! We'll alert you when ${cropToSave} arrives in ${locationToSave}.`);
         } else {
             alert("Error saving interest. Please try again.");
+        }
+    };
+
+    const handleUnsubscribe = async (crop: string, location: string) => {
+        if (!user) return;
+        const { error } = await supabase
+            .from("demand_signals")
+            .delete()
+            .eq("user_id", user.id)
+            .eq("crop", crop)
+            .eq("location", location);
+        
+        if (!error) {
+            alert(`Unsubscribed from ${crop} alerts in ${location}.`);
+            const newSubs = new Set(userSubscriptions);
+            newSubs.delete(`${crop}_${location}`);
+            setUserSubscriptions(newSubs);
         }
     };
 
@@ -205,7 +269,7 @@ export default function HomePage() {
                         <option>Others</option>
                     </select>
                     <select className={styles.filterSelect} value={location} onChange={(e) => setLocation(e.target.value)}>
-                        <option value="">All Regions</option>
+                        <option value="">All Locations</option>
                         {allLocations.map(loc => (
                             <option key={loc} value={loc}>{loc}</option>
                         ))}
@@ -251,7 +315,6 @@ export default function HomePage() {
                                     <div className={styles.cardHeader}>
                                         <div className={styles.tags}>
                                             <span className={styles.categoryTag}>{item.category || "Crop"}</span>
-                                            {item.harvest === "future" && <span className={styles.blueprintBadge}>Future Harvest</span>}
                                         </div>
                                         <span className={styles.locationBadge}>📍 {item.location}</span>
                                     </div>
@@ -289,8 +352,14 @@ export default function HomePage() {
                                     </div>
 
                                     {/* Phase 5: Direct P2P Closing */}
-                                    <div className={styles.actions}>
-                                        {item.profiles?.whatsapp ? (
+                                    <div className={styles.actionsContainer}>
+                                        {item.harvest === "future" && (
+                                            <div className={styles.futureHarvestActionsBadge}>
+                                                ⏳ Future Harvest: {getHarvestCountdown(item.available_date)}
+                                            </div>
+                                        )}
+                                        <div className={styles.actions}>
+                                            {item.profiles?.whatsapp ? (
                                             <a onClick={handleContactGuard} href={`https://wa.me/${item.profiles.whatsapp}`} target="_blank" className={styles.btnWhatsapp}>
                                                 💬 WhatsApp
                                             </a>
@@ -303,9 +372,28 @@ export default function HomePage() {
                                             </a>
                                         )}
                                     </div>
+                                        {userSubscriptions.has(`${item.crop}_${item.location}`) ? (
+                                            <button 
+                                                className={styles.btnUnsubscribe} 
+                                                onClick={() => handleUnsubscribe(item.crop, item.location)}
+                                            >
+                                                🔕 Unsubscribe from {item.crop}
+                                            </button>
+                                        ) : (
+                                            <button 
+                                                className={styles.btnFollow} 
+                                                onClick={() => {
+                                                    if (!user) return handleContactGuard(null as any);
+                                                    handleDemandCapture(item.crop, item.location, item.harvest === 'future');
+                                                }}
+                                            >
+                                                🔔 Notify me of future {item.crop} posts
+                                            </button>
+                                        )}
                                 </div>
-                            );
-                        })}
+                            </div>
+                        );
+                    })}
 
                         {products.length === 0 && !loading && (
                             <div className={styles.emptyState}>
@@ -313,7 +401,7 @@ export default function HomePage() {
                                 <h3>No matching crops found</h3>
                                 <p>We couldn't find any results for "{debouncedSearch}" in this region.</p>
                                 {debouncedSearch && (
-                                    <button className={styles.demandBtn} onClick={handleDemandCapture}>
+                                    <button className={styles.demandBtn} onClick={() => handleDemandCapture()}>
                                         Notify me when "{debouncedSearch}" is available
                                     </button>
                                 )}

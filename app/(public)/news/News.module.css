@@ -1,0 +1,154 @@
+.container {
+    min-height: 100vh;
+    background: #f8fafc;
+}
+
+.hero {
+    background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+    padding: 80px 20px;
+    text-align: center;
+    color: white;
+}
+
+.heroContent h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+    letter-spacing: -1px;
+}
+
+.heroContent p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.feed {
+    max-width: 800px;
+    margin: -40px auto 100px;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.reportCard {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    transition: transform 0.2s;
+}
+
+.reportCard:hover {
+    transform: translateY(-4px);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.typeGroup {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.countdownBadge {
+    background: #eff6ff;
+    color: #1d4ed8;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    border: 1px solid #dbeafe;
+}
+
+.expired {
+    background: #f1f5f9;
+    color: #64748b;
+    border-color: #e2e8f0;
+}
+
+.typeBadge {
+    background: #fef2f2;
+    color: #ef4444;
+    padding: 6px 12px;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.locationBadge {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.message {
+    font-size: 1.1rem;
+    color: #1e293b;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.source {
+    color: #059669;
+}
+
+.loading {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #065f46;
+}
+
+.empty {
+    background: white;
+    padding: 60px;
+    border-radius: 24px;
+    text-align: center;
+    border: 2px dashed #e2e8f0;
+}
+
+.empty h3 {
+    font-size: 1.5rem;
+    color: #1e293b;
+    margin-bottom: 12px;
+}
+
+.empty p {
+    color: #64748b;
+}
+
+@media (max-width: 768px) {
+    .hero {
+        padding: 60px 20px;
+    }
+    .heroContent h1 {
+        font-size: 1.8rem;
+    }
+    .reportCard {
+        padding: 20px;
+    }
+}
