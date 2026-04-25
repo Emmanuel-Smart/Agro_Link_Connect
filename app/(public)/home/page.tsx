@@ -55,7 +55,6 @@ export default function HomePage() {
     const { user } = useAuth();
     const [profile, setProfile] = useState<any>(null);
     const [products, setProducts] = useState<any[]>([]);
-    const [alerts, setAlerts] = useState<any[]>([]);
     const [marketPulse, setMarketPulse] = useState<Record<string, {min: number, avg: number, max: number}>>({});
     const [loading, setLoading] = useState(true);
     const [initialLoading, setInitialLoading] = useState(true);
@@ -87,9 +86,6 @@ export default function HomePage() {
                 const { data: profileData } = await supabase.from("profiles").select("*").eq("id", user.id).single();
                 if (profileData) {
                     setProfile(profileData);
-                    // Fetch local alerts
-                    const { data: alertData } = await supabase.from("alerts").select("*").eq("location", profileData.location).order("created_at", { ascending: false });
-                    if (alertData) setAlerts(alertData);
                 }
 
                 // Fetch user subscriptions
@@ -278,21 +274,6 @@ export default function HomePage() {
             </section>
 
             <div className={styles.contentWrapper}>
-                {/* Phase 4: Geofenced Hub */}
-                {alerts.length > 0 && !searchQuery && !category && !location && (
-                    <section className={styles.broadcastHub}>
-                        <h2 className={styles.sectionTitle}>📡 Official Bulletin ({profile?.location})</h2>
-                        <div className={styles.alertGrid}>
-                            {alerts.map(alert => (
-                                <div key={alert.id} className={styles.alertCard}>
-                                    <span className={styles.alertBadge}>{alert.type}</span>
-                                    <p>{alert.message}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-                )}
-
                 <section className={styles.marketplace}>
                     <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px'}}>
                         <h2 className={styles.sectionTitle} style={{margin: 0}}>Live Listings</h2>
