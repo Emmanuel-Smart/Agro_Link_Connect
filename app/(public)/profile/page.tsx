@@ -23,7 +23,6 @@ export default function ProfilePage() {
 
     const [profile, setProfile] = useState<any>(null);
     const [products, setProducts] = useState<any[]>([]);
-    const [alerts, setAlerts] = useState<any[]>([]);
     const [marketPulse, setMarketPulse] = useState<Record<string, {min: number, avg: number, max: number}>>({});
     const [loading, setLoading] = useState(true);
     const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -84,12 +83,6 @@ export default function ProfilePage() {
                     };
                 });
                 setMarketPulse(pulse);
-            }
-
-            // Fetch alerts
-            if (profileData?.location) {
-                const { data: alertData } = await supabase.from("alerts").select("*").eq("location", profileData.location).order("created_at", { ascending: false });
-                if (alertData) setAlerts(alertData);
             }
             
             setLoading(false);
@@ -439,22 +432,6 @@ export default function ProfilePage() {
 
             {/* ---------------- MAIN CONTENT ---------------- */}
             <main className={styles.main}>
-                {alerts.length > 0 && (
-                    <div className={styles.broadcastHub}>
-                        <h3 className={styles.hubTitle}>📡 Official Bulletin ({profile.location})</h3>
-                        {alerts.map(alert => (
-                            <div key={alert.id} className={styles.alertCard}>
-                                <div className={styles.alertHeader}>
-                                    <span className={styles.alertBadge}>{alert.type}</span>
-                                    <span className={styles.spatialBadge}>[{profile.location} Only]</span>
-                                </div>
-                                <p>{alert.message}</p>
-                                <small>Verified Authority • {formatExactDate(alert.created_at)}</small>
-                            </div>
-                        ))}
-                    </div>
-                )}
-
                 <div className={styles.header}>
                     <h1>My Listings</h1>
                     <button className={styles.addBtn} onClick={() => router.push("/add-product")}>+ Add Product</button>

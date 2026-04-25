@@ -96,8 +96,6 @@ export default function PrivateNavbar() {
             <h1 className={styles.logo}>AgroLink</h1>
             
             <div className={styles.navRight}>
-                <NotificationHub />
-                
                 <div
                     className={`${styles.hamburger} ${menuOpen ? styles.active : ""}`}
                     onClick={() => setMenuOpen(!menuOpen)}
@@ -122,6 +120,7 @@ export default function PrivateNavbar() {
                 </li>
                 <li><Link href="/profile">Profile</Link></li>
                 <li><Link href="/about">About Us</Link></li>
+                <li><NotificationHub /></li>
                 {user?.email?.toLowerCase() === "nsamiemmanuelkongnyu@gmail.com" && (
                     <li>
                         <Link href="/admin/verify" style={{ color: "#ef4444", fontWeight: "900" }}>
