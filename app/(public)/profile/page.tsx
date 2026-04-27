@@ -17,6 +17,21 @@ const formatExactDate = (dateString: string) => {
     });
 };
 
+const getCountdown = (targetDate: string) => {
+    if (!targetDate) return null;
+    const target = new Date(targetDate);
+    const now = new Date();
+    const diffMs = target.getTime() - now.getTime();
+    
+    if (diffMs <= 0) return "AVAILABLE NOW";
+    
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    
+    if (diffDays > 0) return `${diffDays}d ${diffHours}h left`;
+    return `${diffHours}h left`;
+};
+
 export default function ProfilePage() {
     const { user } = useAuth();
     const router = useRouter();
@@ -451,7 +466,11 @@ export default function ProfilePage() {
                                 )}
                                 <div className={styles.cardHeader}>
                                     <span className={styles.categoryTag}>{item.category || "Crop"}</span>
-                                    {item.harvest === "future" && <span className={styles.blueprintBadge}>Future Harvest</span>}
+                                    {item.harvest === "future" && (
+                                        <span className={styles.futureCountdown}>
+                                            🚀 READY IN: {getCountdown(item.available_date)}
+                                        </span>
+                                    )}
                                 </div>
                                 
                                 <h3>{item.crop}</h3>

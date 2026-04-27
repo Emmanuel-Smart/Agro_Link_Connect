@@ -16,6 +16,17 @@ export default function NotificationHub() {
         if (!user) return;
 
         const fetchNotifications = async () => {
+            const now = new Date().toISOString();
+            
+            // 1. Fetch active alert IDs
+            const { data: activeAlerts } = await supabase
+                .from("alerts")
+                .select("id")
+                .or(`expires_at.is.null,expires_at.gt.${now}`);
+            
+            const activeAlertIds = new Set(activeAlerts?.map(a => a.id) || []);
+
+            // 2. Fetch notifications
             const { data } = await supabase
                 .from("notifications")
                 .select("*")
@@ -23,8 +34,17 @@ export default function NotificationHub() {
                 .order("created_at", { ascending: false });
             
             if (data) {
-                setNotifications(data);
-                setUnreadCount(data.filter(n => !n.is_read).length);
+                // 3. Filter notifications: if it's a report, it must point to an active alert
+                const filteredData = data.filter(n => {
+                    if (n.type !== 'report') return true;
+                    // Extract ID from link "/news?id=..."
+                    const alertId = n.link.split("id=")[1];
+                    if (!alertId) return true; // fallback if no ID in link
+                    return activeAlertIds.has(alertId);
+                });
+
+                setNotifications(filteredData);
+                setUnreadCount(filteredData.filter(n => !n.is_read).length);
             }
         };
 
@@ -32,10 +52,12 @@ export default function NotificationHub() {
 
         // Subscribe to real-time changes
         const channel = supabase
-            .channel(`public:notifications:user_id=eq.${user.id}`)
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, (payload) => {
-                setNotifications(prev => [payload.new, ...prev]);
-                setUnreadCount(prev => prev + 1);
+            .channel(`public:notifications:hub`)
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, (payload) => {
+                if (payload.new.user_id === user.id) {
+                    setNotifications(prev => [payload.new, ...prev]);
+                    setUnreadCount(prev => prev + 1);
+                }
             })
             .subscribe();
 

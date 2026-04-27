@@ -222,9 +222,9 @@ export default function HomePage() {
         }
     };
 
-    const handleContactGuard = (e: React.MouseEvent) => {
+    const handleContactGuard = (e?: React.MouseEvent) => {
         if (!user) {
-            e.preventDefault();
+            if (e) e.preventDefault();
             alert("🔒 Access Restricted: Please Sign Up or Login to contact farmers and view full market details.");
             router.push("/register");
         }

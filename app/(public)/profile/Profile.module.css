@@ -424,6 +424,24 @@
     border-radius: 5px; font-size: 0.68rem; font-weight: 800;
 }
 
+.futureCountdown {
+    border: 1.5px dashed #4f46e5;
+    background: #eef2ff;
+    color: #4338ca;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
 .card h3 {
     font-size: 1.3rem; font-weight: 800;
     color: var(--slate-900); margin: 10px 20px 0;

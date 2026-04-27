@@ -17,7 +17,7 @@ const formatExactDate = (dateString: string) => {
 };
 
 export default function ProviderDashboardPage() {
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const router = useRouter();
     const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -35,6 +35,7 @@ export default function ProviderDashboardPage() {
     const [editForm, setEditForm] = useState({ type: "", message: "", location: "", expires_at: "" });
 
     useEffect(() => {
+        if (authLoading) return; // Wait for auth to initialize
         if (!user) {
             router.push("/login");
             return;
@@ -73,7 +74,21 @@ export default function ProviderDashboardPage() {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        if (!message.trim()) return;
+        
+        // 1. Check for empty fields
+        if (!message.trim() || !type || !targetLocation.trim() || !expiryDate) {
+            alert("Please fill in all fields, including the Expiry Deadline, before broadcasting.");
+            return;
+        }
+
+        // 2. Validate Expiry Date (must be in the future)
+        const selectedExpiry = new Date(expiryDate);
+        const now = new Date();
+        if (selectedExpiry <= now) {
+            alert("The Expiry Deadline must be a future date and time. Please select a valid date from now.");
+            return;
+        }
+
         setIsSubmitting(true);
 
         const newAlert = {
@@ -112,7 +127,7 @@ export default function ProviderDashboardPage() {
                     }));
 
                     await supabase.from("notifications").insert(notificationPayloads);
-                    console.log(`[Intelligence] Notified ${localUsers.length} users about official report.`);
+                    console.log(`[Intelligence] Notified ${localUsers.length} users. Includes me? ${localUsers.some(u => u.id === user.id)}`);
                 }
             } catch (notifyError) {
                 console.error("Report Notification Error:", notifyError);
@@ -227,17 +242,17 @@ export default function ProviderDashboardPage() {
                             </div>
                         </div>
                         <div className={styles.formGroup}>
-                            <label>Alert Expiry (Deadline)</label>
+                            <label>Alert Expiry (Deadline) *</label>
                             <input 
                                 type="datetime-local" 
                                 value={expiryDate} 
                                 onChange={(e) => setExpiryDate(e.target.value)} 
                                 className={styles.dateInput}
+                                required
                             />
-                            <small className={styles.helpText}>Leave empty if the report never expires.</small>
                         </div>
                         <div className={styles.formGroup}>
-                            <label>Message Payload</label>
+                            <label>Message Payload *</label>
                             <textarea 
                                 rows={4} 
                                 value={message} 

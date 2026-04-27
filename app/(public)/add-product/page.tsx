@@ -247,7 +247,6 @@ export default function AddProductPage() {
                 }));
 
                 await supabase.from("notifications").insert(notificationPayloads);
-                console.log(`[Intelligence] Notified ${uniqueBuyers.length} buyers about ${form.crop}`);
             }
         } catch (matchError) {
             console.error("Match Engine Error:", matchError);

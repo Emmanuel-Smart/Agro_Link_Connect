@@ -13,9 +13,11 @@ export default function OfficialReportsPage() {
 
     useEffect(() => {
         const fetchReports = async () => {
+            const now = new Date().toISOString();
             const { data, error } = await supabase
                 .from("alerts")
                 .select("*")
+                .or(`expires_at.is.null,expires_at.gt.${now}`)
                 .order("created_at", { ascending: false });
 
             if (data) setReports(data);

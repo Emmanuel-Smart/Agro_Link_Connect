@@ -45,17 +45,16 @@ export default function PrivateNavbar() {
         const reportChannel = supabase
             .channel('navbar-reports')
             .on('postgres_changes', { 
-                event: '*', // Listen to INSERT and UPDATE
+                event: '*', 
                 schema: 'public', 
-                table: 'notifications', 
-                filter: `user_id=eq.${user.id}` 
+                table: 'notifications'
             }, (payload) => {
-                if (payload.new.type === 'report') {
-                    // Only pop if it was an insert or an update to unread
+                // Filter in JS for better reliability
+                if (payload.new.user_id === user.id && payload.new.type === 'report') {
                     if (payload.eventType === 'INSERT' || (payload.eventType === 'UPDATE' && payload.new.is_read === false)) {
                         setReportCount(prev => prev + 1);
                         setToast({ message: payload.new.message, type: payload.new.type });
-                        setTimeout(() => setToast(null), 8000); // Hide after 8s
+                        setTimeout(() => setToast(null), 8000);
                     }
                 }
             })
