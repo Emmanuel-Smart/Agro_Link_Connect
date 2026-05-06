@@ -345,14 +345,9 @@ export default function HomePage() {
                                             <a onClick={handleContactGuard} href={`https://wa.me/${item.profiles.whatsapp}`} target="_blank" className={styles.btnWhatsapp}>
                                                 💬 WhatsApp
                                             </a>
-                                        ) : (
-                                            <button disabled className={styles.btnDisabled}>No WhatsApp</button>
-                                        )}
-                                        {item.profiles?.phone && (
-                                            <a onClick={handleContactGuard} href={`tel:${item.profiles.phone}`} className={styles.btnCall}>
-                                                📞 Call
-                                            </a>
-                                        )}
+                                            <Link href={`/product/${item.id}`} className={styles.btnCall}>
+                                                🔍 View Details
+                                            </Link>
                                     </div>
                                         {userSubscriptions.has(`${item.crop}_${item.location}`) ? (
                                             <button 

@@ -189,7 +189,7 @@ export default function Dashboard() {
                                         )}
                                         <div className={styles.actions}>
                                             <button onClick={handleContactGuard} className={styles.btnAction}>💬 WhatsApp</button>
-                                            <button onClick={handleContactGuard} className={styles.btnActionSecondary}>📞 Call Farmer</button>
+                                            <Link href={`/product/${item.id}`} className={styles.btnActionSecondary}>🔍 View Details</Link>
                                         </div>
                                         
                                         {userSubscriptions.has(`${item.crop}_${item.location}`) ? (

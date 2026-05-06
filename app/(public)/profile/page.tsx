@@ -498,11 +498,9 @@ export default function ProfilePage() {
                                     
                                     {/* Direct P2P Actions */}
                                     <div className={styles.productP2PActions}>
+                                        <Link href={`/product/${item.id}`} className={styles.btnWaSmall}>🔍 View Details</Link>
                                         {profile.whatsapp ? (
-                                            <a href={`https://wa.me/${profile.whatsapp}`} target="_blank" className={styles.btnWaSmall}>💬 WA</a>
-                                        ) : null}
-                                        {profile.phone ? (
-                                            <a href={`tel:${profile.phone}`} className={styles.btnCallSmall}>📞 Call</a>
+                                            <a href={`https://wa.me/${profile.whatsapp}`} target="_blank" className={styles.btnCallSmall}>💬 WA</a>
                                         ) : null}
                                     </div>
 
