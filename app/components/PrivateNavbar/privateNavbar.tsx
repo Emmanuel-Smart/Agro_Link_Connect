@@ -117,7 +117,7 @@ export default function PrivateNavbar() {
                     </Link>
                 </li>
                 <li><Link href="/profile">Profile</Link></li>
-                <li><Link href="/about">About Us</Link></li>
+                <li><Link href="/About">About Us</Link></li>
                 <li><NotificationHub /></li>
                 {user?.email?.toLowerCase() === "nsamiemmanuelkongnyu@gmail.com" && (
                     <li>
