@@ -15,6 +15,7 @@ export default function ProductDetailsPage() {
     const [seller, setSeller] = useState<any>(null);
     const [moreProducts, setMoreProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [activeImage, setActiveImage] = useState<string | null>(null);
 
     useEffect(() => {
         if (!id) return;
@@ -36,6 +37,7 @@ export default function ProductDetailsPage() {
             }
 
             setProduct(productData);
+            setActiveImage(productData.image_url);
 
             // 2. Fetch Seller Profile
             const { data: sellerData, error: sellerError } = await supabase
@@ -80,10 +82,24 @@ export default function ProductDetailsPage() {
                 <div className={styles.mainContent}>
                     <div className={styles.imageSection}>
                         <img 
-                            src={product.image_url || "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80"} 
+                            src={activeImage || "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80"} 
                             alt={product.crop} 
                             className={styles.mainImage} 
                         />
+                        
+                        {product.gallery_urls && product.gallery_urls.length > 1 && (
+                            <div className={styles.thumbnailGallery}>
+                                {product.gallery_urls.map((url: string, idx: number) => (
+                                    <div 
+                                        key={idx} 
+                                        className={`${styles.thumbnail} ${activeImage === url ? styles.activeThumbnail : ''}`}
+                                        onClick={() => setActiveImage(url)}
+                                    >
+                                        <img src={url} alt={`View ${idx}`} />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     <div className={styles.productHeader}>

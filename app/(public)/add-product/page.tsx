@@ -48,8 +48,8 @@ export default function AddProductPage() {
     const [manualMode, setManualMode] = useState(false);
     
     // Image Upload State
-    const [imageFile, setImageFile] = useState<File | null>(null);
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [imageFiles, setImageFiles] = useState<File[]>([]);
+    const [imagePreviews, setImagePreviews] = useState<string[]>([]);
     
     // Price Intelligence States
     const [priceInsight, setPriceInsight] = useState<{min: number, avg: number, max: number} | null>(null);
@@ -114,11 +114,21 @@ export default function AddProductPage() {
     };
 
     const handleImageChange = (e: any) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setImageFile(file);
-            setImagePreview(URL.createObjectURL(file));
+        const files = Array.from(e.target.files as FileList);
+        if (files.length > 0) {
+            const newFiles = [...imageFiles, ...files].slice(0, 5); // Max 5 images
+            setImageFiles(newFiles);
+            
+            const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+            setImagePreviews(newPreviews);
         }
+    };
+
+    const removeImage = (index: number) => {
+        const newFiles = imageFiles.filter((_, i) => i !== index);
+        setImageFiles(newFiles);
+        const newPreviews = imagePreviews.filter((_, i) => i !== index);
+        setImagePreviews(newPreviews);
     };
 
     /* ================= 3. THE PRICE INTELLIGENCE CALCULATION ================= */
@@ -181,23 +191,25 @@ export default function AddProductPage() {
 
         const baseDate = form.harvest === "ready" ? new Date() : new Date(form.available_date);
         
-        let imageUrl = null;
+        const galleryUrls: string[] = [];
 
-        if (imageFile) {
-            const fileExt = imageFile.name.split('.').pop();
-            const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+        // Upload all images
+        for (const file of imageFiles) {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${user.id}-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
             const { error: uploadError } = await supabase.storage
                 .from('products')
-                .upload(fileName, imageFile);
+                .upload(fileName, file);
 
-            if (uploadError) {
-                console.error("Image upload error:", uploadError);
-                alert("Error uploading image. Proceeding without image.");
-            } else {
+            if (!uploadError) {
                 const { data } = supabase.storage.from('products').getPublicUrl(fileName);
-                imageUrl = data.publicUrl;
+                galleryUrls.push(data.publicUrl);
+            } else {
+                console.error("Upload error:", uploadError);
             }
         }
+
+        const mainImageUrl = galleryUrls.length > 0 ? galleryUrls[0] : null;
 
         const { data: newProduct, error } = await supabase.from("products").insert([
             {
@@ -212,7 +224,8 @@ export default function AddProductPage() {
                 available_date: baseDate,
                 is_perishable: form.is_perishable,
                 location: profile.location,
-                image_url: imageUrl,
+                image_url: mainImageUrl,
+                gallery_urls: galleryUrls,
                 created_at: new Date().toISOString(),
             },
         ]).select();
@@ -307,20 +320,33 @@ export default function AddProductPage() {
                         </div>
                     )}
 
-                    {/* IMAGE UPLOAD */}
+                    {/* MULTI-IMAGE UPLOAD */}
                     <div className={styles.imageUploadBox}>
                         <label className={styles.imageLabel}>
-                            {imagePreview ? (
-                                <img src={imagePreview} alt="Preview" className={styles.imagePreview} />
-                            ) : (
-                                <div className={styles.imagePlaceholder}>
-                                    <span className={styles.placeholderIcon}>📸</span>
-                                    <span className={styles.placeholderText}>Upload Product Image</span>
-                                    <small>Optional but recommended for faster sales</small>
-                                </div>
-                            )}
-                            <input type="file" accept="image/*" onChange={handleImageChange} className={styles.hiddenInput} />
+                            <div className={styles.imagePlaceholder}>
+                                <span className={styles.placeholderIcon}>📸</span>
+                                <span className={styles.placeholderText}>Upload Product Images</span>
+                                <small>Add up to 5 photos for better visibility</small>
+                            </div>
+                            <input type="file" accept="image/*" multiple onChange={handleImageChange} className={styles.hiddenInput} />
                         </label>
+
+                        {imagePreviews.length > 0 && (
+                            <div className={styles.previewGrid}>
+                                {imagePreviews.map((url, idx) => (
+                                    <div key={idx} className={styles.previewWrapper}>
+                                        <img src={url} alt={`Preview ${idx}`} className={styles.imagePreview} />
+                                        <button type="button" className={styles.removeBtn} onClick={() => removeImage(idx)}>✕</button>
+                                    </div>
+                                ))}
+                                {imagePreviews.length < 5 && (
+                                    <label className={styles.addMoreBox}>
+                                        <span>+</span>
+                                        <input type="file" accept="image/*" multiple onChange={handleImageChange} className={styles.hiddenInput} />
+                                    </label>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {/* QUANTITY & UNIT */}

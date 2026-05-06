@@ -301,42 +301,86 @@
 .imageUploadBox {
     width: 100%;
     border: 2px dashed rgba(255,255,255,0.12);
-    border-radius: 14px;
-    background: rgba(255,255,255,0.02);
+    border-radius: 18px;
+    background: rgba(255,255,255,0.03);
     transition: all 0.3s;
-    overflow: hidden;
+    padding: 20px;
 }
 
 .imageUploadBox:hover {
-    border-color: rgba(99,102,241,0.4);
-    background: rgba(99,102,241,0.04);
+    border-color: rgba(34,197,94,0.4);
+    background: rgba(34,197,94,0.04);
 }
 
 .imageLabel {
-    display: flex; justify-content: center; align-items: center;
-    width: 100%; min-height: 140px; cursor: pointer;
+    display: block;
+    cursor: pointer;
+    text-align: center;
 }
 
 .imagePlaceholder {
-    display: flex; flex-direction: column; align-items: center;
-    gap: 8px; padding: 24px; text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 0;
 }
 
 .placeholderIcon { font-size: 2.2rem; animation: floatIcon 3s ease-in-out infinite; }
-
-@keyframes floatIcon {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-}
-
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
 .placeholderText { font-weight: 700; color: #94a3b8; font-size: 0.95rem; }
 .imagePlaceholder small { color: #475569; font-weight: 500; }
-.imagePreview { width: 100%; height: 180px; object-fit: cover; }
+
+.previewGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.previewWrapper {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.imagePreview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.removeBtn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(239, 68, 68, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.addMoreBox {
+    aspect-ratio: 1;
+    border: 2px dashed rgba(255,255,255,0.1);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #475569;
+    background: rgba(255,255,255,0.02);
+}
+
 .hiddenInput { display: none; }
 
 /* --- Responsive --- */
