@@ -572,18 +572,19 @@
     .contentWrapper { padding: 8px 16px 60px; width: 100%; }
     .sectionTitle { font-size: 0.68rem; }
 
-    /* Grid — single column */
-    .grid { grid-template-columns: 1fr; gap: 16px; }
+    /* Grid — 2 columns */
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
 
     /* Cards */
-    .cardImageWrapper { height: 200px; }
-    .cardHeader { padding: 12px 14px 0; }
-    .card h3 { padding: 8px 14px 0; font-size: 1.1rem; }
-    .priceRow { padding: 4px 14px 0; }
-    .transparencyBadge { margin: 10px 14px 0; }
-    .perishMeter { margin: 8px 14px 0; }
-    .details { padding: 8px 14px 0; }
-    .futureHarvestActionsBadge { margin: 8px 14px 0; }
+    .cardImageWrapper { height: 130px; }
+    .cardHeader { padding: 10px 12px 0; }
+    .card h3 { padding: 8px 12px 0; font-size: 0.95rem; }
+    .priceRow { padding: 4px 12px 0; font-size: 0.75rem; }
+    .priceRow strong { font-size: 1.1rem; }
+    .transparencyBadge { margin: 8px 12px 0; padding: 8px; }
+    .perishMeter { margin: 6px 12px 0; padding: 4px 8px; font-size: 0.65rem; }
+    .details { display: none; } /* Hide descriptions on mobile for cleaner 2-col grid */
+    .futureHarvestActionsBadge { margin: 6px 12px 0; font-size: 0.65rem; }
 
     /* Actions — thumb-friendly 44px+ */
     .actionsContainer { padding: 12px 14px 16px; }
