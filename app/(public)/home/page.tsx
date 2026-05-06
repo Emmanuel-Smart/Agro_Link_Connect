@@ -341,14 +341,15 @@ export default function HomePage() {
                                             </div>
                                         )}
                                         <div className={styles.actions}>
-                                            {item.profiles?.whatsapp ? (
-                                            <a onClick={handleContactGuard} href={`https://wa.me/${item.profiles.whatsapp}`} target="_blank" className={styles.btnWhatsapp}>
-                                                💬 WhatsApp
-                                            </a>
+                                            {item.profiles?.whatsapp && (
+                                                <a onClick={handleContactGuard} href={`https://wa.me/${item.profiles.whatsapp}`} target="_blank" className={styles.btnWhatsapp}>
+                                                    💬 WhatsApp
+                                                </a>
+                                            )}
                                             <Link href={`/product/${item.id}`} className={styles.btnCall}>
                                                 🔍 View Details
                                             </Link>
-                                    </div>
+                                        </div>
                                         {userSubscriptions.has(`${item.crop}_${item.location}`) ? (
                                             <button 
                                                 className={styles.btnUnsubscribe} 
