@@ -273,7 +273,7 @@ export default function ProfilePage() {
                             <div className={styles.roleTiles}>
                                 <div className={`${styles.roleTile} ${formData.is_farmer ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_farmer: !formData.is_farmer})}>🚜 Farmer</div>
                                 <div className={`${styles.roleTile} ${formData.is_buyer ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_buyer: !formData.is_buyer})}>🛒 Buyer</div>
-                                <div className={`${styles.roleTile} ${formData.is_provider ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_provider: !formData.is_provider})}>🛡️ NGO / Provider</div>
+                                <div className={`${styles.roleTile} ${formData.is_provider ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_provider: !formData.is_provider})}>🛡️ Provider</div>
                             </div>
                         </div>
                         <button type="submit" className={styles.unlockBtn}>Unlock Dashboard</button>
@@ -430,7 +430,7 @@ export default function ProfilePage() {
                                 <div className={styles.roleTilesSmall}>
                                     <div className={`${styles.roleTile} ${formData.is_farmer ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_farmer: !formData.is_farmer})}>🚜 Farmer</div>
                                     <div className={`${styles.roleTile} ${formData.is_buyer ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_buyer: !formData.is_buyer})}>🛒 Buyer</div>
-                                    <div className={`${styles.roleTile} ${formData.is_provider ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_provider: !formData.is_provider})}>🛡️ NGO / Provider</div>
+                                    <div className={`${styles.roleTile} ${formData.is_provider ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_provider: !formData.is_provider})}>🛡️ Provider</div>
                                 </div>
                             </div>
                             <div className={styles.modalActions}>
