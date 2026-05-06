@@ -4,6 +4,7 @@ import { useEffect, useState, FormEvent } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import styles from "./Profile.module.css";
 
 // Fix Date Formatting to handle null/invalid dates
