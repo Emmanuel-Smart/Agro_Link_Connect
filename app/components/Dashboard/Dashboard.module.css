@@ -388,11 +388,12 @@
     .sectionHeader h2 { color: #f1f5f9; font-size: 1.4rem; }
     .sectionHeader p { color: rgba(255,255,255,0.6); }
 
-    .grid { grid-template-columns: 1fr; gap: 16px; }
-    .grid .card:nth-child(n+7) { display: none; }
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .grid .card:nth-child(n+9) { display: none; }
 
-    .cardBody { padding: 16px; }
-    .imageBox { height: 200px; }
+    .cardBody { padding: 12px; }
+    .cardImageWrapper { height: 140px; }
+    .actions { flex-direction: column; gap: 8px; }
 
     .btnAction, .btnActionSecondary { min-height: 44px; font-size: 0.82rem; }
 
