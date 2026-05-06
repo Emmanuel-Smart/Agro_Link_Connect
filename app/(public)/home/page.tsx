@@ -326,7 +326,6 @@ export default function HomePage() {
                                     )}
 
                                     <div className={styles.details}>
-                                        <p>{item.description}</p>
                                         <div className={styles.meta}>
                                             <span>📦 {item.quantity}</span>
                                             <span>🕒 {formatTimeAgo(item.created_at)}</span>
