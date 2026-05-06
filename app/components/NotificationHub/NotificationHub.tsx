@@ -44,7 +44,16 @@ export default function NotificationHub() {
                 });
 
                 setNotifications(filteredData);
-                setUnreadCount(filteredData.filter(n => !n.is_read).length);
+                const unread = filteredData.filter(n => !n.is_read);
+                setUnreadCount(unread.length);
+
+                // Auto-switch tab if only one type has unread items
+                if (unread.length > 0) {
+                    const hasUnreadReport = unread.some(n => n.type === 'report');
+                    const hasUnreadMatch = unread.some(n => n.type === 'match');
+                    if (hasUnreadReport && !hasUnreadMatch) setActiveTab('report');
+                    else if (hasUnreadMatch && !hasUnreadReport) setActiveTab('match');
+                }
             }
         };
 
@@ -91,7 +100,14 @@ export default function NotificationHub() {
             {isOpen && (
                 <div className={styles.dropdown}>
                     <div className={styles.header}>
-                        <h4>Intelligence Feed</h4>
+                        <div className={styles.headerTop}>
+                            <h4>Intelligence Feed</h4>
+                            {unreadCount > 0 && (
+                                <button className={styles.markReadBtn} onClick={markAllAsRead}>
+                                    Mark all read
+                                </button>
+                            )}
+                        </div>
                         <div className={styles.tabs}>
                             <button 
                                 className={`${styles.tabBtn} ${activeTab === 'match' ? styles.tabActive : ''}`}
@@ -109,11 +125,12 @@ export default function NotificationHub() {
                     </div>
                     <div className={styles.list}>
                         {filtered.length === 0 ? (
-                            <p className={styles.empty}>
+                            <div className={styles.empty}>
+                                <div className={styles.emptyIcon}>{activeTab === 'match' ? '🛒' : '📡'}</div>
                                 {activeTab === 'match' 
                                     ? "No new crop matches yet. We'll alert you when supply arrives!" 
                                     : "No official reports for your area at this time."}
-                            </p>
+                            </div>
                         ) : (
                             filtered.map(n => (
                                 <div key={n.id} className={`${styles.item} ${!n.is_read ? styles.unread : ""}`}>

@@ -374,14 +374,42 @@
 }
 
 @media (max-width: 768px) {
-    .heroContent h1 { font-size: 3rem; }
-    .ctaGroup { flex-direction: column; }
+    .hero { height: auto; min-height: 500px; padding: 60px 20px; }
+    .heroContent h1 { font-size: clamp(2rem, 7vw, 3rem); }
+    .heroContent p { font-size: 0.95rem; margin-bottom: 28px; }
+
+    .ctaGroup { flex-direction: column; gap: 12px; margin-bottom: 36px; }
+    .btnPrimary, .btnSecondary { width: 100%; text-align: center; padding: 16px; min-height: 48px; }
+
+    .trustSignals { flex-wrap: wrap; gap: 16px; font-size: 0.82rem; justify-content: center; }
+
+    .previewSection { margin: -60px auto 60px; padding: 0 16px; }
     .sectionHeader { flex-direction: column; align-items: flex-start; gap: 16px; }
-    .sectionHeader h2 { color: #0f172a; }
-    .sectionHeader p { color: #64748b; }
-    
-    /* Show only 6 crops on mobile */
-    .grid .card:nth-child(n+7) {
-        display: none;
-    }
+    .sectionHeader h2 { color: #f1f5f9; font-size: 1.4rem; }
+    .sectionHeader p { color: rgba(255,255,255,0.6); }
+
+    .grid { grid-template-columns: 1fr; gap: 16px; }
+    .grid .card:nth-child(n+7) { display: none; }
+
+    .cardBody { padding: 16px; }
+    .imageBox { height: 200px; }
+
+    .btnAction, .btnActionSecondary { min-height: 44px; font-size: 0.82rem; }
+
+    .dashboardActionsContainer { padding: 0; }
+
+    .features { padding: 60px 20px; }
+    .featureCard { text-align: left; }
+    .icon { font-size: 2.5rem; margin-bottom: 16px; }
+
+    .footer { padding: 48px 20px 32px; }
+}
+
+@media (max-width: 400px) {
+    .hero { padding: 48px 16px; min-height: 420px; }
+    .heroContent h1 { font-size: 1.8rem; }
+    .badge { font-size: 0.7rem; padding: 6px 12px; }
+    .previewSection { margin-top: -40px; }
+    .cardBody h3 { font-size: 1.1rem; }
+    .price strong { font-size: 1.15rem; }
 }

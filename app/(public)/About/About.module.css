@@ -1,0 +1,228 @@
+/* ABOUT PAGE — AgroLink Premium v3 */
+
+.container { min-height: 100vh; font-family: 'Inter', system-ui, sans-serif; }
+
+/* Hero */
+.hero {
+    position: relative; padding: 120px 24px 140px;
+    text-align: center; color: white;
+    background: linear-gradient(160deg, #020617 0%, #052e16 50%, #064e3b 100%);
+    overflow: hidden;
+}
+
+.hero::before {
+    content: ''; position: absolute; inset: 0;
+    background:
+        radial-gradient(ellipse 60% 50% at 50% -10%, rgba(34,197,94,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 80% 90%, rgba(16,185,129,0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.hero::after {
+    content: ''; position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+}
+
+.heroContent {
+    position: relative; z-index: 1; max-width: 700px; margin: 0 auto;
+    animation: fadeInUp 0.7s ease both;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.heroBadge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3);
+    color: #4ade80; font-size: 0.68rem; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 6px 16px; border-radius: 999px; margin-bottom: 24px;
+}
+
+.heroContent h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(2rem, 4.5vw, 3.2rem); font-weight: 800;
+    letter-spacing: -0.04em; line-height: 1.15; margin-bottom: 20px;
+}
+
+.heroContent h1 span { color: #4ade80; }
+
+.heroContent p {
+    font-size: 1.05rem; color: rgba(255,255,255,0.65);
+    max-width: 600px; margin: 0 auto; line-height: 1.7;
+}
+
+/* Section Badge */
+.sectionBadge {
+    display: inline-block; font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: #22c55e; margin-bottom: 12px;
+}
+
+/* Mission */
+.mission { padding: 100px 24px; background: #020617; }
+
+.missionGrid {
+    max-width: 1000px; margin: 0 auto;
+    display: grid; grid-template-columns: 1.5fr 1fr; gap: 60px;
+    align-items: center;
+}
+
+.missionText h2 {
+    font-family: 'Sora', sans-serif; font-size: 2rem;
+    font-weight: 800; color: #f1f5f9;
+    letter-spacing: -0.03em; margin-bottom: 20px;
+}
+
+.missionText p {
+    color: #94a3b8; font-size: 0.95rem; line-height: 1.8; margin-bottom: 16px;
+}
+
+.missionStats {
+    display: grid; grid-template-columns: 1fr; gap: 16px;
+}
+
+.stat {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px; padding: 24px; text-align: center;
+    transition: all 0.25s;
+}
+
+.stat:hover { background: rgba(255,255,255,0.06); transform: translateY(-2px); }
+
+.stat .statNumber {
+    font-family: 'Sora', sans-serif;
+    font-size: 2.2rem; font-weight: 800; color: #4ade80; display: block;
+}
+
+.stat .statLabel {
+    font-size: 0.72rem; font-weight: 700; color: #475569;
+    text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px;
+}
+
+/* Pillars */
+.pillars { padding: 100px 24px; background: #0a1628; }
+
+.pillarsHeader { text-align: center; max-width: 600px; margin: 0 auto 60px; }
+
+.pillarsHeader h2 {
+    font-family: 'Sora', sans-serif; font-size: 2rem; font-weight: 800;
+    color: #f1f5f9; letter-spacing: -0.03em; margin-bottom: 14px;
+}
+
+.pillarsHeader p { color: #64748b; font-size: 0.95rem; line-height: 1.7; }
+
+.pillarGrid {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+}
+
+.pillarCard {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px; padding: 36px 28px;
+    transition: all 0.3s; position: relative; overflow: hidden;
+}
+
+.pillarCard::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, #22c55e, #10b981);
+    opacity: 0; transition: opacity 0.3s;
+}
+
+.pillarCard:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.12);
+    transform: translateY(-4px);
+}
+
+.pillarCard:hover::before { opacity: 1; }
+
+.pillarIcon { font-size: 2.5rem; margin-bottom: 20px; }
+
+.pillarCard h3 {
+    font-family: 'Sora', sans-serif; font-size: 1.2rem;
+    font-weight: 700; color: #f1f5f9; margin-bottom: 14px;
+}
+
+.pillarCard p { color: #94a3b8; font-size: 0.88rem; line-height: 1.7; margin-bottom: 20px; }
+
+.pillarFeatures { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.pillarFeatures span {
+    background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.15);
+    color: #4ade80; padding: 4px 10px; border-radius: 99px;
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.02em;
+}
+
+/* How It Works */
+.howItWorks { padding: 100px 24px; background: #020617; }
+
+.howHeader { text-align: center; margin-bottom: 60px; }
+
+.howHeader h2 {
+    font-family: 'Sora', sans-serif; font-size: 2rem;
+    font-weight: 800; color: #f1f5f9; letter-spacing: -0.03em;
+}
+
+.stepsGrid {
+    max-width: 900px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
+}
+
+.step {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 18px; padding: 32px 28px;
+    transition: all 0.25s;
+}
+
+.step:hover { background: rgba(255,255,255,0.06); transform: translateY(-3px); }
+
+.stepNumber {
+    font-family: 'Sora', sans-serif; font-size: 2rem; font-weight: 800;
+    color: rgba(34,197,94,0.3); margin-bottom: 12px;
+}
+
+.step h3 { font-size: 1.1rem; font-weight: 700; color: #f1f5f9; margin-bottom: 10px; }
+.step p { color: #94a3b8; font-size: 0.88rem; line-height: 1.7; }
+
+/* CTA */
+.cta {
+    padding: 100px 24px; text-align: center;
+    background: linear-gradient(160deg, #052e16, #064e3b);
+}
+
+.cta h2 {
+    font-family: 'Sora', sans-serif; font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 800; color: #f1f5f9; margin-bottom: 16px;
+}
+
+.cta p { color: rgba(255,255,255,0.6); max-width: 500px; margin: 0 auto 36px; font-size: 0.95rem; }
+
+.ctaButtons { display: flex; gap: 14px; justify-content: center; }
+
+.btnPrimary {
+    background: #22c55e; color: white;
+    padding: 14px 32px; border-radius: 12px;
+    font-weight: 700; text-decoration: none;
+    transition: all 0.25s; box-shadow: 0 6px 20px rgba(34,197,94,0.3);
+}
+.btnPrimary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(34,197,94,0.45); }
+
+.btnSecondary {
+    background: rgba(255,255,255,0.08); color: white;
+    padding: 14px 32px; border-radius: 12px;
+    font-weight: 700; text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.15); transition: all 0.25s;
+}
+.btnSecondary:hover { background: rgba(255,255,255,0.15); }
+
+@media (max-width: 768px) {
+    .hero { padding: 80px 20px 100px; }
+    .missionGrid { grid-template-columns: 1fr; gap: 40px; }
+    .pillarGrid { grid-template-columns: 1fr; }
+    .stepsGrid { grid-template-columns: 1fr; }
+    .ctaButtons { flex-direction: column; align-items: center; }
+}

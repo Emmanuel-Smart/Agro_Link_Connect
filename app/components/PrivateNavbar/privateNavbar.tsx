@@ -49,13 +49,12 @@ export default function PrivateNavbar() {
                 schema: 'public', 
                 table: 'notifications'
             }, (payload) => {
-                // Filter in JS for better reliability
-                if (payload.new.user_id === user.id && payload.new.type === 'report') {
-                    if (payload.eventType === 'INSERT' || (payload.eventType === 'UPDATE' && payload.new.is_read === false)) {
-                        setReportCount(prev => prev + 1);
-                        setToast({ message: payload.new.message, type: payload.new.type });
-                        setTimeout(() => setToast(null), 8000);
-                    }
+                fetchCounts(); // Always re-sync count to be safe
+                
+                // Show toast only for new reports targeting this user
+                if (payload.eventType === 'INSERT' && payload.new.user_id === user.id && payload.new.type === 'report') {
+                    setToast({ message: payload.new.message, type: payload.new.type });
+                    setTimeout(() => setToast(null), 8000);
                 }
             })
             .subscribe();

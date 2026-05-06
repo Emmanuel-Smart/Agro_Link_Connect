@@ -1,174 +1,228 @@
-/* ========================================
-   ADMIN VERIFY — AgroLink Pro UI
-   ======================================== */
+/* ADMIN HUB — AgroLink Premium v3 */
 
 .container {
-    background: linear-gradient(160deg, #020617, #0f172a);
-    min-height: 100vh;
-    padding: 48px 24px;
-    font-family: 'Inter', system-ui, sans-serif;
-    color: #f8fafc;
+    background: linear-gradient(160deg, #020617 0%, #0a1628 50%, #0f172a 100%);
+    min-height: 100vh; padding: 0 0 80px;
+    font-family: 'Inter', system-ui, sans-serif; color: #f8fafc;
+    position: relative; overflow: hidden;
+}
+
+.container::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 50% 40% at 70% 0%, rgba(239,68,68,0.05) 0%, transparent 60%);
+    pointer-events: none;
 }
 
 .loading {
-    display: flex; justify-content: center; align-items: center;
-    min-height: 60vh; font-weight: 600; color: #64748b;
+    display: flex; flex-direction: column; justify-content: center;
+    align-items: center; min-height: 70vh; gap: 16px;
+    font-weight: 600; color: #64748b; font-size: 0.9rem;
 }
 
-.dashboard {
-    max-width: 900px;
-    margin: 0 auto;
+.loading::before {
+    content: ''; width: 40px; height: 40px;
+    border: 3px solid rgba(239,68,68,0.2); border-top-color: #ef4444;
+    border-radius: 50%; animation: spin 0.75s linear infinite;
 }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.dashboard { max-width: 940px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
 
 .header {
-    margin-bottom: 48px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid #1e293b;
+    padding: 48px 0 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    margin-bottom: 40px;
+    animation: fadeInUp 0.5s ease both;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.headerBadge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
+    color: #fca5a5; font-size: 0.62rem; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 999px; margin-bottom: 16px;
 }
 
 .header h1 {
-    font-size: 1.75rem;
-    font-weight: 900;
-    margin: 0 0 10px;
-    letter-spacing: -0.03em;
-    color: #f8fafc;
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(1.6rem, 3.5vw, 2.2rem); font-weight: 800;
+    letter-spacing: -0.04em; margin: 0 0 10px; color: #f8fafc;
 }
 
-.header p {
-    color: #64748b;
-    margin: 0;
-    font-size: 0.95rem;
-    font-weight: 500;
+.header p { color: #64748b; margin: 0; font-size: 0.92rem; }
+
+.statsRow {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px; margin-bottom: 40px;
+    animation: fadeInUp 0.5s 0.1s ease both;
 }
 
-.grid {
-    display: grid;
-    gap: 16px;
+.statCard {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px; padding: 20px; text-align: center;
+    transition: all 0.25s;
 }
 
-.card {
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 14px;
-    padding: 24px;
-    transition: all 0.2s;
-}
-
-.card:hover {
-    border-color: #475569;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-}
-
-.cardApproved {
-    border-left: 3px solid #22c55e;
-}
-
-.cardHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 14px;
-}
-
-.cardHeader h2 {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-}
-
-.badge {
-    background: #334155;
-    padding: 4px 10px;
-    border-radius: 5px;
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-
-.card p {
-    color: #94a3b8;
-    margin: 0 0 20px;
-    font-size: 0.9rem;
-}
-
-.actionArea {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid #334155;
-    padding-top: 16px;
-}
-
-.status {
-    font-weight: 700;
-    font-size: 0.85rem;
-    letter-spacing: 0.02em;
-}
-
-.statusActive { color: #22c55e; }
-.statusPending { color: #f59e0b; }
-
-.btnGroup {
-    display: flex;
-    gap: 12px;
-    margin-top: 10px;
-}
-
-.btn {
-    flex: 2;
-    padding: 12px;
-    border-radius: 12px;
-    border: none;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.btnDelete {
-    flex: 1;
-    background: white;
-    color: #ef4444;
-    border: 2px solid #fee2e2;
-    padding: 10px;
-    border-radius: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btnDelete:hover {
-    background: #fef2f2;
-    border-color: #fecaca;
+.statCard:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.12);
     transform: translateY(-2px);
 }
 
+.statNumber {
+    font-family: 'Sora', sans-serif;
+    font-size: 2.2rem; font-weight: 800; color: #f8fafc; line-height: 1;
+}
+
+.statLabel {
+    font-size: 0.68rem; font-weight: 700; color: #475569;
+    text-transform: uppercase; letter-spacing: 0.1em; margin-top: 6px;
+}
+
+.grid {
+    display: flex; flex-direction: column; gap: 14px;
+    animation: fadeInUp 0.5s 0.15s ease both;
+}
+
+.card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 18px; padding: 24px 26px;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    position: relative; overflow: hidden;
+}
+
+.card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: rgba(255,255,255,0.06); transition: background 0.3s;
+}
+
+.card:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.12);
+    transform: translateX(4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+}
+
+.cardApproved::before { background: linear-gradient(to bottom, #22c55e, #10b981); }
+.cardPending::before { background: linear-gradient(to bottom, #f59e0b, #fbbf24); }
+.cardRejected::before { background: linear-gradient(to bottom, #ef4444, #f97316); }
+
+.cardHeader {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 12px; gap: 12px; flex-wrap: wrap;
+}
+
+.cardHeader h2 {
+    margin: 0; font-family: 'Sora', sans-serif;
+    font-size: 1.1rem; font-weight: 700;
+    letter-spacing: -0.02em; color: #f1f5f9;
+}
+
+.badge {
+    padding: 4px 12px; border-radius: 99px;
+    font-size: 0.62rem; font-weight: 800;
+    letter-spacing: 0.08em; text-transform: uppercase;
+}
+
+.badgePending {
+    background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25); color: #fbbf24;
+}
+
+.badgeApproved {
+    background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25); color: #4ade80;
+}
+
+.badgeRejected {
+    background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: #fca5a5;
+}
+
+.card p { color: #64748b; margin: 0 0 18px; font-size: 0.86rem; line-height: 1.6; }
+
+.actionArea {
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 16px; flex-wrap: wrap; gap: 12px;
+}
+
+.status {
+    font-weight: 700; font-size: 0.82rem; letter-spacing: 0.02em;
+    display: flex; align-items: center; gap: 6px;
+}
+
+.statusActive { color: #4ade80; }
+.statusPending { color: #fbbf24; }
+.statusRevoked { color: #f87171; }
+
+.btnGroup { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.btn {
+    padding: 10px 22px; border-radius: 10px;
+    font-weight: 700; font-size: 0.8rem;
+    cursor: pointer; transition: all 0.25s; border: none;
+}
+
 .btnApprove {
-    background: #22c55e;
-    color: #fff;
-    box-shadow: 0 4px 10px rgba(34,197,94,0.3);
+    background: linear-gradient(135deg, #15803d, #22c55e); color: #fff;
+    box-shadow: 0 4px 16px rgba(34,197,94,0.25);
 }
-.btnApprove:hover {
-    background: #16a34a;
-    transform: translateY(-1px);
-}
+.btnApprove:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(34,197,94,0.4); }
 
 .btnRevoke {
-    background: transparent;
-    color: #ef4444;
-    border: 1.5px solid #ef4444;
+    background: rgba(239,68,68,0.08); color: #fca5a5;
+    border: 1px solid rgba(239,68,68,0.2);
 }
-.btnRevoke:hover {
-    background: rgba(239,68,68,0.1);
+.btnRevoke:hover { background: rgba(239,68,68,0.15); transform: translateY(-1px); }
+
+.btnDelete {
+    background: transparent; color: #f87171;
+    border: 1px solid rgba(239,68,68,0.2);
+    padding: 9px 18px; border-radius: 10px;
+    font-weight: 700; font-size: 0.78rem;
+    cursor: pointer; transition: all 0.2s;
 }
+.btnDelete:hover { background: rgba(239,68,68,0.08); transform: translateY(-1px); }
 
 .emptyState {
-    text-align: center;
-    padding: 60px 40px;
-    color: #475569;
-    background: #1e293b;
-    border-radius: 14px;
-    border: 1px dashed #334155;
-    font-weight: 600;
+    text-align: center; padding: 80px 40px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 20px; border: 1px dashed rgba(255,255,255,0.08);
+    color: #475569; font-size: 0.9rem; font-weight: 600;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.emptyState p { margin-top: 10px; font-weight: 400; }
+
+@media (max-width: 768px) {
+    .dashboard { padding: 0 16px; }
+    .header { padding: 32px 0 24px; }
+    .header h1 { font-size: clamp(1.3rem, 5vw, 1.8rem); }
+    .card { padding: 18px; }
+    .cardHeader { flex-direction: column; gap: 8px; }
+    .actionArea { flex-direction: column; align-items: stretch; }
+    .btnGroup { width: 100%; }
+    .btn, .btnDelete { flex: 1; text-align: center; min-height: 44px; font-size: 0.82rem; }
+    .statsRow { grid-template-columns: repeat(2, 1fr); }
+    .statNumber { font-size: 1.7rem; }
+    .emptyState { padding: 48px 20px; }
+}
+
+@media (max-width: 400px) {
+    .dashboard { padding: 0 12px; }
+    .header h1 { font-size: 1.2rem; }
+    .headerBadge { font-size: 0.58rem; }
+    .statsRow { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .statCard { padding: 14px 12px; }
+    .statNumber { font-size: 1.4rem; }
+    .card { padding: 14px; border-radius: 14px; }
+    .card p { font-size: 0.8rem; }
+    .btn { padding: 10px 16px; }
 }

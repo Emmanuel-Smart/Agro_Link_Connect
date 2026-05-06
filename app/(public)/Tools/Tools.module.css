@@ -1,0 +1,119 @@
+/* TOOLS — AgroLink Premium v3 */
+
+.container { min-height: 100vh; font-family: 'Inter', system-ui, sans-serif; background: #020617; }
+
+.hero {
+    position: relative; padding: 100px 24px 130px;
+    text-align: center; color: white;
+    background: linear-gradient(160deg, #020617, #1a1a2e, #0a1628);
+    overflow: hidden;
+}
+
+.hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 50% 40% at 50% 20%, rgba(245,158,11,0.08) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.heroContent { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; animation: fadeInUp 0.6s ease both; }
+
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+
+.heroBadge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25);
+    color: #fbbf24; font-size: 0.68rem; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 6px 16px; border-radius: 999px; margin-bottom: 24px;
+}
+
+.heroContent h1 { font-family: 'Sora', sans-serif; font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: -0.04em; line-height: 1.15; margin-bottom: 16px; }
+.heroContent h1 span { color: #fbbf24; }
+.heroContent p { font-size: 1rem; color: rgba(255,255,255,0.6); max-width: 500px; margin: 0 auto; line-height: 1.7; }
+
+/* Tools Section */
+.toolsSection { padding: 0 24px 80px; max-width: 1100px; margin: -60px auto 0; position: relative; z-index: 10; }
+
+.toolsGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+
+.toolCard {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px; padding: 32px 28px;
+    transition: all 0.25s; position: relative; overflow: hidden;
+}
+
+.toolCard::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, #f59e0b, #22c55e); opacity: 0; transition: opacity 0.3s;
+}
+
+.toolCard:hover { background: rgba(255,255,255,0.05); transform: translateY(-3px); border-color: rgba(255,255,255,0.12); }
+.toolCard:hover::before { opacity: 1; }
+
+.toolHeader { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.toolIcon { font-size: 1.6rem; }
+.toolHeader h3 { font-family: 'Sora', sans-serif; font-size: 1.15rem; font-weight: 700; color: #f1f5f9; }
+
+.toolDesc { color: #64748b; font-size: 0.85rem; line-height: 1.6; margin-bottom: 20px; }
+
+/* Form */
+.toolForm { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+
+.toolForm select, .toolForm input {
+    padding: 12px 16px; border-radius: 10px;
+    border: 1.5px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05); color: #f1f5f9;
+    font-size: 0.88rem; font-family: inherit; outline: none;
+    transition: all 0.25s;
+}
+
+.toolForm select option { background: #0f172a; color: #f1f5f9; }
+
+.toolForm select:focus, .toolForm input:focus {
+    border-color: #22c55e; background: rgba(34,197,94,0.06);
+    box-shadow: 0 0 0 3px rgba(34,197,94,0.1);
+}
+
+/* Results */
+.resultBox {
+    background: rgba(34,197,94,0.05); border: 1px solid rgba(34,197,94,0.15);
+    border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 10px;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+.resultRow { display: flex; justify-content: space-between; align-items: center; }
+.resultRow span { font-size: 0.8rem; color: #64748b; font-weight: 600; }
+.resultRow strong { font-size: 1rem; color: #f1f5f9; font-weight: 800; }
+
+.danger { color: #f87171 !important; }
+.warning { color: #fbbf24 !important; }
+.safe { color: #4ade80 !important; }
+.revenue { color: #4ade80 !important; font-size: 1.2rem !important; }
+
+/* Reference Table */
+.refTable { display: flex; flex-direction: column; gap: 0; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.07); }
+
+.refHeader {
+    display: grid; grid-template-columns: 1fr 60px 80px;
+    padding: 10px 14px; background: rgba(255,255,255,0.06);
+    font-size: 0.68rem; font-weight: 700; color: #64748b;
+    text-transform: uppercase; letter-spacing: 0.08em;
+}
+
+.refRow {
+    display: grid; grid-template-columns: 1fr 60px 80px;
+    padding: 10px 14px; font-size: 0.82rem; color: #cbd5e1;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.15s;
+}
+
+.refRow:hover { background: rgba(255,255,255,0.03); }
+
+.refRow span { font-weight: 600; }
+.refType { font-size: 0.7rem; color: #475569; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+
+@media (max-width: 768px) {
+    .toolsGrid { grid-template-columns: 1fr; }
+}

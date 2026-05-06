@@ -110,11 +110,12 @@ export default function ProviderDashboardPage() {
         } else if (data) {
             /* ================= 8. INTELLIGENCE ENGINE: OFFICIAL BROADCAST ================= */
             try {
-                // Find all users in the target location
+                // Find all users in the target locations (handling comma-separated lists)
+                const locations = targetLocation.split(",").map(l => l.trim()).filter(l => l !== "");
                 const { data: localUsers } = await supabase
                     .from("profiles")
                     .select("id")
-                    .eq("location", targetLocation);
+                    .in("location", locations);
 
                 if (localUsers && localUsers.length > 0) {
                     const alertId = data[0].id;
@@ -127,7 +128,7 @@ export default function ProviderDashboardPage() {
                     }));
 
                     await supabase.from("notifications").insert(notificationPayloads);
-                    console.log(`[Intelligence] Notified ${localUsers.length} users. Includes me? ${localUsers.some(u => u.id === user.id)}`);
+                    console.log(`[Intelligence] Notified ${localUsers.length} users across ${locations.length} zones.`);
                 }
             } catch (notifyError) {
                 console.error("Report Notification Error:", notifyError);

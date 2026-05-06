@@ -1,0 +1,99 @@
+# 🛡️ AgroLink Pro: Technical Blueprint & Logic Manual
+
+Welcome to the **AgroLink Pro** technical documentation. This file explains every core concept, logic engine, and architectural decision implemented in the project to help you understand the "brain" behind the interface.
+
+---
+
+## 1. The Core Infrastructure (Supabase & Auth)
+
+### **A. Session Persistence (The AuthContext)**
+*   **Concept**: We use a `AuthProvider` wrapping the entire app.
+*   **Logic**: 
+    *   On page refresh, the `useEffect` calls `supabase.auth.getSession()`.
+    *   It also sets up a `listener` using `supabase.auth.onAuthStateChange`.
+    *   **The "Wait" Guard**: We implemented a `loading` state. Pages like the **Provider Dashboard** wait for `loading` to be false before checking if `user` is null. This prevents accidental redirects to the login page during a refresh.
+
+### **B. Real-Time Sync**
+*   **Concept**: The app "reacts" to database changes without refreshing.
+*   **Logic**: We use `supabase.channel('any')` with `.on('postgres_changes', ...)` listeners.
+    *   **Official Reports**: When a new row enters the `alerts` table, the `PrivateNavbar` catches it instantly and triggers a **Toast Notification** and a pulsing badge.
+    *   **Market Matches**: When a product matches a buyer's interest, the `NotificationHub` updates the unread count in real-time.
+
+---
+
+## 2. The Regional Marketplace Engine
+
+### **A. Location-Based Discovery**
+*   **Logic**: Every listing is tagged with a `location` (e.g., "Bambili").
+*   **Filtering**: The `home/page.tsx` queries the database using `.eq('location', selectedLocation)`. This ensures farmers only see relevant local trade.
+
+### **B. The "Matchmaking" Intelligence**
+*   **Location**: `add-product/page.tsx`
+*   **How it works**: 
+    1.  When a farmer posts a crop (e.g., "Maize" in "Bambili"), the code immediately searches the `demand_signals` table.
+    2.  It looks for any buyers who "subscribed" to "Maize" in "Bambili".
+    3.  If found, it creates a row in the `notifications` table for every matching buyer.
+    4.  **Result**: The buyer gets a bell notification instantly: *"Great news! Maize just arrived in your area!"*
+
+---
+
+## 3. Transparency & Quality Engines
+
+### **A. Market Pulse (Price Integrity)**
+*   **Logic**: We aggregate all active listings for a specific crop in a specific location.
+*   **Math**: The system calculates the `MIN` and `MAX` prices currently being offered.
+*   **Impact**: Buyers can see if they are getting a fair deal, and farmers know how to price their crops competitively.
+
+### **B. Perishability Meter (Quality Timer)**
+*   **Logic**: Crops have a `is_perishable` flag.
+*   **Math**: We compare the `created_at` date with the current date.
+    *   **0-2 days**: "FRESH" (Green).
+    *   **3-5 days**: "DEGRADING" (Amber).
+    *   **5+ days**: "EXPIRED/STALE" (Red).
+*   **Impact**: Prevents food waste by alerting buyers to "Urgent" deals for crops that need to be sold quickly.
+
+---
+
+## 4. The Authority & Security System
+
+### **A. Provider Verification**
+*   **Workflow**: 
+    1.  Users register as "Providers" (NGOs/Gov).
+    2.  They are "Pending" by default.
+    3.  An **Admin** (Master Email) uses the `/admin/verify` hub to approve them.
+    4.  Only approved providers can access the **Provider Operations Hub**.
+
+### **B. Future Harvest Blueprints**
+*   **Concept**: Farmers can post crops *before* they are harvested.
+*   **Logic**: We use an `available_date`.
+*   **UI**: On the Profile page, these listings get a **Pulsing Countdown Timer** (e.g., *"READY IN: 5d 2h"*). This allows buyers to pre-order and secure supply early.
+
+---
+
+## 5. UI/UX Design Architecture
+
+### **A. Glassmorphism & Depth**
+*   **Styles**: Located in `globals.css` and individual `.module.css` files.
+*   **Technique**: Use of `backdrop-filter: blur()`, semi-transparent backgrounds, and high-contrast shadows to create a premium "Pro" feel.
+
+### **B. The "Heartbeat" Alert System**
+*   **Logic**: CSS `@keyframes pulse`.
+*   **Trigger**: When `unreadCount > 0`, the badges on the navbar and notification bell start a "heartbeat" animation. This ensures critical updates (like emergency broadcasts) are never ignored.
+
+---
+
+## 6. Database Schema Summary
+
+| Table | Purpose |
+| :--- | :--- |
+| `profiles` | Stores user roles, location, and approval status. |
+| `products` | The marketplace listings (price, qty, harvest status). |
+| `alerts` | Official NGO broadcasts and emergency reports. |
+| `notifications` | The link between events and specific users (Matches/Reports). |
+| `demand_signals` | Stores buyer interests (Crops + Locations) for auto-matching. |
+
+---
+
+**This project is built for scale.** Every logic gate is designed to be automated, meaning the platform "thinks" for the user—connecting supply to demand and safety reports to the public without manual intervention.
+
+*Documentation generated by Antigravity AI.*

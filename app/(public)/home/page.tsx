@@ -237,8 +237,9 @@ export default function HomePage() {
             {/* HERO */}
             <section className={styles.hero}>
                 <div className={styles.heroContent}>
-                    <h1>Public Market Discovery</h1>
-                    <p>Transparent local trading, direct from the source.</p>
+                    <div className={styles.heroBadge}>🌱 Live Regional Marketplace</div>
+                    <h1>Discover Fresh Crops <span>Near You</span></h1>
+                    <p>Transparent local trading, direct from the source. Real prices. Real farmers.</p>
                 </div>
             </section>
 

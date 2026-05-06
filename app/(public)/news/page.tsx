@@ -53,14 +53,15 @@ export default function OfficialReportsPage() {
         return `${diffHours}h ${diffMins}m left`;
     };
 
-    if (loading) return <div className={styles.loading}>Loading Official Intelligence...</div>;
+    if (loading) return <div className={styles.loading}><span>Loading Intelligence Feed...</span></div>;
 
     return (
         <main className={styles.container}>
             <section className={styles.hero}>
                 <div className={styles.heroContent}>
-                    <h1>🛡️ Official Regional Reports</h1>
-                    <p>Verified agricultural bulletins and emergency broadcasts for the Bamenda region.</p>
+                    <div className={styles.heroBadge}>🛡️ Verified Authority Channel</div>
+                    <h1>Official Regional Reports</h1>
+                    <p>Verified agricultural bulletins and emergency broadcasts from approved providers.</p>
                 </div>
             </section>
 
