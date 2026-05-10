@@ -345,9 +345,11 @@ export default function HomePage() {
                                                     💬 WhatsApp
                                                 </a>
                                             )}
-                                            <Link href={`/product/${item.id}`} className={styles.btnCall}>
-                                                🔍 View Details
-                                            </Link>
+                                            {item.id ? (
+                                                <Link href={`/product/${item.id}`} className={styles.btnCall}>
+                                                    🔍 View Details
+                                                </Link>
+                                            ) : null}
                                         </div>
                                         {userSubscriptions.has(`${item.crop}_${item.location}`) ? (
                                             <button 

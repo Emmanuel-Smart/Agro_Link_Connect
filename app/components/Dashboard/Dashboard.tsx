@@ -189,7 +189,11 @@ export default function Dashboard() {
                                         )}
                                         <div className={styles.actions}>
                                             <button onClick={handleContactGuard} className={styles.btnAction}>💬 WhatsApp</button>
-                                            <Link href={`/product/${item.id}`} className={styles.btnActionSecondary}>🔍 View Details</Link>
+                                            {item.id ? (
+                                                <Link href={`/product/${item.id}`} className={styles.btnActionSecondary}>🔍 View Details</Link>
+                                            ) : (
+                                                <button disabled className={styles.btnActionSecondary}>No Details</button>
+                                            )}
                                         </div>
                                         
                                         {userSubscriptions.has(`${item.crop}_${item.location}`) ? (
