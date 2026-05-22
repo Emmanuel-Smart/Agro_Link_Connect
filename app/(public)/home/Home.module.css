@@ -586,10 +586,11 @@
     .details { display: none; } /* Hide descriptions on mobile for cleaner 2-col grid */
     .futureHarvestActionsBadge { margin: 6px 12px 0; font-size: 0.65rem; }
 
-    /* Actions — thumb-friendly 44px+ */
-    .actionsContainer { padding: 12px 14px 16px; }
-    .btnWhatsapp, .btnCall, .btnDisabled { min-height: 44px; font-size: 0.82rem; }
-    .btnFollow, .btnUnsubscribe { min-height: 44px; font-size: 0.82rem; }
+    /* Actions — stacked full width for mobile */
+    .actionsContainer { padding: 12px 14px 16px; gap: 8px; }
+    .actions { flex-direction: column; width: 100%; }
+    .btnWhatsapp, .btnCall, .btnDisabled { width: 100%; min-height: 42px; font-size: 0.85rem; padding: 10px; flex-direction: row; justify-content: center; gap: 8px; }
+    .btnFollow, .btnUnsubscribe { min-height: 42px; font-size: 0.85rem; padding: 10px; }
 
     /* Meta stacking */
     .meta { flex-wrap: wrap; gap: 8px; }
@@ -612,6 +613,4 @@
     .card h3 { font-size: 1rem; }
     .priceRow strong { font-size: 1.2rem; }
     .transStats { font-size: 0.7rem; gap: 8px; }
-    .actions { flex-direction: column; }
-    .btnWhatsapp, .btnCall { width: 100%; }
 }
