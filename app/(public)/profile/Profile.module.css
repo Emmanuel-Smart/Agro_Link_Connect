@@ -261,8 +261,14 @@
     box-shadow: 0 0 0 3px rgba(34,197,94,0.2), 0 8px 24px rgba(0,0,0,0.3);
 }
 
-.fileInput { color: #64748b; font-size: 0.75rem; margin-top: 10px; width: 100%; }
+.fileInput { display: none; }
 
+.profileEmail {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    margin: -5px 0 10px 0;
+    text-align: center;
+}
 .profileName {
     font-family: 'Sora', sans-serif;
     font-size: 1.3rem; font-weight: 800; color: #f1f5f9;
@@ -636,4 +642,114 @@
     .priceLine strong { font-size: 1.2rem; }
     .cardHeader { padding: 12px 14px 0; }
     .metaRow { font-size: 0.7rem; }
+}
+
+/* --- LIGHT THEME OVERRIDES --- */
+:global(.light-theme) .container,
+:global(.light-theme) .gateContainer {
+    background: linear-gradient(160deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+}
+
+:global(.light-theme) .gateCard,
+:global(.light-theme) .sidebar,
+:global(.light-theme) .card,
+:global(.light-theme) .alertCard {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+}
+
+:global(.light-theme) .header h1,
+:global(.light-theme) .gateHeader h2,
+:global(.light-theme) .profileEditForm h3,
+:global(.light-theme) .profileName,
+:global(.light-theme) .card h3,
+:global(.light-theme) .modalContent h2 {
+    color: #0f172a;
+}
+
+:global(.light-theme) .gateHeader p,
+:global(.light-theme) .profileFarm,
+:global(.light-theme) .priceLine,
+:global(.light-theme) .fileInput {
+    color: #475569;
+}
+
+:global(.light-theme) .formGroup label,
+:global(.light-theme) .radioGroupSmall label,
+:global(.light-theme) .geoBtn, 
+:global(.light-theme) .geoBtnSmall,
+:global(.light-theme) .roleTile,
+:global(.light-theme) .btnCancel,
+:global(.light-theme) .btnEdit {
+    color: #475569;
+}
+
+:global(.light-theme) .formGroup input,
+:global(.light-theme) .formGroup textarea,
+:global(.light-theme) .formGroup select {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #0f172a;
+}
+
+:global(.light-theme) .formGroup select option {
+    background: #ffffff;
+    color: #0f172a;
+}
+
+:global(.light-theme) .checkboxLabel,
+:global(.light-theme) .alertCard p {
+    color: #334155 !important;
+}
+
+:global(.light-theme) .btnEditProfile,
+:global(.light-theme) .btnCall,
+:global(.light-theme) .btnCallSmall {
+    background: rgba(0, 0, 0, 0.04);
+    color: #475569;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+:global(.light-theme) .btnEditProfile:hover,
+:global(.light-theme) .btnCall:hover,
+:global(.light-theme) .btnCallSmall:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+:global(.light-theme) .transparencyBadge {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.06);
+}
+
+:global(.light-theme) .transStats span {
+    color: #475569;
+}
+:global(.light-theme) .transStats span:first-child {
+    border-right-color: rgba(0, 0, 0, 0.08);
+}
+
+:global(.light-theme) .cardFooter {
+    border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+:global(.light-theme) .metaRow {
+    color: #475569;
+}
+
+:global(.light-theme) .modalContent {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+:global(.light-theme) .hubTitle::after {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+:global(.light-theme) .categoryTag,
+:global(.light-theme) .radioGroupSmall,
+:global(.light-theme) .cardImageWrapper {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.06);
+    color: #475569;
 }

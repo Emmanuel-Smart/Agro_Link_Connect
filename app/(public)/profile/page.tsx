@@ -385,7 +385,7 @@ export default function ProfilePage() {
                                 }} />
                             </label>
                             <h2 className={styles.profileName}>{profile.full_name}</h2>
-                            <p className={styles.profileEmail} style={{color: '#94a3b8', fontSize: '0.85rem', margin: '-5px 0 10px 0'}}>{user?.email}</p>
+                            <p className={styles.profileEmail}>{user?.email}</p>
                             <p className={styles.profileFarm}>📍 {profile.location}</p>
                             <div className={styles.roles}>
                                 {profile.is_farmer && <span className={styles.roleTag}>🚜 Farmer</span>}

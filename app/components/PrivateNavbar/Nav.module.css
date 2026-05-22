@@ -11,10 +11,10 @@
     align-items: center;
     height: 64px;
     padding: 0 32px;
-    background: rgba(10, 34, 24, 0.92);
+    background: var(--nav-bg);
     backdrop-filter: blur(20px) saturate(1.5);
     -webkit-backdrop-filter: blur(20px) saturate(1.5);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid var(--nav-border);
     box-shadow: 0 4px 24px rgba(0,0,0,0.25);
     font-family: 'Inter', system-ui, sans-serif;
     animation: slideDown 0.4s ease;
@@ -63,7 +63,7 @@
     align-items: center;
     gap: 6px;
     text-decoration: none;
-    color: rgba(255,255,255,0.7);
+    color: var(--nav-text);
     font-size: 0.84rem;
     font-weight: 500;
     padding: 7px 13px;
@@ -74,8 +74,8 @@
 }
 
 .menu li a:hover {
-    color: #fff;
-    background: rgba(255,255,255,0.1);
+    color: var(--nav-text-hover);
+    background: var(--nav-hover-bg);
     transform: translateY(-1px);
 }
 
@@ -139,7 +139,7 @@
 .linkButton {
     background: none;
     border: none;
-    color: rgba(255,255,255,0.7);
+    color: var(--nav-text);
     font-size: 0.84rem;
     font-weight: 500;
     cursor: pointer;
@@ -151,8 +151,31 @@
     gap: 6px;
 }
 .linkButton:hover {
-    color: #fff;
-    background: rgba(255,255,255,0.1);
+    color: var(--nav-text-hover);
+    background: var(--nav-hover-bg);
+}
+
+/* Theme Button */
+.themeButton {
+    background: var(--nav-hover-bg);
+    color: var(--nav-text-hover);
+    border: 1px solid var(--nav-border);
+    padding: 7px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.themeButton:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-1px);
+}
+.light-theme .themeButton:hover {
+    background: rgba(0,0,0,0.1);
 }
 
 /* Hamburger menu */
@@ -170,7 +193,7 @@
 .hamburger span {
     width: 22px;
     height: 2px;
-    background: rgba(255,255,255,0.85);
+    background: var(--hamburger-bg);
     border-radius: 2px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: block;
@@ -194,9 +217,9 @@
         flex-direction: column;
         gap: 4px;
         padding: 16px;
-        background: rgba(10, 34, 24, 0.98);
+        background: var(--nav-mobile-bg);
         backdrop-filter: blur(20px);
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        border-bottom: 1px solid var(--nav-border);
         box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         z-index: 199;
         animation: fadeDown 0.25s ease;

@@ -13,7 +13,28 @@ export default function PrivateNavbar() {
     const [reportCount, setReportCount] = useState(0);
     const [pendingCount, setPendingCount] = useState(0);
     const [toast, setToast] = useState<{ message: string, type: string } | null>(null);
+    const [theme, setTheme] = useState('dark');
 
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        setTheme(savedTheme);
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-theme');
+        } else {
+            document.body.classList.remove('light-theme');
+        }
+    }, []);
+
+    const toggleTheme = () => {
+        const newTheme = theme === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
+        if (newTheme === 'light') {
+            document.body.classList.add('light-theme');
+        } else {
+            document.body.classList.remove('light-theme');
+        }
+    };
     useEffect(() => {
         if (!user) return;
         const isAdmin = user.email?.toLowerCase().trim() === "nsamiemmanuelkongnyu@gmail.com";
@@ -106,9 +127,9 @@ export default function PrivateNavbar() {
 
             <ul className={`${styles.menu} ${menuOpen ? styles.menuActive : ""}`}>
                 <li>
-                    {/* <button onClick={handleHomeReload} className={styles.linkButton}>
-                        Home
-                    </button> */}
+                    <button onClick={toggleTheme} className={styles.themeButton} aria-label="Toggle Theme">
+                        {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
+                    </button>
                 </li>
                 <li><Link href="/home">Home</Link></li>
                 <li>
