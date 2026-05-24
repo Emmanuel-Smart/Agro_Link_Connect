@@ -242,7 +242,7 @@ export default function HomePage() {
 
     const userLocation = profile?.location;
     Object.keys(groupedProducts).forEach(cat => {
-        groupedProducts[cat].sort((a, b) => {
+        groupedProducts[cat].sort((a: any, b: any) => {
             const aIsLocal = userLocation && a.location === userLocation;
             const bIsLocal = userLocation && b.location === userLocation;
             if (aIsLocal && !bIsLocal) return -1;
@@ -261,13 +261,15 @@ export default function HomePage() {
         "Others": "📦"
     };
 
-    const sortedCategories = Object.entries(groupedProducts).sort(([catA, itemsA], [catB, itemsB]) => {
-        const aHasLocal = itemsA.some(item => userLocation && item.location === userLocation);
-        const bHasLocal = itemsB.some(item => userLocation && item.location === userLocation);
+    const sortedCategories = (Object.entries(groupedProducts) as [string, any[]][]).sort(([_catA, itemsA], [_catB, itemsB]) => {
+        const arrA = itemsA as any[];
+        const arrB = itemsB as any[];
+        const aHasLocal = arrA.some(item => userLocation && item.location === userLocation);
+        const bHasLocal = arrB.some(item => userLocation && item.location === userLocation);
         
         if (aHasLocal && !bHasLocal) return -1;
         if (!aHasLocal && bHasLocal) return 1;
-        return itemsB.length - itemsA.length; // Fallback: sort by number of items descending
+        return arrB.length - arrA.length; // Fallback: sort by number of items descending
     });
     // ----------------------------------
 
