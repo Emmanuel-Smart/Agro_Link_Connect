@@ -232,6 +232,45 @@ export default function HomePage() {
 
     if (initialLoading) return <div className={styles.loading}>Loading Regional Marketplace...</div>;
 
+    // --- Grouping and Sorting Logic ---
+    const groupedProducts = products.reduce((acc, product) => {
+        const cat = product.category || "Others";
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(product);
+        return acc;
+    }, {} as Record<string, any[]>);
+
+    const userLocation = profile?.location;
+    Object.keys(groupedProducts).forEach(cat => {
+        groupedProducts[cat].sort((a, b) => {
+            const aIsLocal = userLocation && a.location === userLocation;
+            const bIsLocal = userLocation && b.location === userLocation;
+            if (aIsLocal && !bIsLocal) return -1;
+            if (!aIsLocal && bIsLocal) return 1;
+            return 0; // Maintain original order (which is by created_at desc)
+        });
+    });
+
+    const categoryEmojis: Record<string, string> = {
+        "Cereals": "🌾",
+        "Tubers": "🥔",
+        "Vegetables": "🥬",
+        "Fruits": "🍎",
+        "Livestock": "🐄",
+        "Cash Crops": "💰",
+        "Others": "📦"
+    };
+
+    const sortedCategories = Object.entries(groupedProducts).sort(([catA, itemsA], [catB, itemsB]) => {
+        const aHasLocal = itemsA.some(item => userLocation && item.location === userLocation);
+        const bHasLocal = itemsB.some(item => userLocation && item.location === userLocation);
+        
+        if (aHasLocal && !bHasLocal) return -1;
+        if (!aHasLocal && bHasLocal) return 1;
+        return itemsB.length - itemsA.length; // Fallback: sort by number of items descending
+    });
+    // ----------------------------------
+
     return (
         <main className={styles.container}>
             {/* HERO */}
@@ -281,98 +320,106 @@ export default function HomePage() {
                         {loading && !initialLoading && <span style={{fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600}}>Updating results...</span>}
                     </div>
                     
-                    <div className={styles.grid}>
-                        {products.map(item => {
-                            const pulseKey = `${item.crop}_${item.location}_${item.unit}`;
-                            const pulse = marketPulse[pulseKey];
-                            const perishState = getPerishabilityState(item.available_date || item.created_at, item.is_perishable);
-                            
-                            return (
-                                <div key={item.id} className={styles.card}>
-                                    {item.image_url && (
-                                        <div className={styles.cardImageWrapper}>
-                                            <img src={item.image_url} alt={item.crop} className={styles.cardImage} />
-                                        </div>
-                                    )}
-                                    <div className={styles.cardHeader}>
-                                        <div className={styles.tags}>
-                                            <span className={styles.categoryTag}>{item.category || "Crop"}</span>
-                                        </div>
-                                        <span className={styles.locationBadge}>📍 {item.location}</span>
-                                    </div>
-
-                                    <h3>{item.crop}</h3>
+                    {sortedCategories.map(([categoryName, categoryProducts]) => (
+                        <div key={categoryName} className={styles.categorySection}>
+                            <h3 className={styles.categoryTitle}>
+                                {categoryEmojis[categoryName] || "📦"} {categoryName}
+                            </h3>
+                            <div className={styles.grid}>
+                                {categoryProducts.map(item => {
+                                    const pulseKey = `${item.crop}_${item.location}_${item.unit}`;
+                                    const pulse = marketPulse[pulseKey];
+                                    const perishState = getPerishabilityState(item.available_date || item.created_at, item.is_perishable);
                                     
-                                    <div className={styles.priceRow}>
-                                        💰 <strong>{Number(item.price).toLocaleString()} FCFA</strong> / {item.unit}
-                                    </div>
-
-                                    {/* Phase 5: Transparency Badges */}
-                                    {pulse && (
-                                        <div className={styles.transparencyBadge}>
-                                            <div className={styles.transTitle}>Market Pulse</div>
-                                            <div className={styles.transStats}>
-                                                <span>Min <strong>{pulse.min}</strong></span>
-                                                <span>Max <strong>{pulse.max}</strong></span>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Phase 5: Perishability Meter */}
-                                    {perishState && (
-                                        <div className={`${styles.perishMeter} ${styles[`perish_${perishState.state}`]}`}>
-                                            ⏱️ Quality Timer: <strong>{perishState.text}</strong>
-                                        </div>
-                                    )}
-
-                                    <div className={styles.details}>
-                                        <div className={styles.meta}>
-                                            <span>📦 {item.quantity}</span>
-                                            <span>🕒 {formatTimeAgo(item.created_at)}</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Phase 5: Direct P2P Closing */}
-                                    <div className={styles.actionsContainer}>
-                                        {item.harvest === "future" && (
-                                            <div className={styles.futureHarvestActionsBadge}>
-                                                ⏳ Future Harvest: {getHarvestCountdown(item.available_date)}
-                                            </div>
-                                        )}
-                                        <div className={styles.actions}>
-                                            {item.profiles?.whatsapp && (
-                                                <a onClick={handleContactGuard} href={`https://wa.me/${item.profiles.whatsapp}`} target="_blank" className={styles.btnWhatsapp}>
-                                                    💬 WhatsApp
-                                                </a>
+                                    return (
+                                        <div key={item.id} className={styles.card}>
+                                            {item.image_url && (
+                                                <div className={styles.cardImageWrapper}>
+                                                    <img src={item.image_url} alt={item.crop} className={styles.cardImage} />
+                                                </div>
                                             )}
-                                            {item.id ? (
-                                                <Link href={`/product/${item.id}`} className={styles.btnCall}>
-                                                    🔍 View Details
-                                                </Link>
-                                            ) : null}
+                                            <div className={styles.cardHeader}>
+                                                <div className={styles.tags}>
+                                                    <span className={styles.categoryTag}>{item.category || "Crop"}</span>
+                                                </div>
+                                                <span className={styles.locationBadge}>📍 {item.location}</span>
+                                            </div>
+
+                                            <h3>{item.crop}</h3>
+                                            
+                                            <div className={styles.priceRow}>
+                                                💰 <strong>{Number(item.price).toLocaleString()} FCFA</strong> / {item.unit}
+                                            </div>
+
+                                            {/* Phase 5: Transparency Badges */}
+                                            {pulse && (
+                                                <div className={styles.transparencyBadge}>
+                                                    <div className={styles.transTitle}>Market Pulse</div>
+                                                    <div className={styles.transStats}>
+                                                        <span>Min <strong>{pulse.min}</strong></span>
+                                                        <span>Max <strong>{pulse.max}</strong></span>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Phase 5: Perishability Meter */}
+                                            {perishState && (
+                                                <div className={`${styles.perishMeter} ${styles[`perish_${perishState.state}`]}`}>
+                                                    ⏱️ Quality Timer: <strong>{perishState.text}</strong>
+                                                </div>
+                                            )}
+
+                                            <div className={styles.details}>
+                                                <div className={styles.meta}>
+                                                    <span>📦 {item.quantity}</span>
+                                                    <span>🕒 {formatTimeAgo(item.created_at)}</span>
+                                                </div>
+                                            </div>
+
+                                            {/* Phase 5: Direct P2P Closing */}
+                                            <div className={styles.actionsContainer}>
+                                                {item.harvest === "future" && (
+                                                    <div className={styles.futureHarvestActionsBadge}>
+                                                        ⏳ Future Harvest: {getHarvestCountdown(item.available_date)}
+                                                    </div>
+                                                )}
+                                                <div className={styles.actions}>
+                                                    {item.profiles?.whatsapp && (
+                                                        <a onClick={handleContactGuard} href={`https://wa.me/${item.profiles.whatsapp}`} target="_blank" className={styles.btnWhatsapp}>
+                                                            💬 WhatsApp
+                                                        </a>
+                                                    )}
+                                                    {item.id ? (
+                                                        <Link href={`/product/${item.id}`} className={styles.btnCall}>
+                                                            🔍 View Details
+                                                        </Link>
+                                                    ) : null}
+                                                </div>
+                                                {userSubscriptions.has(`${item.crop}_${item.location}`) ? (
+                                                    <button 
+                                                        className={styles.btnUnsubscribe} 
+                                                        onClick={() => handleUnsubscribe(item.crop, item.location)}
+                                                    >
+                                                        🔕 Unsubscribe from {item.crop}
+                                                    </button>
+                                                ) : (
+                                                    <button 
+                                                        className={styles.btnFollow} 
+                                                        onClick={() => {
+                                                            if (!user) return handleContactGuard(null as any);
+                                                            handleDemandCapture(item.crop, item.location, item.harvest === 'future');
+                                                        }}
+                                                    >
+                                                        🔔 Notify me of future {item.crop} posts
+                                                    </button>
+                                                )}
                                         </div>
-                                        {userSubscriptions.has(`${item.crop}_${item.location}`) ? (
-                                            <button 
-                                                className={styles.btnUnsubscribe} 
-                                                onClick={() => handleUnsubscribe(item.crop, item.location)}
-                                            >
-                                                🔕 Unsubscribe from {item.crop}
-                                            </button>
-                                        ) : (
-                                            <button 
-                                                className={styles.btnFollow} 
-                                                onClick={() => {
-                                                    if (!user) return handleContactGuard(null as any);
-                                                    handleDemandCapture(item.crop, item.location, item.harvest === 'future');
-                                                }}
-                                            >
-                                                🔔 Notify me of future {item.crop} posts
-                                            </button>
-                                        )}
-                                </div>
+                                    </div>
+                                    );
+                                })}
                             </div>
-                        );
-                    })}
+                        </div>
+                    ))}
 
                         {products.length === 0 && !loading && (
                             <div className={styles.emptyState}>
@@ -386,8 +433,6 @@ export default function HomePage() {
                                 )}
                             </div>
                         )}
-                    </div>
-
                     {hasMore && (
                         <div className={styles.loadMoreContainer}>
                             <button 

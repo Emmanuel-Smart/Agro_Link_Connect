@@ -323,6 +323,7 @@ export default function ProfilePage() {
                                         <option>Bucket</option>
                                         <option>Crate</option>
                                         <option>Kg</option>
+                                        <option>Others</option>
                                     </select>
                                 </div>
                                 <div className={styles.formGroup}>

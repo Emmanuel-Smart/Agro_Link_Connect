@@ -357,6 +357,7 @@ export default function AddProductPage() {
                             <option>Bucket</option>
                             <option>Crate</option>
                             <option>Kg</option>
+                            <option>Others</option>
                         </select>
                     </div>
 

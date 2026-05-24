@@ -203,6 +203,31 @@
     background: linear-gradient(to right, #e2e8f0, transparent);
 }
 
+/* ---- Categories ---- */
+.categorySection {
+    margin-bottom: 48px;
+    animation: fadeInUp 0.5s ease both;
+}
+
+.categoryTitle {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.categoryTitle::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(to right, #e2e8f0, transparent);
+    margin-left: 8px;
+}
+
 /* ---- Product Grid ---- */
 .marketplace { position: relative; }
 
