@@ -71,7 +71,25 @@ export default function HomePage() {
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [userSubscriptions, setUserSubscriptions] = useState<Set<string>>(new Set());
-    const PAGE_SIZE = 12;
+    const PAGE_SIZE = 50;
+
+    // Category Expand State
+    const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+        checkMobile(); // Check on mount
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    const toggleCategory = (catName: string) => {
+        setExpandedCategories(prev => ({
+            ...prev,
+            [catName]: !prev[catName]
+        }));
+    };
 
     useEffect(() => {
         const fetchMetadata = async () => {
@@ -322,13 +340,19 @@ export default function HomePage() {
                         {loading && !initialLoading && <span style={{fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600}}>Updating results...</span>}
                     </div>
                     
-                    {sortedCategories.map(([categoryName, categoryProducts]) => (
-                        <div key={categoryName} className={styles.categorySection}>
-                            <h3 className={styles.categoryTitle}>
-                                {categoryEmojis[categoryName] || "📦"} {categoryName}
-                            </h3>
-                            <div className={styles.grid}>
-                                {categoryProducts.map(item => {
+                    {sortedCategories.map(([categoryName, categoryProducts]) => {
+                        const isExpanded = expandedCategories[categoryName];
+                        const limit = isMobile ? 4 : 8;
+                        const visibleProducts = isExpanded ? categoryProducts : categoryProducts.slice(0, limit);
+                        const hasMoreLocal = categoryProducts.length > limit;
+
+                        return (
+                            <div key={categoryName} className={styles.categorySection}>
+                                <h3 className={styles.categoryTitle}>
+                                    {categoryEmojis[categoryName] || "📦"} {categoryName}
+                                </h3>
+                                <div className={styles.grid}>
+                                    {visibleProducts.map(item => {
                                     const pulseKey = `${item.crop}_${item.location}_${item.unit}`;
                                     const pulse = marketPulse[pulseKey];
                                     const perishState = getPerishabilityState(item.available_date || item.created_at, item.is_perishable);
@@ -420,8 +444,20 @@ export default function HomePage() {
                                     );
                                 })}
                             </div>
-                        </div>
-                    ))}
+
+                            {hasMoreLocal && (
+                                <div className={styles.categoryActions}>
+                                    <button 
+                                        className={styles.btnShowMoreCategory} 
+                                        onClick={() => toggleCategory(categoryName)}
+                                    >
+                                        {isExpanded ? "Show Less" : `Show All ${categoryProducts.length} ${categoryName}`}
+                                    </button>
+                                </div>
+                            )}
+                            </div>
+                        );
+                    })}
 
                         {products.length === 0 && !loading && (
                             <div className={styles.emptyState}>

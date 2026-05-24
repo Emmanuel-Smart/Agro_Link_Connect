@@ -228,6 +228,30 @@
     margin-left: 8px;
 }
 
+.categoryActions {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+}
+
+.btnShowMoreCategory {
+    padding: 10px 24px;
+    background: transparent;
+    color: #15803d;
+    border: 1.5px solid #bbf7d0;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.btnShowMoreCategory:hover {
+    background: #f0fdf4;
+    border-color: #86efac;
+    transform: translateY(-1px);
+}
+
 /* ---- Product Grid ---- */
 .marketplace { position: relative; }
 
