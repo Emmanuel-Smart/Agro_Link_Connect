@@ -63,6 +63,24 @@ export default function ProfilePage() {
         available_date: "", is_perishable: false 
     });
 
+    // Category Expand State
+    const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+        checkMobile(); // Check on mount
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    const toggleCategory = (catName: string) => {
+        setExpandedCategories(prev => ({
+            ...prev,
+            [catName]: !prev[catName]
+        }));
+    };
+
     useEffect(() => {
         if (!user) return;
         const fetchData = async () => {
@@ -284,6 +302,27 @@ export default function ProfilePage() {
         );
     }
 
+    const groupedProducts = products.reduce((acc, product) => {
+        const cat = product.category || "Others";
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(product);
+        return acc;
+    }, {} as Record<string, any[]>);
+
+    const categoryEmojis: Record<string, string> = {
+        "Cereals": "🌾",
+        "Tubers": "🥔",
+        "Vegetables": "🥬",
+        "Fruits": "🍎",
+        "Livestock": "🐄",
+        "Cash Crops": "💰",
+        "Others": "📦"
+    };
+
+    const sortedCategories: [string, any[]][] = (Object.entries(groupedProducts) as [string, any[]][]).sort(([_catA, itemsA], [_catB, itemsB]) => {
+        return itemsB.length - itemsA.length;
+    });
+
     return (
         <div className={styles.container}>
             {/* ---------------- EDIT PRODUCT MODAL (Expanded) ---------------- */}
@@ -454,8 +493,19 @@ export default function ProfilePage() {
                     <button className={styles.addBtn} onClick={() => router.push("/add-product")}>+ Add Product</button>
                 </div>
 
-                <div className={styles.grid}>
-                    {products.map((item) => {
+                    {sortedCategories.map(([categoryName, categoryProducts]) => {
+                        const isExpanded = expandedCategories[categoryName];
+                        const limit = isMobile ? 4 : 8;
+                        const visibleProducts = isExpanded ? categoryProducts : categoryProducts.slice(0, limit);
+                        const hasMoreLocal = categoryProducts.length > limit;
+
+                        return (
+                            <div key={categoryName} className={styles.categorySection}>
+                                <h3 className={styles.categoryTitle}>
+                                    {categoryEmojis[categoryName] || "📦"} {categoryName}
+                                </h3>
+                                <div className={styles.grid}>
+                                    {visibleProducts.map((item) => {
                         const pulseKey = `${item.crop}_${item.location}_${item.unit}`;
                         const pulse = marketPulse[pulseKey];
 
@@ -516,8 +566,21 @@ export default function ProfilePage() {
                                 </div>
                             </div>
                         );
+                                    })}
+                                </div>
+                                {hasMoreLocal && (
+                                    <div className={styles.categoryActions}>
+                                        <button 
+                                            className={styles.btnShowMoreCategory} 
+                                            onClick={() => toggleCategory(categoryName)}
+                                        >
+                                            {isExpanded ? "Show Less" : `Show All ${categoryProducts.length} ${categoryName}`}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        );
                     })}
-                </div>
             </main>
         </div>
     );
