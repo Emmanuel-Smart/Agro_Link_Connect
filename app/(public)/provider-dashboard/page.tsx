@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
 import styles from "./ProviderDashboard.module.css";
+import { ShieldAlert, MapPin, Edit, Trash2 } from "lucide-react";
 
 const formatExactDate = (dateString: string) => {
     if (!dateString) return "N/A";
@@ -121,7 +122,7 @@ export default function ProviderDashboardPage() {
                     const alertId = data[0].id;
                     const notificationPayloads = localUsers.map(u => ({
                         user_id: u.id,
-                        title: `📢 Official: ${type}`,
+                        title: `Official Bulletin: ${type}`,
                         message: message.substring(0, 100) + (message.length > 100 ? "..." : ""),
                         link: `/news?id=${alertId}`,
                         type: "report"
@@ -206,7 +207,9 @@ export default function ProviderDashboardPage() {
         <div className={styles.container}>
             <div className={styles.dashboard}>
                 <div className={styles.header}>
-                    <h1>🛡️ Provider Operations Hub</h1>
+                    <h1 style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                        <ShieldAlert size={26} style={{ color: "#4ade80" }} /> Provider Operations Hub
+                    </h1>
                     <p>Broadcasting Official Bulletins to <strong>{profile?.location}</strong></p>
                 </div>
 
@@ -275,15 +278,21 @@ export default function ProviderDashboardPage() {
                             <div className={styles.alertHeader}>
                                 <div className={styles.alertMainInfo}>
                                     <span className={styles.alertBadge}>{alert.type}</span>
-                                    <span className={styles.targetBadge}>📍 {alert.location}</span>
+                                    <span className={styles.targetBadge} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                        <MapPin size={12} /> {alert.location}
+                                    </span>
                                 </div>
                                 <span className={styles.alertDate}>{formatExactDate(alert.created_at)}</span>
                             </div>
                             <p>{alert.message}</p>
                             
                             <div className={styles.alertActions}>
-                                <button className={styles.btnEdit} onClick={() => openEdit(alert)}>✏️ Edit</button>
-                                <button className={styles.btnDelete} onClick={() => handleDelete(alert.id)}>🗑️ Delete</button>
+                                <button className={styles.btnEdit} onClick={() => openEdit(alert)} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                    <Edit size={12} /> Edit
+                                </button>
+                                <button className={styles.btnDelete} onClick={() => handleDelete(alert.id)} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                    <Trash2 size={12} /> Delete
+                                </button>
                             </div>
                         </div>
                     ))}

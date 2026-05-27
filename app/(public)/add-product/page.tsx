@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import styles from "./AddProduct.module.css";
+import { Sparkles, Camera, Zap } from "lucide-react";
 
 /* ================= CROP MAP & SHELF-LIFE LOGIC (Phase 5) ================= */
 // Shelf-life is calculated in days.
@@ -253,7 +254,7 @@ export default function AddProductPage() {
                 // Create notifications for each unique buyer
                 const notificationPayloads = uniqueBuyers.map(buyerId => ({
                     user_id: buyerId,
-                    title: "💎 Fresh Match Found!",
+                    title: "Fresh Match Found!",
                     message: `Great news! ${form.quantity} ${form.unit}(s) of ${form.crop} just arrived in ${profile.location}.`,
                     link: productId ? `/home?highlight=${productId}` : `/home?search=${form.crop}`,
                     type: "match"
@@ -291,8 +292,8 @@ export default function AddProductPage() {
                     </div>
                     
                     {manualMode && form.crop && (
-                        <div className={styles.customCropHint}>
-                            ✨ <strong>Custom Crop Detected:</strong> You are adding a crop not currently in our catalog. Please specify its category below.
+                        <div className={styles.customCropHint} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                            <Sparkles size={16} style={{ color: "#fbbf24" }} /> <strong>Custom Crop Detected:</strong> You are adding a crop not currently in our catalog. Please specify its category below.
                         </div>
                     )}
 
@@ -324,7 +325,9 @@ export default function AddProductPage() {
                     <div className={styles.imageUploadBox}>
                         <label className={styles.imageLabel}>
                             <div className={styles.imagePlaceholder}>
-                                <span className={styles.placeholderIcon}>📸</span>
+                                <span className={styles.placeholderIcon} style={{ display: "flex", justifyContent: "center", marginBottom: "8px" }}>
+                                    <Camera size={32} style={{ color: "#64748b" }} />
+                                </span>
                                 <span className={styles.placeholderText}>Upload Product Images</span>
                                 <small>Add up to 5 photos for better visibility</small>
                             </div>
@@ -363,8 +366,8 @@ export default function AddProductPage() {
 
                     {/* THE PIONEER STATE */}
                     {isPioneer && form.crop && (
-                        <div className={styles.pioneerState}>
-                            🚀 <strong>Pioneer Alert:</strong> You are the first to price this crop in this neighborhood! You are setting the market pulse.
+                        <div className={styles.pioneerState} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <Zap size={18} style={{ color: "#fbbf24" }} /> <strong>Pioneer Alert:</strong> You are the first to price this crop in this neighborhood! You are setting the market pulse.
                         </div>
                     )}
 

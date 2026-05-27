@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
 import styles from "./Community.module.css";
 import Footer from "../../components/Footer/Footer";
+import { Globe, Sprout, ShoppingCart, ShieldCheck, MapPin, Handshake, Lock, Leaf } from "lucide-react";
 
 export default function CommunityPage() {
     const { user } = useAuth();
@@ -29,7 +30,9 @@ export default function CommunityPage() {
             {/* HERO */}
             <section className={styles.hero}>
                 <div className={styles.heroContent}>
-                    <span className={styles.heroBadge}>🌍 AgroLink Community</span>
+                    <span className={styles.heroBadge} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                        <Globe size={14} /> AgroLink Community
+                    </span>
                     <h1>Connect With <span>Farmers</span> & <span>Buyers</span></h1>
                     <p>Meet the growing network of verified producers, traders, and organizations building a better agricultural future in the North West Region.</p>
                 </div>
@@ -39,22 +42,30 @@ export default function CommunityPage() {
             <section className={styles.statsSection}>
                 <div className={styles.statsGrid}>
                     <div className={styles.statCard}>
-                        <span className={styles.statIcon}>🌾</span>
+                        <span className={styles.statIcon} style={{ display: "flex", justifyContent: "center" }}>
+                            <Sprout size={24} style={{ color: "#22c55e" }} />
+                        </span>
                         <span className={styles.statNum}>{members.filter(m => m.is_farmer).length}</span>
                         <span className={styles.statLbl}>Farmers</span>
                     </div>
                     <div className={styles.statCard}>
-                        <span className={styles.statIcon}>🛒</span>
+                        <span className={styles.statIcon} style={{ display: "flex", justifyContent: "center" }}>
+                            <ShoppingCart size={24} style={{ color: "#fbbf24" }} />
+                        </span>
                         <span className={styles.statNum}>{members.filter(m => m.is_buyer).length}</span>
                         <span className={styles.statLbl}>Buyers</span>
                     </div>
                     <div className={styles.statCard}>
-                        <span className={styles.statIcon}>🛡️</span>
+                        <span className={styles.statIcon} style={{ display: "flex", justifyContent: "center" }}>
+                            <ShieldCheck size={24} style={{ color: "#4ade80" }} />
+                        </span>
                         <span className={styles.statNum}>{members.filter(m => m.is_approved_provider).length}</span>
                         <span className={styles.statLbl}>Verified Providers</span>
                     </div>
                     <div className={styles.statCard}>
-                        <span className={styles.statIcon}>📍</span>
+                        <span className={styles.statIcon} style={{ display: "flex", justifyContent: "center" }}>
+                            <MapPin size={24} style={{ color: "#ef4444" }} />
+                        </span>
                         <span className={styles.statNum}>{new Set(members.map(m => m.location).filter(Boolean)).size}</span>
                         <span className={styles.statLbl}>Neighborhoods</span>
                     </div>
@@ -82,11 +93,15 @@ export default function CommunityPage() {
                                     )}
                                 </div>
                                 <h3>{member.full_name || "Anonymous"}</h3>
-                                {member.location && <p className={styles.memberLocation}>📍 {member.location}</p>}
+                                {member.location && (
+                                    <p className={styles.memberLocation} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                        <MapPin size={12} /> {member.location}
+                                    </p>
+                                )}
                                 <div className={styles.memberRoles}>
-                                    {member.is_farmer && <span className={styles.roleFarmer}>🚜 Farmer</span>}
-                                    {member.is_buyer && <span className={styles.roleBuyer}>🛒 Buyer</span>}
-                                    {member.is_approved_provider && <span className={styles.roleProvider}>🛡️ Provider</span>}
+                                    {member.is_farmer && <span className={styles.roleFarmer} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Sprout size={11} /> Farmer</span>}
+                                    {member.is_buyer && <span className={styles.roleBuyer} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><ShoppingCart size={11} /> Buyer</span>}
+                                    {member.is_approved_provider && <span className={styles.roleProvider} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><ShieldCheck size={11} /> Provider</span>}
                                 </div>
                             </div>
                         ))}
@@ -99,17 +114,23 @@ export default function CommunityPage() {
                 <h2>Community Values</h2>
                 <div className={styles.valuesGrid}>
                     <div className={styles.valueCard}>
-                        <div className={styles.valueIcon}>🤝</div>
+                        <div className={styles.valueIcon} style={{ display: "flex", justifyContent: "center", marginBottom: "16px" }}>
+                            <Handshake size={32} style={{ color: "#22c55e" }} />
+                        </div>
                         <h3>Transparency</h3>
                         <p>All prices are visible. No hidden fees, no middleman markups.</p>
                     </div>
                     <div className={styles.valueCard}>
-                        <div className={styles.valueIcon}>🔒</div>
+                        <div className={styles.valueIcon} style={{ display: "flex", justifyContent: "center", marginBottom: "16px" }}>
+                            <Lock size={32} style={{ color: "#fbbf24" }} />
+                        </div>
                         <h3>Trust</h3>
                         <p>Verified profiles and GPS-anchored locations ensure accountability.</p>
                     </div>
                     <div className={styles.valueCard}>
-                        <div className={styles.valueIcon}>🌱</div>
+                        <div className={styles.valueIcon} style={{ display: "flex", justifyContent: "center", marginBottom: "16px" }}>
+                            <Leaf size={32} style={{ color: "#4ade80" }} />
+                        </div>
                         <h3>Sustainability</h3>
                         <p>Reducing waste through perishability tracking and demand signaling.</p>
                     </div>

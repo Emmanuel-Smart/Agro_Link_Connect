@@ -5,8 +5,7 @@ import styles from "./login.module.css";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Link from "next/link";
-
-
+import { Sprout } from "lucide-react";
 
 export default function LoginPage() {
 
@@ -47,7 +46,9 @@ export default function LoginPage() {
     return (
         <div className={styles.pageBackground}>
             <div className={styles.container}>
-                <h2 className={styles.title}>Welcome Back to AgroLink 🌾</h2>
+                <h2 className={styles.title} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                    Welcome Back to AgroLink <Sprout size={24} style={{ color: "#22c55e" }} />
+                </h2>
                 <p className={styles.subtitle}>
                     Log in to access your dashboard and manage your farm marketplace.
                 </p>

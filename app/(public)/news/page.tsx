@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/app/context/AuthContext";
 import styles from "./News.module.css";
 import Footer from "../../components/Footer/Footer";
+import { ShieldCheck, Clock, MapPin } from "lucide-react";
 
 export default function OfficialReportsPage() {
     const { user } = useAuth();
@@ -59,7 +60,9 @@ export default function OfficialReportsPage() {
         <main className={styles.container}>
             <section className={styles.hero}>
                 <div className={styles.heroContent}>
-                    <div className={styles.heroBadge}>🛡️ Verified Authority Channel</div>
+                    <div className={styles.heroBadge} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                        <ShieldCheck size={14} /> Verified Authority Channel
+                    </div>
                     <h1>Official Regional Reports</h1>
                     <p>Verified agricultural bulletins and emergency broadcasts from approved providers.</p>
                 </div>
@@ -80,12 +83,14 @@ export default function OfficialReportsPage() {
                                     <div className={styles.typeGroup}>
                                         <span className={styles.typeBadge}>{report.type}</span>
                                         {countdown && (
-                                            <span className={`${styles.countdownBadge} ${countdown === 'EXPIRED' ? styles.expired : ''}`}>
-                                                ⏳ {countdown}
+                                            <span className={`${styles.countdownBadge} ${countdown === 'EXPIRED' ? styles.expired : ''}`} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                                <Clock size={12} /> {countdown}
                                             </span>
                                         )}
                                     </div>
-                                    <span className={styles.locationBadge}>📍 {report.location}</span>
+                                    <span className={styles.locationBadge} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                        <MapPin size={12} /> {report.location}
+                                    </span>
                                 </div>
                                 <p className={styles.message}>{report.message}</p>
                                 <div className={styles.footer}>

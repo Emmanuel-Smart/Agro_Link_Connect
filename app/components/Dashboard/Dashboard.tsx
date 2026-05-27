@@ -7,6 +7,20 @@ import { useRouter } from "next/navigation";
 import styles from "./Dashboard.module.css";
 import Link from "next/link";
 import Footer from "../Footer/Footer";
+import { 
+    CheckCircle2, 
+    Truck, 
+    TrendingUp, 
+    MapPin, 
+    Calendar, 
+    MessageCircle, 
+    Search, 
+    Bell, 
+    BellOff, 
+    Sprout, 
+    DollarSign, 
+    Package 
+} from "lucide-react";
 
 const getHarvestCountdown = (availableDate: string) => {
     if (!availableDate) return null;
@@ -58,7 +72,7 @@ export default function Dashboard() {
     const handleContactGuard = (e: React.MouseEvent) => {
         if (!user) {
             if (e) e.preventDefault();
-            alert("🔒 Access Restricted: Please Sign Up or Login to contact farmers and view full market details.");
+            alert("Access Restricted: Please Sign Up or Login to contact farmers and view full market details.");
             router.push("/register");
             return true;
         }
@@ -70,7 +84,7 @@ export default function Dashboard() {
 
         // PROFILE CHECK
         if (!profile?.whatsapp || !profile?.location) {
-            alert("🛠️ Profile Incomplete: Please set your WhatsApp number and Location in your Profile first so we know where to send your alerts!");
+            alert("Profile Incomplete: Please set your WhatsApp number and Location in your Profile first so we know where to send your alerts!");
             router.push("/profile");
             return;
         }
@@ -144,9 +158,15 @@ export default function Dashboard() {
                         <Link href="/About" className={styles.btnSecondary}>Learn How It Works</Link>
                     </div>
                     <div className={styles.trustSignals}>
-                        <span>✅ Verified Producers</span>
-                        <span>🚛 Logistics Tracking</span>
-                        <span>📊 Live Market Rates</span>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                            <CheckCircle2 size={15} style={{ color: "#4ade80" }} /> Verified Producers
+                        </span>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                            <Truck size={15} style={{ color: "#4ade80" }} /> Logistics Tracking
+                        </span>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                            <TrendingUp size={15} style={{ color: "#4ade80" }} /> Live Market Rates
+                        </span>
                     </div>
                 </div>
             </section>
@@ -175,7 +195,9 @@ export default function Dashboard() {
                                 <div className={styles.cardBody}>
                                     <div className={styles.cardTags}>
                                         <span className={styles.tag}>{item.category}</span>
-                                        <span className={styles.location}>📍 {item.location}</span>
+                                        <span className={styles.location} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                            <MapPin size={12} /> {item.location}
+                                        </span>
                                     </div>
                                     <h3>{item.crop}</h3>
                                     <div className={styles.price}>
@@ -183,14 +205,18 @@ export default function Dashboard() {
                                     </div>
                                     <div className={styles.dashboardActionsContainer}>
                                         {item.harvest === "future" && (
-                                            <div style={{fontSize: '0.7rem', fontWeight: 800, color: '#0284c7', marginBottom: '8px', textAlign: 'center', background: '#f0f9ff', padding: '6px', borderRadius: '8px', border: '1px solid #bae6fd'}}>
-                                                🚚 Future Harvest: {getHarvestCountdown(item.available_date)}
+                                            <div style={{fontSize: '0.7rem', fontWeight: 800, color: '#0284c7', marginBottom: '8px', textAlign: 'center', background: '#f0f9ff', padding: '6px', borderRadius: '8px', border: '1px solid #bae6fd', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'}}>
+                                                <Calendar size={12} /> Future Harvest: {getHarvestCountdown(item.available_date)}
                                             </div>
                                         )}
                                         <div className={styles.actions}>
-                                            <button onClick={handleContactGuard} className={styles.btnAction}>💬 WhatsApp</button>
+                                            <button onClick={handleContactGuard} className={styles.btnAction} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+                                                <MessageCircle size={14} /> WhatsApp
+                                            </button>
                                             {item.id ? (
-                                                <Link href={`/product/${item.id}`} className={styles.btnActionSecondary}>🔍 View Details</Link>
+                                                <Link href={`/product/${item.id}`} className={styles.btnActionSecondary} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+                                                    <Search size={14} /> View Details
+                                                </Link>
                                             ) : (
                                                 <button disabled className={styles.btnActionSecondary}>No Details</button>
                                             )}
@@ -199,16 +225,16 @@ export default function Dashboard() {
                                         {userSubscriptions.has(`${item.crop}_${item.location}`) ? (
                                             <button 
                                                 onClick={() => handleUnsubscribeCorrect(item.crop, item.location)}
-                                                style={{width: '100%', background: 'transparent', border: 'none', color: '#94a3b8', fontSize: '0.65rem', fontWeight: 800, marginTop: '10px', cursor: 'pointer', textAlign: 'center'}}
+                                                style={{width: '100%', background: 'transparent', border: 'none', color: '#94a3b8', fontSize: '0.65rem', fontWeight: 800, marginTop: '10px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px'}}
                                             >
-                                                🔕 Unsubscribe from {item.crop}
+                                                <BellOff size={11} /> Unsubscribe from {item.crop}
                                             </button>
                                         ) : (
                                             <button 
                                                 onClick={() => handleDemandCapture(item.crop, item.location, item.harvest === 'future')}
-                                                style={{width: '100%', background: 'transparent', border: 'none', color: '#0ea5e9', fontSize: '0.65rem', fontWeight: 800, marginTop: '10px', cursor: 'pointer', textAlign: 'center'}}
+                                                style={{width: '100%', background: 'transparent', border: 'none', color: '#0ea5e9', fontSize: '0.65rem', fontWeight: 800, marginTop: '10px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px'}}
                                             >
-                                                🔔 Notify me of future {item.crop} in {item.location}
+                                                <Bell size={11} /> Notify me of future {item.crop} in {item.location}
                                             </button>
                                         )}
                                     </div>
@@ -223,17 +249,23 @@ export default function Dashboard() {
             <section className={styles.features}>
                 <div className={styles.featureGrid}>
                     <div className={styles.featureCard}>
-                        <div className={styles.icon}>🌾</div>
+                        <div className={styles.icon} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Sprout size={32} style={{ color: "#4ade80" }} />
+                        </div>
                         <h3>For Farmers</h3>
                         <p>Set your own prices and reach thousands of buyers instantly via SMS and Web.</p>
                     </div>
                     <div className={styles.featureCard}>
-                        <div className={styles.icon}>💰</div>
+                        <div className={styles.icon} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <DollarSign size={32} style={{ color: "#4ade80" }} />
+                        </div>
                         <h3>For Buyers</h3>
                         <p>Access transparent market rates and purchase directly from the source.</p>
                     </div>
                     <div className={styles.featureCard}>
-                        <div className={styles.icon}>📦</div>
+                        <div className={styles.icon} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Package size={32} style={{ color: "#4ade80" }} />
+                        </div>
                         <h3>For Logistics</h3>
                         <p>Partner with producers to transport crops and minimize post-harvest loss.</p>
                     </div>

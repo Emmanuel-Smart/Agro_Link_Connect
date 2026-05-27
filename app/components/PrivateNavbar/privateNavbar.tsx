@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useState, useEffect } from "react";
 import styles from "./Nav.module.css";
 import NotificationHub from "../NotificationHub/NotificationHub";
+import { Sun, Moon, Megaphone } from "lucide-react";
 
 export default function PrivateNavbar() {
     const { user } = useAuth();
@@ -128,7 +129,15 @@ export default function PrivateNavbar() {
             <ul className={`${styles.menu} ${menuOpen ? styles.menuActive : ""}`}>
                 <li>
                     <button onClick={toggleTheme} className={styles.themeButton} aria-label="Toggle Theme">
-                        {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
+                        {theme === 'dark' ? (
+                            <>
+                                <Sun size={15} /> Light
+                            </>
+                        ) : (
+                            <>
+                                <Moon size={15} /> Dark
+                            </>
+                        )}
                     </button>
                 </li>
                 <li><Link href="/home">Home</Link></li>
@@ -156,7 +165,9 @@ export default function PrivateNavbar() {
             {toast && (
                 <div className={styles.toastContainer} onClick={() => setToast(null)}>
                     <div className={styles.toastContent}>
-                        <span className={styles.toastBadge}>📢 NEW OFFICIAL REPORT</span>
+                        <span className={styles.toastBadge} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                            <Megaphone size={14} style={{ color: "#4ade80" }} /> NEW OFFICIAL REPORT
+                        </span>
                         <p>{toast.message}</p>
                     </div>
                 </div>

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import styles from "../login/login.module.css";
+import { KeyRound } from "lucide-react";
 
 export default function ResetPasswordPage() {
     const router = useRouter();
@@ -36,7 +37,9 @@ export default function ResetPasswordPage() {
     return (
         <div className={styles.pageBackground}>
             <div className={styles.container}>
-                <h2 className={styles.title}>Set New Password 🆕</h2>
+                <h2 className={styles.title} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                    <KeyRound size={22} style={{ color: "#22c55e" }} /> Set New Password
+                </h2>
                 <p className={styles.subtitle}>
                     Choose a strong password to secure your AgroLink account.
                 </p>

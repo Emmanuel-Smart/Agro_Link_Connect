@@ -3,6 +3,7 @@
 import styles from "./About.module.css";
 import Link from "next/link";
 import Footer from "../../components/Footer/Footer";
+import { ShieldCheck, Radio, Clock } from "lucide-react";
 
 export default function AboutPage() {
     return (
@@ -51,7 +52,9 @@ export default function AboutPage() {
                 </div>
                 <div className={styles.pillarGrid}>
                     <div className={styles.pillarCard}>
-                        <div className={styles.pillarIcon}>🛡️</div>
+                        <div className={styles.pillarIcon} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                            <ShieldCheck size={28} style={{ color: "#22c55e" }} />
+                        </div>
                         <h3>Anti-Exploitation Engine</h3>
                         <p>Real-time price intelligence that protects farmers from predatory middlemen. Our system compares your asking price against neighborhood market data, alerting you if your price falls below fair market value.</p>
                         <div className={styles.pillarFeatures}>
@@ -61,7 +64,9 @@ export default function AboutPage() {
                         </div>
                     </div>
                     <div className={styles.pillarCard}>
-                        <div className={styles.pillarIcon}>📡</div>
+                        <div className={styles.pillarIcon} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                            <Radio size={28} style={{ color: "#3b82f6" }} />
+                        </div>
                         <h3>Spatial Intelligence</h3>
                         <p>GPS-verified neighborhood mapping ensures every price point and market signal is geographically accurate. Your location is your anchor — it connects you to hyper-local market data.</p>
                         <div className={styles.pillarFeatures}>
@@ -71,7 +76,9 @@ export default function AboutPage() {
                         </div>
                     </div>
                     <div className={styles.pillarCard}>
-                        <div className={styles.pillarIcon}>⏳</div>
+                        <div className={styles.pillarIcon} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                            <Clock size={28} style={{ color: "#eab308" }} />
+                        </div>
                         <h3>Perishability Management</h3>
                         <p>Crop-specific shelf-life tracking reduces post-harvest waste by alerting buyers and farmers about product freshness windows. Future harvest signaling connects buyers to crops before they are even ready.</p>
                         <div className={styles.pillarFeatures}>

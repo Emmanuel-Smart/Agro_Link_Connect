@@ -4,6 +4,7 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import styles from "../login/login.module.css";
 import Link from "next/link";
+import { KeyRound } from "lucide-react";
 
 export default function ForgotPasswordPage() {
     const [email, setEmail] = useState("");
@@ -32,7 +33,9 @@ export default function ForgotPasswordPage() {
     return (
         <div className={styles.pageBackground}>
             <div className={styles.container}>
-                <h2 className={styles.title}>Reset Your Password 🔑</h2>
+                <h2 className={styles.title} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                    <KeyRound size={22} style={{ color: "#22c55e" }} /> Reset Your Password
+                </h2>
                 <p className={styles.subtitle}>
                     Enter your email address and we'll send you a link to reset your password.
                 </p>

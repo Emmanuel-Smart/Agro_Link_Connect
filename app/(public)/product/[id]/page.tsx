@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabaseClient";
 import Link from "next/link";
 import styles from "./ProductDetails.module.css";
 import Footer from "../../../components/Footer/Footer";
+import { ArrowLeft, MapPin, MessageCircle, Phone, ShieldCheck, Search } from "lucide-react";
 
 export default function ProductDetailsPage() {
     const { id } = useParams();
@@ -68,13 +69,13 @@ export default function ProductDetailsPage() {
         fetchProductData();
     }, [id]);
 
-    if (loading) return <div className={styles.loading}>🔍 Securing Harvest Data...</div>;
+    if (loading) return <div className={styles.loading} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}><Search size={20} className={styles.animatePulse} /> Securing Harvest Data...</div>;
     if (!product) return <div className={styles.container}><h1>Product not found</h1><Link href="/home">Return to Marketplace</Link></div>;
 
     return (
         <main className={styles.container}>
-            <Link href="/home" className={styles.backBtn}>
-                ← Back to Marketplace
+            <Link href="/home" className={styles.backBtn} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                <ArrowLeft size={16} /> Back to Marketplace
             </Link>
 
             <div className={styles.productLayout}>
@@ -106,7 +107,9 @@ export default function ProductDetailsPage() {
                         <h1>{product.crop}</h1>
                         <div className={styles.badges}>
                             <span className={`${styles.badge} ${styles.categoryBadge}`}>{product.category}</span>
-                            <span className={`${styles.badge} ${styles.locationBadge}`}>📍 {product.location}</span>
+                            <span className={`${styles.badge} ${styles.locationBadge}`} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                <MapPin size={12} /> {product.location}
+                            </span>
                         </div>
                     </div>
 
@@ -141,16 +144,18 @@ export default function ProductDetailsPage() {
                                     href={`https://wa.me/${seller.whatsapp}`} 
                                     target="_blank" 
                                     className={styles.btnWa}
+                                    style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
                                 >
-                                    💬 Contact via WhatsApp
+                                    <MessageCircle size={18} /> Contact via WhatsApp
                                 </a>
                             )}
                             {seller?.phone && (
                                 <a 
                                     href={`tel:${seller.phone}`} 
                                     className={styles.btnCall}
+                                    style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
                                 >
-                                    📞 Call Farmer Direct
+                                    <Phone size={18} /> Call Farmer Direct
                                 </a>
                             )}
                         </div>
@@ -164,9 +169,13 @@ export default function ProductDetailsPage() {
                                 </div>
                                 <div className={styles.sellerMeta}>
                                     <h3>{seller.full_name}</h3>
-                                    <div className={styles.sellerLocation}>📍 Based in {seller.location}</div>
+                                    <div className={styles.sellerLocation} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                                        <MapPin size={12} /> Based in {seller.location}
+                                    </div>
                                     {seller.is_approved_provider && (
-                                        <div className={styles.verifiedBadge}>🛡️ Verified Source</div>
+                                        <div className={styles.verifiedBadge} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                            <ShieldCheck size={12} /> Verified Source
+                                        </div>
                                     )}
                                 </div>
                             </div>

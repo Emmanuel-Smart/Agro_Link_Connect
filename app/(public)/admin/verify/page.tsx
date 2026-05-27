@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
 import styles from "./Admin.module.css";
+import { ShieldCheck, XOctagon } from "lucide-react";
 
 const ADMIN_EMAIL = "nsamiemmanuelkongnyu@gmail.com";
 
@@ -91,7 +92,9 @@ export default function AdminVerifyPage() {
         <div className={styles.container}>
             <div className={styles.dashboard}>
                 <div className={styles.header}>
-                    <h1>🛡️ Central Authority Hub</h1>
+                    <h1 style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                        <ShieldCheck size={28} style={{ color: "#22c55e" }} /> Central Authority Hub
+                    </h1>
                     <p>Vetting & Approval of Official Information Providers</p>
                 </div>
 
@@ -118,8 +121,9 @@ export default function AdminVerifyPage() {
                                     <button 
                                         className={styles.btnDelete}
                                         onClick={() => handleReject(provider.id)}
+                                        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "4px" }}
                                     >
-                                        🚫 Reject & Wipe
+                                        <XOctagon size={14} /> Reject & Wipe
                                     </button>
                                 </div>
                             </div>

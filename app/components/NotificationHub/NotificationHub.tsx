@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
 import styles from "./NotificationHub.module.css";
+import { Bell, ShoppingCart, ShieldAlert, Radio, Eye, BookOpen } from "lucide-react";
 
 export default function NotificationHub() {
     const { user } = useAuth();
@@ -94,7 +95,7 @@ export default function NotificationHub() {
     return (
         <div className={styles.wrapper}>
             <button className={styles.bellBtn} onClick={() => { setIsOpen(!isOpen); if (!isOpen) markAllAsRead(); }}>
-                🔔 {unreadCount > 0 && <span className={styles.badge}>{unreadCount}</span>}
+                <Bell size={16} /> {unreadCount > 0 && <span className={styles.badge}>{unreadCount}</span>}
             </button>
 
             {isOpen && (
@@ -112,21 +113,25 @@ export default function NotificationHub() {
                             <button 
                                 className={`${styles.tabBtn} ${activeTab === 'match' ? styles.tabActive : ''}`}
                                 onClick={() => setActiveTab('match')}
+                                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                             >
-                                🛒 Market Matches
+                                <ShoppingCart size={13} /> Market Matches
                             </button>
                             <button 
                                 className={`${styles.tabBtn} ${activeTab === 'report' ? styles.tabActive : ''}`}
                                 onClick={() => setActiveTab('report')}
+                                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                             >
-                                🛡️ Official Reports
+                                <ShieldAlert size={13} /> Official Reports
                             </button>
                         </div>
                     </div>
                     <div className={styles.list}>
                         {filtered.length === 0 ? (
                             <div className={styles.empty}>
-                                <div className={styles.emptyIcon}>{activeTab === 'match' ? '🛒' : '📡'}</div>
+                                <div className={styles.emptyIcon} style={{ display: "flex", justifyContent: "center", marginBottom: "12px" }}>
+                                    {activeTab === 'match' ? <ShoppingCart size={40} style={{ opacity: 0.6 }} /> : <Radio size={40} style={{ opacity: 0.6 }} />}
+                                </div>
                                 {activeTab === 'match' 
                                     ? "No new crop matches yet. We'll alert you when supply arrives!" 
                                     : "No official reports for your area at this time."}
@@ -140,7 +145,15 @@ export default function NotificationHub() {
                                         <div className={styles.itemTime}>{new Date(n.created_at).toLocaleTimeString()}</div>
                                         {n.link && (
                                             <a href={n.link} className={styles.contactBtn}>
-                                                {activeTab === 'match' ? "👀 View Listing" : "📖 Read Report"}
+                                                {activeTab === 'match' ? (
+                                                    <>
+                                                        <Eye size={11} /> View Listing
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <BookOpen size={11} /> Read Report
+                                                    </>
+                                                )}
                                             </a>
                                         )}
                                     </div>

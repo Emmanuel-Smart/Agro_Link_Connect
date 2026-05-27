@@ -7,6 +7,22 @@ import { useRouter } from "next/navigation";
 import styles from "./Home.module.css";
 import Link from "next/link";
 import Footer from "../../components/Footer/Footer";
+import { 
+    Search, 
+    Sprout, 
+    CircleDot, 
+    Leaf, 
+    Apple, 
+    Egg, 
+    DollarSign, 
+    Package, 
+    MapPin, 
+    Clock, 
+    MessageCircle, 
+    BellOff, 
+    Bell, 
+    Globe 
+} from "lucide-react";
 
 const formatTimeAgo = (dateString: string) => {
     if (!dateString) return "Recently";
@@ -269,14 +285,14 @@ export default function HomePage() {
         });
     });
 
-    const categoryEmojis: Record<string, string> = {
-        "Cereals": "🌾",
-        "Tubers": "🥔",
-        "Vegetables": "🥬",
-        "Fruits": "🍎",
-        "Livestock": "🐄",
-        "Cash Crops": "💰",
-        "Others": "📦"
+    const categoryIcons: Record<string, React.ComponentType<any>> = {
+        "Cereals": Sprout,
+        "Tubers": CircleDot,
+        "Vegetables": Leaf,
+        "Fruits": Apple,
+        "Livestock": Egg,
+        "Cash Crops": DollarSign,
+        "Others": Package
     };
 
     const sortedCategories = (Object.entries(groupedProducts) as [string, any[]][]).sort(([_catA, itemsA], [_catB, itemsB]) => {
@@ -296,7 +312,9 @@ export default function HomePage() {
             {/* HERO */}
             <section className={styles.hero}>
                 <div className={styles.heroContent}>
-                    <div className={styles.heroBadge}>🌱 Live Regional Marketplace</div>
+                    <div className={styles.heroBadge} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                        <Globe size={14} /> Live Regional Marketplace
+                    </div>
                     <h1>Discover Fresh Crops <span>Near You</span></h1>
                     <p>Transparent local trading, direct from the source. Real prices. Real farmers.</p>
                 </div>
@@ -304,7 +322,7 @@ export default function HomePage() {
 
             <section className={styles.discoveryBar}>
                 <div className={styles.searchGroup}>
-                    <span className={styles.searchIcon}>🔍</span>
+                    <span className={styles.searchIcon} style={{ display: "flex", alignItems: "center" }}><Search size={16} /></span>
                     <input 
                         type="text" 
                         placeholder="Search crops, farmers, or keywords..." 
@@ -348,8 +366,12 @@ export default function HomePage() {
 
                         return (
                             <div key={categoryName} className={styles.categorySection}>
-                                <h3 className={styles.categoryTitle}>
-                                    {categoryEmojis[categoryName] || "📦"} {categoryName}
+                                <h3 className={styles.categoryTitle} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                    {(() => {
+                                        const Icon = categoryIcons[categoryName] || Package;
+                                        return <Icon size={20} style={{ color: "#22c55e" }} />;
+                                    })()}
+                                    {categoryName}
                                 </h3>
                                 <div className={styles.grid}>
                                     {visibleProducts.map(item => {
@@ -368,13 +390,15 @@ export default function HomePage() {
                                                 <div className={styles.tags}>
                                                     <span className={styles.categoryTag}>{item.category || "Crop"}</span>
                                                 </div>
-                                                <span className={styles.locationBadge}>📍 {item.location}</span>
+                                                <span className={styles.locationBadge} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                                    <MapPin size={12} /> {item.location}
+                                                </span>
                                             </div>
 
                                             <h3>{item.crop}</h3>
                                             
-                                            <div className={styles.priceRow}>
-                                                💰 <strong>{Number(item.price).toLocaleString()} FCFA</strong> / {item.unit}
+                                            <div className={styles.priceRow} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                                <DollarSign size={14} style={{ color: "#4ade80" }} /> <strong>{Number(item.price).toLocaleString()} FCFA</strong> / {item.unit}
                                             </div>
 
                                             {/* Phase 5: Transparency Badges */}
@@ -390,34 +414,34 @@ export default function HomePage() {
 
                                             {/* Phase 5: Perishability Meter */}
                                             {perishState && (
-                                                <div className={`${styles.perishMeter} ${styles[`perish_${perishState.state}`]}`}>
-                                                    ⏱️ Quality Timer: <strong>{perishState.text}</strong>
+                                                <div className={`${styles.perishMeter} ${styles[`perish_${perishState.state}`]}`} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                                    <Clock size={12} /> Quality Timer: <strong>{perishState.text}</strong>
                                                 </div>
                                             )}
 
                                             <div className={styles.details}>
                                                 <div className={styles.meta}>
-                                                    <span>📦 {item.quantity}</span>
-                                                    <span>🕒 {formatTimeAgo(item.created_at)}</span>
+                                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Package size={11} /> {item.quantity}</span>
+                                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Clock size={11} /> {formatTimeAgo(item.created_at)}</span>
                                                 </div>
                                             </div>
 
                                             {/* Phase 5: Direct P2P Closing */}
                                             <div className={styles.actionsContainer}>
                                                 {item.harvest === "future" && (
-                                                    <div className={styles.futureHarvestActionsBadge}>
-                                                        ⏳ Future Harvest: {getHarvestCountdown(item.available_date)}
+                                                    <div className={styles.futureHarvestActionsBadge} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                                                        <Clock size={12} /> Future Harvest: {getHarvestCountdown(item.available_date)}
                                                     </div>
                                                 )}
                                                 <div className={styles.actions}>
                                                     {item.profiles?.whatsapp && (
-                                                        <a onClick={handleContactGuard} href={`https://wa.me/${item.profiles.whatsapp}`} target="_blank" className={styles.btnWhatsapp}>
-                                                            💬 WhatsApp
+                                                        <a onClick={handleContactGuard} href={`https://wa.me/${item.profiles.whatsapp}`} target="_blank" className={styles.btnWhatsapp} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                                                            <MessageCircle size={14} /> WhatsApp
                                                         </a>
                                                     )}
                                                     {item.id ? (
-                                                        <Link href={`/product/${item.id}`} className={styles.btnCall}>
-                                                            🔍 View Details
+                                                        <Link href={`/product/${item.id}`} className={styles.btnCall} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                                                            <Search size={14} /> View Details
                                                         </Link>
                                                     ) : null}
                                                 </div>
@@ -425,8 +449,9 @@ export default function HomePage() {
                                                     <button 
                                                         className={styles.btnUnsubscribe} 
                                                         onClick={() => handleUnsubscribe(item.crop, item.location)}
+                                                        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
                                                     >
-                                                        🔕 Unsubscribe from {item.crop}
+                                                        <BellOff size={12} /> Unsubscribe from {item.crop}
                                                     </button>
                                                 ) : (
                                                     <button 
@@ -435,8 +460,9 @@ export default function HomePage() {
                                                             if (!user) return handleContactGuard(null as any);
                                                             handleDemandCapture(item.crop, item.location, item.harvest === 'future');
                                                         }}
+                                                        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
                                                     >
-                                                        🔔 Notify me of future {item.crop} posts
+                                                        <Bell size={12} /> Notify me of future {item.crop} posts
                                                     </button>
                                                 )}
                                         </div>
@@ -461,7 +487,7 @@ export default function HomePage() {
 
                         {products.length === 0 && !loading && (
                             <div className={styles.emptyState}>
-                                <span className={styles.emptyIcon}>🚜</span>
+                                <span className={styles.emptyIcon} style={{ display: "flex", justifyContent: "center" }}><Sprout size={48} style={{ color: "#94a3b8" }} /></span>
                                 <h3>No matching crops found</h3>
                                 <p>We couldn't find any results for "{debouncedSearch}" in this region.</p>
                                 {debouncedSearch && (

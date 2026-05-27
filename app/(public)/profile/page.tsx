@@ -6,6 +6,25 @@ import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import styles from "./Profile.module.css";
+import { 
+    Sprout, 
+    ShoppingCart, 
+    ShieldAlert, 
+    ShieldCheck,
+    MapPin, 
+    Clock, 
+    Edit, 
+    Trash2, 
+    MessageCircle, 
+    Phone, 
+    Search, 
+    DollarSign, 
+    Package,
+    Egg,
+    Leaf,
+    Apple,
+    CircleDot
+} from "lucide-react";
 
 // Fix Date Formatting to handle null/invalid dates
 const formatExactDate = (dateString: string) => {
@@ -290,9 +309,9 @@ export default function ProfilePage() {
                         <div className={styles.formGroup}>
                             <label>Role Setup (Select Identity)</label>
                             <div className={styles.roleTiles}>
-                                <div className={`${styles.roleTile} ${formData.is_farmer ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_farmer: !formData.is_farmer})}>🚜 Farmer</div>
-                                <div className={`${styles.roleTile} ${formData.is_buyer ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_buyer: !formData.is_buyer})}>🛒 Buyer</div>
-                                <div className={`${styles.roleTile} ${formData.is_provider ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_provider: !formData.is_provider})}>🛡️ Provider</div>
+                                <div className={`${styles.roleTile} ${formData.is_farmer ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_farmer: !formData.is_farmer})} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><Sprout size={15} /> Farmer</div>
+                                <div className={`${styles.roleTile} ${formData.is_buyer ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_buyer: !formData.is_buyer})} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><ShoppingCart size={15} /> Buyer</div>
+                                <div className={`${styles.roleTile} ${formData.is_provider ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_provider: !formData.is_provider})} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><ShieldAlert size={15} /> Provider</div>
                             </div>
                         </div>
                         <button type="submit" className={styles.unlockBtn}>Unlock Dashboard</button>
@@ -309,14 +328,14 @@ export default function ProfilePage() {
         return acc;
     }, {} as Record<string, any[]>);
 
-    const categoryEmojis: Record<string, string> = {
-        "Cereals": "🌾",
-        "Tubers": "🥔",
-        "Vegetables": "🥬",
-        "Fruits": "🍎",
-        "Livestock": "🐄",
-        "Cash Crops": "💰",
-        "Others": "📦"
+    const categoryIcons: Record<string, React.ComponentType<any>> = {
+        "Cereals": Sprout,
+        "Tubers": CircleDot,
+        "Vegetables": Leaf,
+        "Fruits": Apple,
+        "Livestock": Egg,
+        "Cash Crops": DollarSign,
+        "Others": Package
     };
 
     const sortedCategories: [string, any[]][] = (Object.entries(groupedProducts) as [string, any[]][]).sort(([_catA, itemsA], [_catB, itemsB]) => {
@@ -426,21 +445,21 @@ export default function ProfilePage() {
                             </label>
                             <h2 className={styles.profileName}>{profile.full_name}</h2>
                             <p className={styles.profileEmail}>{user?.email}</p>
-                            <p className={styles.profileFarm}>📍 {profile.location}</p>
+                            <p className={styles.profileFarm} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><MapPin size={14} style={{ color: "#fbbf24" }} /> {profile.location}</p>
                             <div className={styles.roles}>
-                                {profile.is_farmer && <span className={styles.roleTag}>🚜 Farmer</span>}
-                                {profile.is_buyer && <span className={styles.roleTag}>🛒 Buyer</span>}
-                                {profile.is_provider && !profile.is_approved_provider && <span className={styles.roleTagPending}>⏳ Pending Provider</span>}
-                                {profile.is_approved_provider && <span className={styles.roleTagAuthority}>🛡️ Official Provider</span>}
+                                {profile.is_farmer && <span className={styles.roleTag} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Sprout size={12} /> Farmer</span>}
+                                {profile.is_buyer && <span className={styles.roleTag} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><ShoppingCart size={12} /> Buyer</span>}
+                                {profile.is_provider && !profile.is_approved_provider && <span className={styles.roleTagPending} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Clock size={12} /> Pending Provider</span>}
+                                {profile.is_approved_provider && <span className={styles.roleTagAuthority} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><ShieldCheck size={12} /> Official Provider</span>}
                             </div>
                         </div>
                         <div className={styles.actions}>
                             {profile.is_approved_provider && (
-                                <button className={styles.btnDashboard} onClick={() => router.push("/provider-dashboard")}>🛡️ Provider Dashboard</button>
+                                <button className={styles.btnDashboard} onClick={() => router.push("/provider-dashboard")} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px" }}><ShieldCheck size={14} /> Provider Dashboard</button>
                             )}
-                            <button className={styles.btnEditProfile} onClick={() => setIsEditingProfile(true)}>✏️ Edit Profile</button>
-                            {profile.whatsapp && <a href={`https://wa.me/${profile.whatsapp}`} target="_blank" className={styles.btnWa}>💬 WhatsApp</a>}
-                            {profile.phone && <a href={`tel:${profile.phone}`} className={styles.btnCall}>📞 Contact Call</a>}
+                            <button className={styles.btnEditProfile} onClick={() => setIsEditingProfile(true)} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px" }}><Edit size={14} /> Edit Profile</button>
+                            {profile.whatsapp && <a href={`https://wa.me/${profile.whatsapp}`} target="_blank" className={styles.btnWa} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px" }}><MessageCircle size={14} /> WhatsApp</a>}
+                            {profile.phone && <a href={`tel:${profile.phone}`} className={styles.btnCall} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px" }}><Phone size={14} /> Contact Call</a>}
                         </div>
                     </>
                 ) : (
@@ -462,16 +481,16 @@ export default function ProfilePage() {
                             </div>
                             <div className={styles.formGroup}>
                                 <label>Location</label>
-                                <button type="button" onClick={handleGetLocation} className={styles.geoBtnSmall}>
-                                    {formData.location ? `📍 ${formData.location} (Update)` : "Fetch GPS"}
+                                <button type="button" onClick={handleGetLocation} className={styles.geoBtnSmall} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                                    {formData.location ? <><MapPin size={12} /> {formData.location} (Update)</> : "Fetch GPS"}
                                 </button>
                             </div>
                             <div className={styles.formGroup}>
                                 <label>Roles</label>
                                 <div className={styles.roleTilesSmall}>
-                                    <div className={`${styles.roleTile} ${formData.is_farmer ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_farmer: !formData.is_farmer})}>🚜 Farmer</div>
-                                    <div className={`${styles.roleTile} ${formData.is_buyer ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_buyer: !formData.is_buyer})}>🛒 Buyer</div>
-                                    <div className={`${styles.roleTile} ${formData.is_provider ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_provider: !formData.is_provider})}>🛡️ Provider</div>
+                                    <div className={`${styles.roleTile} ${formData.is_farmer ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_farmer: !formData.is_farmer})} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Sprout size={13} /> Farmer</div>
+                                    <div className={`${styles.roleTile} ${formData.is_buyer ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_buyer: !formData.is_buyer})} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><ShoppingCart size={13} /> Buyer</div>
+                                    <div className={`${styles.roleTile} ${formData.is_provider ? styles.roleTileActive : ''}`} onClick={() => setFormData({...formData, is_provider: !formData.is_provider})} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><ShieldCheck size={13} /> Provider</div>
                                 </div>
                             </div>
                             <div className={styles.modalActions}>
@@ -501,8 +520,12 @@ export default function ProfilePage() {
 
                         return (
                             <div key={categoryName} className={styles.categorySection}>
-                                <h3 className={styles.categoryTitle}>
-                                    {categoryEmojis[categoryName] || "📦"} {categoryName}
+                                <h3 className={styles.categoryTitle} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                    {(() => {
+                                        const Icon = categoryIcons[categoryName] || Package;
+                                        return <Icon size={20} style={{ color: "#22c55e" }} />;
+                                    })()}
+                                    {categoryName}
                                 </h3>
                                 <div className={styles.grid}>
                                     {visibleProducts.map((item) => {
@@ -519,16 +542,16 @@ export default function ProfilePage() {
                                 <div className={styles.cardHeader}>
                                     <span className={styles.categoryTag}>{item.category || "Crop"}</span>
                                     {item.harvest === "future" && (
-                                        <span className={styles.futureCountdown}>
-                                            🚀 READY IN: {getCountdown(item.available_date)}
+                                        <span className={styles.futureCountdown} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                            <Clock size={11} /> READY IN: {getCountdown(item.available_date)}
                                         </span>
                                     )}
                                 </div>
                                 
                                 <h3>{item.crop}</h3>
                                 
-                                <p className={styles.priceLine}>
-                                    💰 <strong>{item.price?.toLocaleString()} FCFA</strong> / {item.unit}
+                                <p className={styles.priceLine} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                    <DollarSign size={14} style={{ color: "#4ade80" }} /> <strong>{item.price?.toLocaleString()} FCFA</strong> / {item.unit}
                                 </p>
 
                                 {/* Market Pulse (Transparency Badge) */}
@@ -544,24 +567,24 @@ export default function ProfilePage() {
 
                                 <div className={styles.cardFooter}>
                                     <div className={styles.metaRow}>
-                                        <span>📦 Qty: {item.quantity}</span>
-                                        <span>🕒 {formatExactDate(item.created_at)}</span>
+                                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Package size={11} /> Qty: {item.quantity}</span>
+                                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Clock size={11} /> {formatExactDate(item.created_at)}</span>
                                     </div>
                                     
                                     {/* Direct P2P Actions */}
                                     <div className={styles.productP2PActions}>
                                         {item.id ? (
-                                            <Link href={`/product/${item.id}`} className={styles.btnWaSmall}>🔍 View Details</Link>
+                                            <Link href={`/product/${item.id}`} className={styles.btnWaSmall} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Search size={11} /> View Details</Link>
                                         ) : null}
                                         {profile.whatsapp ? (
-                                            <a href={`https://wa.me/${profile.whatsapp}`} target="_blank" className={styles.btnCallSmall}>💬 WA</a>
+                                            <a href={`https://wa.me/${profile.whatsapp}`} target="_blank" className={styles.btnCallSmall} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><MessageCircle size={11} /> WA</a>
                                         ) : null}
                                     </div>
 
                                     {/* Product CRUD Actions */}
                                     <div className={styles.productActions}>
-                                        <button className={styles.btnEdit} onClick={() => openEditModal(item)}>✏️ Edit</button>
-                                        <button className={styles.btnDelete} onClick={() => handleDeleteProduct(item.id)}>🗑️ Delete</button>
+                                        <button className={styles.btnEdit} onClick={() => openEditModal(item)} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Edit size={11} /> Edit</button>
+                                        <button className={styles.btnDelete} onClick={() => handleDeleteProduct(item.id)} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Trash2 size={11} /> Delete</button>
                                     </div>
                                 </div>
                             </div>

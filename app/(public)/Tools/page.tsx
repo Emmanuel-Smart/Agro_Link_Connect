@@ -3,6 +3,7 @@
 import { useState } from "react";
 import styles from "./Tools.module.css";
 import Footer from "../../components/Footer/Footer";
+import { Wrench, Clock, DollarSign, BookOpen } from "lucide-react";
 
 const CROP_SHELF_LIFE: Record<string, number> = {
     "Tomatoes": 7, "Peppers": 10, "Leafy Greens": 5, "Bananas": 12,
@@ -41,7 +42,9 @@ export default function ToolsPage() {
             {/* HERO */}
             <section className={styles.hero}>
                 <div className={styles.heroContent}>
-                    <span className={styles.heroBadge}>🧰 AgroLink Tools</span>
+                    <span className={styles.heroBadge} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                        <Wrench size={14} /> AgroLink Tools
+                    </span>
                     <h1>Smart <span>Agricultural</span> Tools</h1>
                     <p>Free tools designed to help farmers make better decisions about pricing, shelf life, and revenue forecasting.</p>
                 </div>
@@ -53,7 +56,9 @@ export default function ToolsPage() {
                     {/* Shelf Life Calculator */}
                     <div className={styles.toolCard}>
                         <div className={styles.toolHeader}>
-                            <span className={styles.toolIcon}>⏳</span>
+                            <span className={styles.toolIcon} style={{ display: "flex", alignItems: "center" }}>
+                                <Clock size={20} style={{ color: "#fbbf24" }} />
+                            </span>
                             <h3>Shelf Life Calculator</h3>
                         </div>
                         <p className={styles.toolDesc}>Calculate how long your crop will stay fresh after harvest.</p>
@@ -96,7 +101,9 @@ export default function ToolsPage() {
                     {/* Revenue Calculator */}
                     <div className={styles.toolCard}>
                         <div className={styles.toolHeader}>
-                            <span className={styles.toolIcon}>💰</span>
+                            <span className={styles.toolIcon} style={{ display: "flex", alignItems: "center" }}>
+                                <DollarSign size={20} style={{ color: "#fbbf24" }} />
+                            </span>
                             <h3>Revenue Calculator</h3>
                         </div>
                         <p className={styles.toolDesc}>Estimate your total revenue based on price and quantity.</p>
@@ -119,7 +126,9 @@ export default function ToolsPage() {
                     {/* Crop Calendar */}
                     <div className={styles.toolCard}>
                         <div className={styles.toolHeader}>
-                            <span className={styles.toolIcon}>📅</span>
+                            <span className={styles.toolIcon} style={{ display: "flex", alignItems: "center" }}>
+                                <BookOpen size={20} style={{ color: "#fbbf24" }} />
+                            </span>
                             <h3>Crop Shelf Life Reference</h3>
                         </div>
                         <p className={styles.toolDesc}>Quick reference guide for crop storage durations.</p>
