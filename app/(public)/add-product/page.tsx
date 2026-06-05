@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import styles from "./AddProduct.module.css";
-import { Sparkles, Camera, Zap } from "lucide-react";
+import { Sparkles, Camera, Zap, CheckCircle2, AlertCircle } from "lucide-react";
 
 /* ================= CROP MAP & SHELF-LIFE LOGIC (Phase 5) ================= */
 // Shelf-life is calculated in days.
@@ -31,6 +31,7 @@ export default function AddProductPage() {
 
     const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(false);
+    const [loadingText, setLoadingText] = useState("Publish & Alert Buyers");
 
     /* FORM */
     const [form, setForm] = useState({
@@ -57,6 +58,7 @@ export default function AddProductPage() {
     const [isPioneer, setIsPioneer] = useState(false);
     const [guidanceState, setGuidanceState] = useState<'none' | 'red' | 'green' | 'yellow'>('none');
     const [guidanceMsg, setGuidanceMsg] = useState("");
+    const [modalState, setModalState] = useState<{show: boolean, type: 'success' | 'error', message: string, onConfirm?: () => void}>({show: false, type: 'success', message: ''});
 
     /* ================= 1. THE TRIGGER: SPATIAL CONTEXT ================= */
     useEffect(() => {
@@ -185,10 +187,11 @@ export default function AddProductPage() {
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         if (!user || !profile?.location) {
-            alert("Set your location in your profile first to access the localized market.");
+            setModalState({ show: true, type: 'error', message: "Set your location in your profile first to access the localized market." });
             return;
         }
         setLoading(true);
+        setLoadingText("Publishing Product...");
 
         const baseDate = form.harvest === "ready" ? new Date() : new Date(form.available_date);
         
@@ -228,18 +231,24 @@ export default function AddProductPage() {
                 image_url: mainImageUrl,
                 gallery_urls: galleryUrls,
                 created_at: new Date().toISOString(),
+                // Override DB defaults so we don't show 85% before AI evaluates
+                calculated_quality_score: null,
+                quality_status_badge: null,
+                quality_diagnostic_text: null
             },
         ]).select();
 
         if (error) {
             setLoading(false);
+            setLoadingText("Publish & Alert Buyers");
             console.log(error);
-            alert("Error adding product");
+            setModalState({ show: true, type: 'error', message: "Error adding product" });
             return;
         }
 
         /* ================= 7. INTELLIGENCE ENGINE: MATCHING ================= */
         try {
+            setLoadingText("Matching with Buyers...");
             // Find buyers interested in this crop + location
             const { data: matches } = await supabase
                 .from("demand_signals")
@@ -265,10 +274,42 @@ export default function AddProductPage() {
         } catch (matchError) {
             console.error("Match Engine Error:", matchError);
         }
+
+        /* ================= 8. DYNAMIC GEO-ENVIRONMENTAL SCORING ENGINE ================= */
+        // Execute synchronously so user sees rating immediately upon redirection
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+
+        const productId = newProduct?.[0]?.id;
+        if (productId) {
+            setLoadingText("Running AI Quality Diagnostics...");
+            try {
+                await fetch('/api/listings/universal-evaluate', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': token ? `Bearer ${token}` : ''
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        imageUrl: mainImageUrl,
+                        cropKey: form.crop,
+                        location: profile.location
+                    })
+                });
+            } catch (err) {
+                console.error("Universal Evaluate API failed:", err);
+            }
+        }
         
-        alert(`Listing Published! We've notified any buyers waiting for ${form.crop} in ${profile.location}.`);
         setLoading(false);
-        router.push("/home");
+        setLoadingText("Publish & Alert Buyers");
+        setModalState({ 
+            show: true, 
+            type: 'success', 
+            message: `Listing Published! We've notified any buyers waiting for ${form.crop} in ${profile.location}.`,
+            onConfirm: () => router.push("/home")
+        });
     };
 
     /* ================= UI ================= */
@@ -417,10 +458,31 @@ export default function AddProductPage() {
                     <textarea name="description" placeholder="Describe quality, strain, or logistics..." value={form.description} onChange={handleChange} />
 
                     <button className={styles.button} type="submit" disabled={loading}>
-                        {loading ? "Matching with Buyers..." : "Publish & Alert Buyers"}
+                        {loadingText}
                     </button>
                 </form>
             </div>
+
+            {/* Custom Modal */}
+            {modalState.show && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.authModal}>
+                        <div className={styles.authModalIcon} style={{ background: modalState.type === 'error' ? '#fef2f2' : '#f0fdf4', color: modalState.type === 'error' ? '#ef4444' : '#22c55e' }}>
+                            {modalState.type === 'error' ? <AlertCircle size={32} /> : <CheckCircle2 size={32} />}
+                        </div>
+                        <h3>{modalState.type === 'error' ? 'Notice' : 'Success'}</h3>
+                        <p>{modalState.message}</p>
+                        <div className={styles.authModalActions}>
+                            <button className={styles.btnModalPrimary} onClick={() => {
+                                setModalState({...modalState, show: false});
+                                if (modalState.onConfirm) modalState.onConfirm();
+                            }}>
+                                Continue
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

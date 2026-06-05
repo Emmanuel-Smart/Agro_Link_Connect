@@ -23,19 +23,11 @@ import {
     Egg,
     Leaf,
     Apple,
-    CircleDot
+    CircleDot,
+    Calendar
 } from "lucide-react";
 
-// Fix Date Formatting to handle null/invalid dates
-const formatExactDate = (dateString: string) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return "N/A";
-    return date.toLocaleDateString('en-US', {
-        month: 'short', day: 'numeric', year: 'numeric',
-        hour: 'numeric', minute: '2-digit'
-    });
-};
+// Removed formatExactDate in favor of inline explicit rendering
 
 const getCountdown = (targetDate: string) => {
     if (!targetDate) return null;
@@ -565,10 +557,26 @@ export default function ProfilePage() {
                                     </div>
                                 )}
 
-                                <div className={styles.cardFooter}>
-                                    <div className={styles.metaRow}>
-                                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Package size={11} /> Qty: {item.quantity}</span>
-                                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Clock size={11} /> {formatExactDate(item.created_at)}</span>
+                                {/* Geo-Environmental Quality Engine Trust Badge */}
+                                {item.calculated_quality_score !== null && item.calculated_quality_score !== undefined && (
+                                    <div className={`${styles.trustBadgeContainer} ${
+                                        item.calculated_quality_score >= 90 ? styles.badgePremium :
+                                        item.calculated_quality_score >= 70 ? styles.badgeHealthy :
+                                        item.calculated_quality_score >= 40 ? styles.badgeDegraded :
+                                        styles.badgeCritical
+                                    }`}>
+                                        <div className={styles.trustBadgeHeader}>
+                                            <ShieldCheck size={16} />
+                                            <span>Quality: {item.calculated_quality_score}% [{item.quality_status_badge}]</span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className={styles.cardFooter} style={{ paddingTop: '10px' }}>
+                                    <div style={{ padding: '12px 14px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', color: '#64748b', fontSize: '0.75rem', fontWeight: 700, marginBottom: '16px' }}>
+                                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Package size={12} style={{color: '#94a3b8'}}/> {item.quantity}</span>
+                                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Calendar size={12} style={{color: '#94a3b8'}}/> {new Date(item.created_at).toLocaleDateString()}</span>
+                                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Clock size={12} style={{color: '#94a3b8'}}/> {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                     </div>
                                     
                                     {/* Direct P2P Actions */}

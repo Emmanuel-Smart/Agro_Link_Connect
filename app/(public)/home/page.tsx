@@ -21,35 +21,14 @@ import {
     MessageCircle, 
     BellOff, 
     Bell, 
-    Globe 
+    Globe,
+    ShieldCheck,
+    Lock,
+    CheckCircle2,
+    Calendar
 } from "lucide-react";
 
-const formatTimeAgo = (dateString: string) => {
-    if (!dateString) return "Recently";
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInMs = now.getTime() - date.getTime();
-    const diffInMins = Math.floor(diffInMs / (1000 * 60));
-
-    if (diffInMins < 60) return `${diffInMins || 1}m ago`;
-    if (date.toDateString() === now.toDateString()) return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    return date.toLocaleDateString();
-};
-
-const getPerishabilityState = (availableDate: string, isPerishable: boolean) => {
-    if (!isPerishable) return null;
-    const target = new Date(availableDate);
-    target.setDate(target.getDate() + 7); // Mock 7-day shelf life
-    const now = new Date();
-    const diffMs = target.getTime() - now.getTime();
-    
-    if (diffMs <= 0) return { state: 'red', text: 'Expired' };
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    
-    if (diffDays > 4) return { state: 'green', text: `${diffDays}d left (Fresh)` };
-    if (diffDays > 1) return { state: 'yellow', text: `${diffDays}d left (Expiring)` };
-    return { state: 'red', text: `Critical: <1d left` };
-};
+// Removed formatTimeAgo in favor of explicit date/time rendering
 
 const getHarvestCountdown = (availableDate: string) => {
     if (!availableDate) return null;
@@ -92,6 +71,7 @@ export default function HomePage() {
     // Category Expand State
     const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
     const [isMobile, setIsMobile] = useState(false);
+    const [modalState, setModalState] = useState<{show: boolean, type: 'auth' | 'success' | 'error', message: string}>({show: false, type: 'auth', message: ''});
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -214,7 +194,7 @@ export default function HomePage() {
 
         // PROFILE CHECK: Must have phone/whatsapp and location for alerts to work
         if (!profile?.whatsapp || !profile?.location) {
-            alert("🛠️ Profile Incomplete: Please set your WhatsApp number and Location in your Profile first so we know where to send your alerts!");
+            setModalState({ show: true, type: 'error', message: "Profile Incomplete: Please set your WhatsApp number and Location in your Profile first so we know where to send your alerts!" });
             router.push("/profile");
             return;
         }
@@ -230,12 +210,12 @@ export default function HomePage() {
             const msg = isFutureHarvest 
                 ? `Subscription Active! We will notify you on the harvest date and whenever new ${cropToSave} is posted in ${locationToSave}.`
                 : `Signal captured! We will notify you when ${cropToSave} becomes available in ${locationToSave}.`;
-            alert(msg);
+            setModalState({ show: true, type: 'success', message: msg });
             setUserSubscriptions(prev => new Set(prev).add(`${cropToSave}_${locationToSave}`));
         } else if (error.code === '23505') {
-            alert(`You're already on the list! We'll alert you when ${cropToSave} arrives in ${locationToSave}.`);
+            setModalState({ show: true, type: 'success', message: `You're already on the list! We'll alert you when ${cropToSave} arrives in ${locationToSave}.` });
         } else {
-            alert("Error saving interest. Please try again.");
+            setModalState({ show: true, type: 'error', message: "Error saving interest. Please try again." });
         }
     };
 
@@ -249,7 +229,7 @@ export default function HomePage() {
             .eq("location", location);
         
         if (!error) {
-            alert(`Unsubscribed from ${crop} alerts in ${location}.`);
+            setModalState({ show: true, type: 'success', message: `Unsubscribed from ${crop} alerts in ${location}.` });
             const newSubs = new Set(userSubscriptions);
             newSubs.delete(`${crop}_${location}`);
             setUserSubscriptions(newSubs);
@@ -259,8 +239,7 @@ export default function HomePage() {
     const handleContactGuard = (e?: React.MouseEvent) => {
         if (!user) {
             if (e) e.preventDefault();
-            alert("🔒 Access Restricted: Please Sign Up or Login to contact farmers and view full market details.");
-            router.push("/register");
+            setModalState({ show: true, type: 'auth', message: 'Join AgroLink to contact farmers, view detailed market intelligence, and get real-time quality diagnostics.' });
         }
     };
 
@@ -377,7 +356,6 @@ export default function HomePage() {
                                     {visibleProducts.map(item => {
                                     const pulseKey = `${item.crop}_${item.location}_${item.unit}`;
                                     const pulse = marketPulse[pulseKey];
-                                    const perishState = getPerishabilityState(item.available_date || item.created_at, item.is_perishable);
                                     
                                     return (
                                         <div key={item.id} className={styles.card}>
@@ -412,17 +390,26 @@ export default function HomePage() {
                                                 </div>
                                             )}
 
-                                            {/* Phase 5: Perishability Meter */}
-                                            {perishState && (
-                                                <div className={`${styles.perishMeter} ${styles[`perish_${perishState.state}`]}`} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                                                    <Clock size={12} /> Quality Timer: <strong>{perishState.text}</strong>
+                                            {/* Geo-Environmental Quality Engine Trust Badge */}
+                                            {item.calculated_quality_score !== null && item.calculated_quality_score !== undefined && (
+                                                <div className={`${styles.trustBadgeContainer} ${
+                                                    item.calculated_quality_score >= 90 ? styles.badgePremium :
+                                                    item.calculated_quality_score >= 70 ? styles.badgeHealthy :
+                                                    item.calculated_quality_score >= 40 ? styles.badgeDegraded :
+                                                    styles.badgeCritical
+                                                }`}>
+                                                    <div className={styles.trustBadgeHeader}>
+                                                        <ShieldCheck size={16} />
+                                                        <span>Quality: {item.calculated_quality_score}% [{item.quality_status_badge}]</span>
+                                                    </div>
                                                 </div>
                                             )}
 
-                                            <div className={styles.details}>
-                                                <div className={styles.meta}>
-                                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Package size={11} /> {item.quantity}</span>
-                                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Clock size={11} /> {formatTimeAgo(item.created_at)}</span>
+                                            <div className={styles.details} style={{ marginTop: '8px', padding: '12px 14px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                                                <div className={styles.meta} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", color: "#64748b", fontSize: "0.75rem", fontWeight: 700 }}>
+                                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Package size={12} style={{color: '#94a3b8'}}/> {item.quantity}</span>
+                                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Calendar size={12} style={{color: '#94a3b8'}}/> {new Date(item.created_at).toLocaleDateString()}</span>
+                                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Clock size={12} style={{color: '#94a3b8'}}/> {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                                 </div>
                                             </div>
 
@@ -511,6 +498,32 @@ export default function HomePage() {
                 </section>
             </div>
             <Footer />
+
+            {/* Custom Modal */}
+            {modalState.show && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.authModal}>
+                        <div className={styles.authModalIcon} style={{ background: modalState.type === 'auth' ? '#fef2f2' : (modalState.type === 'error' ? '#fef2f2' : '#f0fdf4'), color: modalState.type === 'auth' ? '#ef4444' : (modalState.type === 'error' ? '#ef4444' : '#22c55e') }}>
+                            {modalState.type === 'auth' ? <Lock size={32} /> : (modalState.type === 'error' ? <BellOff size={32} /> : <CheckCircle2 size={32} />)}
+                        </div>
+                        <h3>{modalState.type === 'auth' ? 'Access Restricted' : (modalState.type === 'error' ? 'Notice' : 'Success')}</h3>
+                        <p>{modalState.message}</p>
+                        <div className={styles.authModalActions}>
+                            {modalState.type === 'auth' ? (
+                                <>
+                                    <Link href="/register" className={styles.btnModalPrimary}>Create Free Account</Link>
+                                    <Link href="/login" className={styles.btnModalSecondary} onClick={() => setModalState({...modalState, show: false})}>Sign In</Link>
+                                    <button className={styles.btnModalSecondary} style={{marginTop: '4px'}} onClick={() => setModalState({...modalState, show: false})}>Continue Browsing</button>
+                                </>
+                            ) : (
+                                <button className={styles.btnModalPrimary} onClick={() => setModalState({...modalState, show: false})}>
+                                    Got it
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }

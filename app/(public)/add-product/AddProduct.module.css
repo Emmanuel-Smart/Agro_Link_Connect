@@ -410,13 +410,90 @@
     .pioneerState { font-size: 0.82rem; padding: 14px; }
 }
 
-@media (max-width: 400px) {
-    .container { padding: 16px 12px 40px; }
-    .card { padding: 22px 16px; border-radius: 14px; }
-    .title { font-size: 1.15rem; }
-    .form input, .form select, .form textarea { padding: 12px 14px; }
-    .intelBox { padding: 16px; }
-    .button { font-size: 0.92rem; }
+@media (max-width: 480px) {
+    .container { padding: 80px 16px 40px; }
+    .card { padding: 24px 16px; }
+    .title { font-size: 1.8rem; }
+    .intelStat, .intelStatAvg { padding: 12px 8px; }
+    .intelStat span, .intelStatAvg span { font-size: 0.75rem; }
+    .intelStat strong, .intelStatAvg strong { font-size: 1rem; }
+}
+
+/* --- Auth/Success Modal --- */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.authModal {
+    background: white;
+    width: 90%;
+    max-width: 360px;
+    border-radius: 24px;
+    padding: 32px 24px;
+    text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid #f1f5f9;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.authModalIcon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.authModal h3 {
+    font-size: 1.4rem;
+    color: #0f172a;
+    margin-bottom: 12px;
+    font-weight: 800;
+}
+
+.authModal p {
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 24px;
+}
+
+.authModalActions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btnModalPrimary {
+    background: #0f172a;
+    color: white;
+    padding: 14px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btnModalPrimary:hover {
+    background: #1e293b;
 }
 
 /* --- LIGHT THEME OVERRIDES --- */

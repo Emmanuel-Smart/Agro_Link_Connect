@@ -142,6 +142,55 @@
     white-space: pre-wrap;
 }
 
+.aiQualityBox {
+    background: #eff6ff;
+    padding: 32px;
+    border-radius: 24px;
+    border: 1px solid #bfdbfe;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.05);
+}
+
+.aiQualityBox h2 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: #1e3a8a;
+    letter-spacing: -0.02em;
+}
+
+.aiScoreRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.aiScoreHighlight {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #2563eb;
+    letter-spacing: -0.05em;
+    line-height: 1;
+}
+
+.aiBadgeHighlight {
+    background: #2563eb;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.aiDiagnosticText {
+    font-size: 1.05rem;
+    color: #1e40af;
+    line-height: 1.7;
+    font-weight: 500;
+}
+
 /* --- Right Column: Seller & Buy --- */
 .sidebar {
     display: flex;

@@ -117,6 +117,20 @@ export default function ProductDetailsPage() {
                         <h2>Product Description</h2>
                         <p>{product.description || "No detailed description provided for this listing."}</p>
                     </div>
+
+                    {product.calculated_quality_score !== null && product.calculated_quality_score !== undefined && (
+                        <div className={styles.aiQualityBox}>
+                            <h2 style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                <ShieldCheck size={20} style={{ color: "#3b82f6" }} /> 
+                                AI Quality Diagnosis
+                            </h2>
+                            <div className={styles.aiScoreRow}>
+                                <span className={styles.aiScoreHighlight}>{product.calculated_quality_score}%</span>
+                                <span className={styles.aiBadgeHighlight}>{product.quality_status_badge}</span>
+                            </div>
+                            <p className={styles.aiDiagnosticText}>{product.quality_diagnostic_text}</p>
+                        </div>
+                    )}
                 </div>
 
                 {/* RIGHT COLUMN */}
