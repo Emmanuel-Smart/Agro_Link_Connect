@@ -97,7 +97,8 @@ export async function POST(req: Request) {
                 console.warn("Failed to fetch image for Gemini, falling back to text.");
                 result = await model.generateContent(prompt);
             } else {
-                const mimeType = imageResp.headers.get("content-type") || "image/jpeg";
+                let mimeType = imageResp.headers.get("content-type") || "image/jpeg";
+                mimeType = mimeType.split(';')[0].trim(); // Remove charset if present
                 const arrayBuffer = await imageResp.arrayBuffer();
                 const buffer = Buffer.from(arrayBuffer);
                 const base64Image = buffer.toString("base64");
