@@ -405,7 +405,7 @@ export default function HomePage() {
                                                 </div>
                                             )}
 
-                                            <div className={styles.details} style={{ marginTop: '8px', padding: '12px 14px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                                            <div className={styles.details} style={{ marginTop: '8px', marginInline: '16px', padding: '10px 12px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0', flex: 'none' }}>
                                                 <div className={styles.meta} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", color: "#64748b", fontSize: "0.75rem", fontWeight: 700 }}>
                                                     <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Package size={12} style={{color: '#94a3b8'}}/> {item.quantity}</span>
                                                     <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Calendar size={12} style={{color: '#94a3b8'}}/> {new Date(item.created_at).toLocaleDateString()}</span>

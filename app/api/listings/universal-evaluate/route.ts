@@ -5,7 +5,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { productId, imageUrl, cropKey, location } = body;
+    const { productId, imageUrl, cropKey, location, agricultural_domain } = body;
 
     const authHeader = req.headers.get('Authorization');
     const supabaseClient = createClient(
@@ -58,16 +58,33 @@ export async function POST(req: Request) {
     let visionScore = 85;
     let diagnosticText = `Evaluated under ${climateCategory} (${temp}°C, ${humidity}% humidity).`;
     
+    // Domain Strategy Mapping
+    let visionFocus = "";
+    const domainStr = agricultural_domain?.toLowerCase() || 'horticulture';
+    if (domainStr === 'horticulture') {
+      visionFocus = "Focus on chromatic maturity index (color shifting), surface blemish density (blight/spots), morphological integrity (crushing/bruising), and skin turgidity (wilting/hydration).";
+    } else if (domainStr === 'husbandry') {
+      visionFocus = "Focus on Anatomical Body Condition Score (mass-to-frame ratio tracking), posture/stance structural vigor (alertness vs lethargy), and coat/plumage surface cleanliness and health (patchiness, lesions, missing feathers).";
+    } else if (domainStr === 'aquaculture') {
+      visionFocus = "Focus on operculum/gill coloring assessment, corneal lucidity (eye clarity profiles), and skin specularity/mucus coating continuity (freshness metrics).";
+    } else if (domainStr === 'processing') {
+      visionFocus = "Focus on packaging structural seal integrity, moisture separation layers, text-line extraction for visible production/expiry dates, and granular consistency.";
+    } else {
+      visionFocus = "Focus on general quality, intactness, freshness, and absence of visual defects.";
+    }
+    
     if (process.env.GEMINI_API_KEY) {
       try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         const prompt = `
           You are an expert Agronomic Systems Engineer.
           Analyze this image of ${cropKey} located in a ${climateCategory} (Temp: ${temp}°C, Humidity: ${humidity}%).
+          This item belongs to the ${domainStr} domain.
+          ${visionFocus}
           Provide a strict visual quality score from 0 to 100.
-          Also provide a 1-sentence diagnostic explanation of why this score was given considering the climate.
+          Also provide a 1-sentence diagnostic explanation of why this score was given considering the climate and specific vision focus criteria.
           Respond strictly in JSON format: {"score": 85, "diagnostic": "Explanation here..."}
         `;
 
@@ -131,7 +148,8 @@ export async function POST(req: Request) {
         .update({
             calculated_quality_score: finalScore,
             quality_status_badge: statusBadge,
-            quality_diagnostic_text: diagnosticText
+            quality_diagnostic_text: diagnosticText,
+            agricultural_domain: domainStr
         })
         .eq('id', productId);
 

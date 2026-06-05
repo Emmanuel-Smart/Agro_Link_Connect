@@ -24,6 +24,15 @@ const CROP_MAP = [
     { name: "Cocoa", category: "Cash Crops", perishable: false, shelf_life: 365 },
 ];
 
+/* ================= 4 DOMAIN MAPPING LOGIC ================= */
+const getDomainFromCategory = (category: string) => {
+    const cat = category.toLowerCase();
+    if (cat.includes("livestock") || cat.includes("poultry") || cat.includes("animal")) return "husbandry";
+    if (cat.includes("fish") || cat.includes("aquaculture") || cat.includes("seafood")) return "aquaculture";
+    if (cat.includes("others") || cat.includes("processing") || cat.includes("processed")) return "processing";
+    return "horticulture"; // Default for Cereals, Tubers, Vegetables, Fruits, Cash Crops
+};
+
 /* ================= COMPONENT ================= */
 export default function AddProductPage() {
     const { user } = useAuth();
@@ -215,6 +224,8 @@ export default function AddProductPage() {
 
         const mainImageUrl = galleryUrls.length > 0 ? galleryUrls[0] : null;
 
+        const domain = getDomainFromCategory(form.category);
+
         const { data: newProduct, error } = await supabase.from("products").insert([
             {
                 user_id: user.id,
@@ -231,6 +242,7 @@ export default function AddProductPage() {
                 image_url: mainImageUrl,
                 gallery_urls: galleryUrls,
                 created_at: new Date().toISOString(),
+                agricultural_domain: domain,
                 // Override DB defaults so we don't show 85% before AI evaluates
                 calculated_quality_score: null,
                 quality_status_badge: null,
@@ -294,7 +306,8 @@ export default function AddProductPage() {
                         productId: productId,
                         imageUrl: mainImageUrl,
                         cropKey: form.crop,
-                        location: profile.location
+                        location: profile.location,
+                        agricultural_domain: domain
                     })
                 });
             } catch (err) {
