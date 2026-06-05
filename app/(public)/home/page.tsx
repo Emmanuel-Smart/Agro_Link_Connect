@@ -25,7 +25,9 @@ import {
     ShieldCheck,
     Lock,
     CheckCircle2,
-    Calendar
+    Calendar,
+    SlidersHorizontal,
+    X
 } from "lucide-react";
 
 // Removed formatTimeAgo in favor of explicit date/time rendering
@@ -72,6 +74,10 @@ export default function HomePage() {
     const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
     const [isMobile, setIsMobile] = useState(false);
     const [modalState, setModalState] = useState<{show: boolean, type: 'auth' | 'success' | 'error', message: string}>({show: false, type: 'auth', message: ''});
+    
+    // Mobile Overhaul States
+    const [showMobileFilters, setShowMobileFilters] = useState(false);
+    const [selectedDiagnostic, setSelectedDiagnostic] = useState<{text: string, title: string, score: number, status: string} | null>(null);
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -304,13 +310,18 @@ export default function HomePage() {
                     <span className={styles.searchIcon} style={{ display: "flex", alignItems: "center" }}><Search size={16} /></span>
                     <input 
                         type="text" 
-                        placeholder="Search crops, farmers, or keywords..." 
+                        placeholder="Search crops, farmers..." 
                         className={styles.searchInput}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
+                    {isMobile && (
+                        <button className={styles.mobileFilterBtn} onClick={() => setShowMobileFilters(true)}>
+                            <SlidersHorizontal size={18} />
+                        </button>
+                    )}
                 </div>
-                <div className={styles.filterGroup}>
+                <div className={`${styles.filterGroup} ${isMobile ? styles.hiddenMobile : ''}`}>
                     <select className={styles.filterSelect} value={category} onChange={(e) => setCategory(e.target.value)}>
                         <option value="">All Categories</option>
                         <option>Tubers</option>
@@ -392,12 +403,24 @@ export default function HomePage() {
 
                                             {/* Geo-Environmental Quality Engine Trust Badge */}
                                             {item.calculated_quality_score !== null && item.calculated_quality_score !== undefined && (
-                                                <div className={`${styles.trustBadgeContainer} ${
-                                                    item.calculated_quality_score >= 90 ? styles.badgePremium :
-                                                    item.calculated_quality_score >= 70 ? styles.badgeHealthy :
-                                                    item.calculated_quality_score >= 40 ? styles.badgeDegraded :
-                                                    styles.badgeCritical
-                                                }`}>
+                                                <div 
+                                                    className={`${styles.trustBadgeContainer} ${
+                                                        item.calculated_quality_score >= 90 ? styles.badgeEmerald :
+                                                        item.calculated_quality_score >= 70 ? styles.badgeOcean :
+                                                        item.calculated_quality_score >= 40 ? styles.badgeAmber :
+                                                        styles.badgeCrimson
+                                                    }`}
+                                                    onClick={() => {
+                                                        if (isMobile && item.quality_diagnostic_text) {
+                                                            setSelectedDiagnostic({
+                                                                text: item.quality_diagnostic_text,
+                                                                title: item.crop,
+                                                                score: item.calculated_quality_score,
+                                                                status: item.quality_status_badge
+                                                            });
+                                                        }
+                                                    }}
+                                                >
                                                     <div className={styles.trustBadgeHeader}>
                                                         <ShieldCheck size={16} />
                                                         <span>Quality: {item.calculated_quality_score}% [{item.quality_status_badge}]</span>
@@ -524,6 +547,79 @@ export default function HomePage() {
                     </div>
                 </div>
             )}
+            {/* Mobile Bottom Sheets */}
+            {/* Filter Drawer */}
+            {isMobile && showMobileFilters && (
+                <>
+                    <div className={styles.bottomSheetOverlay} onClick={() => setShowMobileFilters(false)} />
+                    <div className={styles.bottomSheet}>
+                        <div className={styles.sheetHeader}>
+                            <h3>Marketplace Filters</h3>
+                            <button className={styles.closeBtn} onClick={() => setShowMobileFilters(false)}>
+                                <X size={24} />
+                            </button>
+                        </div>
+                        <div className={styles.sheetBody}>
+                            <div className={styles.formGroup}>
+                                <label>Category</label>
+                                <select className={styles.filterSelectMobile} value={category} onChange={(e) => setCategory(e.target.value)}>
+                                    <option value="">All Categories</option>
+                                    <option>Tubers</option>
+                                    <option>Cereals</option>
+                                    <option>Vegetables</option>
+                                    <option>Fruits</option>
+                                    <option>Livestock</option>
+                                    <option>Cash Crops</option>
+                                    <option>Others</option>
+                                </select>
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label>Location</label>
+                                <select className={styles.filterSelectMobile} value={location} onChange={(e) => setLocation(e.target.value)}>
+                                    <option value="">All Locations</option>
+                                    {allLocations.map(loc => (
+                                        <option key={loc} value={loc}>{loc}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <button className={styles.applyFiltersBtn} onClick={() => setShowMobileFilters(false)}>
+                                Apply Filters
+                            </button>
+                        </div>
+                    </div>
+                </>
+            )}
+
+            {/* Diagnostic Drawer */}
+            {isMobile && selectedDiagnostic && (
+                <>
+                    <div className={styles.bottomSheetOverlay} onClick={() => setSelectedDiagnostic(null)} />
+                    <div className={styles.bottomSheet}>
+                        <div className={styles.sheetHeader}>
+                            <h3>Quality Diagnosis</h3>
+                            <button className={styles.closeBtn} onClick={() => setSelectedDiagnostic(null)}>
+                                <X size={24} />
+                            </button>
+                        </div>
+                        <div className={styles.sheetBody}>
+                            <div className={styles.diagHeader}>
+                                <ShieldCheck size={32} style={{ color: selectedDiagnostic.score >= 90 ? '#10b981' : selectedDiagnostic.score >= 70 ? '#2563eb' : selectedDiagnostic.score >= 40 ? '#f59e0b' : '#ef4444' }} />
+                                <div>
+                                    <h4 style={{ margin: 0, fontSize: '1.2rem', color: '#0f172a' }}>{selectedDiagnostic.title}</h4>
+                                    <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 600 }}>Score: {selectedDiagnostic.score}% [{selectedDiagnostic.status}]</span>
+                                </div>
+                            </div>
+                            <div className={styles.diagContent}>
+                                <p>{selectedDiagnostic.text}</p>
+                            </div>
+                            <button className={styles.applyFiltersBtn} onClick={() => setSelectedDiagnostic(null)}>
+                                Got it
+                            </button>
+                        </div>
+                    </div>
+                </>
+            )}
+
         </main>
     );
 }

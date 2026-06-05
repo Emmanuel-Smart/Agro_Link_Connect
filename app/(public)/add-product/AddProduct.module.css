@@ -59,6 +59,16 @@
     margin: 0 0 32px; font-weight: 500;
 }
 
+/* --- Wizard & Progress --- */
+.wizardHeader { text-align: center; margin-bottom: 24px; }
+.progressContainer { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; }
+.progressStep { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.1); color: #64748b; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; transition: all 0.3s; }
+.progressLine { height: 2px; width: 32px; background: rgba(255,255,255,0.1); transition: all 0.3s; }
+.activeStep { background: #22c55e; color: white; box-shadow: 0 0 12px rgba(34,197,94,0.4); }
+.activeLine { background: #22c55e; }
+.wizardStep { animation: fadeIn 0.4s ease-out; display: flex; flex-direction: column; gap: 20px; }
+.stepTitle { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin: 0 0 8px; text-align: left; }
+
 /* --- Form --- */
 .form { display: flex; flex-direction: column; gap: 20px; }
 
@@ -102,6 +112,31 @@
     padding: 18px; background: rgba(255,255,255,0.03);
     border-radius: 14px; border: 1px dashed rgba(255,255,255,0.1);
 }
+
+.largeSelect, .numInput, .numSelect, .dateInput, .largeTextarea {
+    padding: 16px;
+    font-size: 1rem !important;
+}
+
+.locationBlock {
+    display: flex; align-items: center; background: rgba(255,255,255,0.05);
+    border-radius: 12px; padding: 0 16px; border: 1.5px solid rgba(255,255,255,0.1);
+}
+.locIcon { color: #94a3b8; margin-right: 12px; }
+.locInput { border: none !important; background: transparent !important; padding-left: 0 !important; color: #94a3b8 !important; }
+.locHint { display: block; margin-top: 6px; color: #64748b; font-size: 0.75rem; }
+
+.btnRow { display: flex; gap: 12px; margin-top: 16px; }
+.backBtn, .nextBtn, .publishBtn { flex: 1; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.2s; border: none; }
+.backBtn { background: rgba(255,255,255,0.1); color: #cbd5e1; }
+.nextBtn, .publishBtn { background: linear-gradient(135deg, #15803d, #22c55e); color: white; box-shadow: 0 4px 12px rgba(34,197,94,0.2); }
+.nextBtn:disabled, .publishBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.previewCarousel {
+    display: flex; overflow-x: auto; gap: 12px; padding: 12px 0; margin-top: 16px;
+    scroll-snap-type: x mandatory;
+}
+.previewCarousel::-webkit-scrollbar { display: none; }
 
 .checkboxLabel {
     display: flex; align-items: center; gap: 8px;
@@ -580,4 +615,36 @@
 :global(.light-theme) .imageUploadBox:hover {
     background: rgba(34, 197, 94, 0.04);
     border-color: rgba(34, 197, 94, 0.4);
+}
+
+:global(.light-theme) .stepTitle {
+    color: #1e293b;
+}
+
+:global(.light-theme) .progressStep {
+    background: rgba(0,0,0,0.05);
+    color: #475569;
+}
+
+:global(.light-theme) .progressLine {
+    background: rgba(0,0,0,0.05);
+}
+
+:global(.light-theme) .activeStep {
+    background: #22c55e;
+    color: white;
+}
+
+:global(.light-theme) .activeLine {
+    background: #22c55e;
+}
+
+:global(.light-theme) .backBtn {
+    background: rgba(0,0,0,0.05);
+    color: #475569;
+}
+
+:global(.light-theme) .locationBlock {
+    background: rgba(0,0,0,0.02);
+    border-color: rgba(0,0,0,0.08);
 }

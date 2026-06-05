@@ -76,7 +76,7 @@ export async function POST(req: Request) {
     if (process.env.GEMINI_API_KEY) {
       try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         const prompt = `
           You are an expert Agronomic Systems Engineer.
@@ -93,19 +93,25 @@ export async function POST(req: Request) {
         let result;
         if (imageUrl) {
             const imageResp = await fetch(imageUrl);
-            const arrayBuffer = await imageResp.arrayBuffer();
-            const buffer = Buffer.from(arrayBuffer);
-            const base64Image = buffer.toString("base64");
+            if (!imageResp.ok) {
+                console.warn("Failed to fetch image for Gemini, falling back to text.");
+                result = await model.generateContent(prompt);
+            } else {
+                const mimeType = imageResp.headers.get("content-type") || "image/jpeg";
+                const arrayBuffer = await imageResp.arrayBuffer();
+                const buffer = Buffer.from(arrayBuffer);
+                const base64Image = buffer.toString("base64");
 
-            result = await model.generateContent([
-                prompt,
-                {
-                    inlineData: {
-                        data: base64Image,
-                        mimeType: "image/jpeg" // Guessing jpeg, but ideally extracted from headers
+                result = await model.generateContent([
+                    prompt,
+                    {
+                        inlineData: {
+                            data: base64Image,
+                            mimeType: mimeType
+                        }
                     }
-                }
-            ]);
+                ]);
+            }
         } else {
             result = await model.generateContent(prompt);
         }

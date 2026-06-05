@@ -58,6 +58,19 @@ export default function AddProductPage() {
 
     const [manualMode, setManualMode] = useState(false);
     
+    // Mobile Wizard State
+    const [step, setStep] = useState(1);
+    const nextStep = () => setStep(s => Math.min(s + 1, 4));
+    const prevStep = () => setStep(s => Math.max(s - 1, 1));
+    
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 768);
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     // Image Upload State
     const [imageFiles, setImageFiles] = useState<File[]>([]);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
@@ -329,151 +342,363 @@ export default function AddProductPage() {
     return (
         <div className={styles.container}>
             <div className={styles.card}>
-                <h1 className={styles.title}>Add Product</h1>
-
-                <form className={styles.form} onSubmit={handleSubmit}>
-                    {/* 2. HYBRID CROP LOGIC */}
-                    <div className={styles.formGroup}>
-                        <label>Crop Name</label>
-                        <input 
-                            name="crop" 
-                            type="text"
-                            placeholder="Type crop name (e.g. Maize, Beans...)" 
-                            value={form.crop} 
-                            onChange={handleChange} 
-                            required 
-                        />
-                    </div>
-                    
-                    {manualMode && form.crop && (
-                        <div className={styles.customCropHint} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                            <Sparkles size={16} style={{ color: "#fbbf24" }} /> <strong>Custom Crop Detected:</strong> You are adding a crop not currently in our catalog. Please specify its category below.
-                        </div>
-                    )}
-
-                    <div className={styles.formGroup}>
-                        <label>Crop Category</label>
-                        <select name="category" value={form.category} onChange={handleChange} required>
-                            <option value="">Select Category</option>
-                            <option>Cereals</option>
-                            <option>Tubers</option>
-                            <option>Vegetables</option>
-                            <option>Fruits</option>
-                            <option>Livestock</option>
-                            <option>Cash Crops</option>
-                            <option>Others</option>
-                        </select>
-                    </div>
-
-                    {/* MANUAL FIELDS */}
-                    {manualMode && (
-                        <div className={styles.manualFields}>
-                            <label className={styles.checkboxLabel}>
-                                <input type="checkbox" checked={form.is_perishable} onChange={(e) => setForm({ ...form, is_perishable: e.target.checked })} />
-                                <span>Perishable Crop</span>
-                            </label>
-                        </div>
-                    )}
-
-                    {/* MULTI-IMAGE UPLOAD */}
-                    <div className={styles.imageUploadBox}>
-                        <label className={styles.imageLabel}>
-                            <div className={styles.imagePlaceholder}>
-                                <span className={styles.placeholderIcon} style={{ display: "flex", justifyContent: "center", marginBottom: "8px" }}>
-                                    <Camera size={32} style={{ color: "#64748b" }} />
-                                </span>
-                                <span className={styles.placeholderText}>Upload Product Images</span>
-                                <small>Add up to 5 photos for better visibility</small>
+                {isMobile ? (
+                    <>
+                        <div className={styles.wizardHeader}>
+                            <h1 className={styles.title}>Add Product</h1>
+                            <div className={styles.progressContainer}>
+                                <div className={`${styles.progressStep} ${step >= 1 ? styles.activeStep : ''}`}>1</div>
+                                <div className={`${styles.progressLine} ${step >= 2 ? styles.activeLine : ''}`}></div>
+                                <div className={`${styles.progressStep} ${step >= 2 ? styles.activeStep : ''}`}>2</div>
+                                <div className={`${styles.progressLine} ${step >= 3 ? styles.activeLine : ''}`}></div>
+                                <div className={`${styles.progressStep} ${step >= 3 ? styles.activeStep : ''}`}>3</div>
+                                <div className={`${styles.progressLine} ${step >= 4 ? styles.activeLine : ''}`}></div>
+                                <div className={`${styles.progressStep} ${step >= 4 ? styles.activeStep : ''}`}>4</div>
                             </div>
-                            <input type="file" accept="image/*" multiple onChange={handleImageChange} className={styles.hiddenInput} />
-                        </label>
+                        </div>
 
-                        {imagePreviews.length > 0 && (
-                            <div className={styles.previewGrid}>
-                                {imagePreviews.map((url, idx) => (
-                                    <div key={idx} className={styles.previewWrapper}>
-                                        <img src={url} alt={`Preview ${idx}`} className={styles.imagePreview} />
-                                        <button type="button" className={styles.removeBtn} onClick={() => removeImage(idx)}>✕</button>
+                        <form className={styles.form} onSubmit={handleSubmit}>
+                            {/* STEP 1: DOMAIN SELECTION */}
+                            {step === 1 && (
+                                <div className={styles.wizardStep}>
+                                    <h2 className={styles.stepTitle}>Step 1: Classification</h2>
+                                    <div className={styles.formGroup}>
+                                        <label>Crop / Asset Name</label>
+                                        <input 
+                                            name="crop" 
+                                            type="text"
+                                            placeholder="e.g. Maize, Catfish, Tomatoes..." 
+                                            value={form.crop} 
+                                            onChange={handleChange} 
+                                            required 
+                                        />
                                     </div>
-                                ))}
-                                {imagePreviews.length < 5 && (
-                                    <label className={styles.addMoreBox}>
-                                        <span>+</span>
-                                        <input type="file" accept="image/*" multiple onChange={handleImageChange} className={styles.hiddenInput} />
+                                    
+                                    {manualMode && form.crop && (
+                                        <div className={styles.customCropHint}>
+                                            <Sparkles size={16} style={{ color: "#fbbf24" }} /> <strong>Custom Asset:</strong> Please specify its category.
+                                        </div>
+                                    )}
+
+                                    <div className={styles.formGroup}>
+                                        <label>Agricultural Domain</label>
+                                        <select name="category" value={form.category} onChange={handleChange} required className={styles.largeSelect}>
+                                            <option value="">Select Domain Category</option>
+                                            <option>Cereals</option>
+                                            <option>Tubers</option>
+                                            <option>Vegetables</option>
+                                            <option>Fruits</option>
+                                            <option>Livestock</option>
+                                            <option>Aquaculture</option>
+                                            <option>Cash Crops</option>
+                                            <option>Others</option>
+                                        </select>
+                                    </div>
+
+                                    {manualMode && (
+                                        <div className={styles.manualFields}>
+                                            <label className={styles.checkboxLabel}>
+                                                <input type="checkbox" checked={form.is_perishable} onChange={(e) => setForm({ ...form, is_perishable: e.target.checked })} />
+                                                <span>Highly Perishable?</span>
+                                            </label>
+                                        </div>
+                                    )}
+
+                                    <button type="button" className={styles.nextBtn} onClick={nextStep} disabled={!form.crop || !form.category}>
+                                        Next Step
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* STEP 2: GEO-LOCATION */}
+                            {step === 2 && (
+                                <div className={styles.wizardStep}>
+                                    <h2 className={styles.stepTitle}>Step 2: Geo-Location</h2>
+                                    <div className={styles.formGroup}>
+                                        <label>Sourcing Location</label>
+                                        <div className={styles.locationBlock}>
+                                            <input 
+                                                type="text" 
+                                                value={profile?.location || ""} 
+                                                disabled 
+                                                className={styles.locInput}
+                                                placeholder="Location loading..."
+                                            />
+                                        </div>
+                                        <small className={styles.locHint}>Location is pulled securely from your verified profile.</small>
+                                    </div>
+
+                                    <div className={styles.btnRow}>
+                                        <button type="button" className={styles.backBtn} onClick={prevStep}>Back</button>
+                                        <button type="button" className={styles.nextBtn} onClick={nextStep}>Next Step</button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* STEP 3: FINANCIALS */}
+                            {step === 3 && (
+                                <div className={styles.wizardStep}>
+                                    <h2 className={styles.stepTitle}>Step 3: Financials & Metrics</h2>
+                                    
+                                    <div className={styles.row}>
+                                        <div className={styles.formGroup} style={{ flex: 2 }}>
+                                            <label>Quantity</label>
+                                            <input name="quantity" type="number" placeholder="e.g. 50" onChange={handleChange} required className={styles.numInput} value={form.quantity}/>
+                                        </div>
+                                        <div className={styles.formGroup} style={{ flex: 1 }}>
+                                            <label>Unit</label>
+                                            <select name="unit" value={form.unit} onChange={handleChange} className={styles.numSelect}>
+                                                <option>Bag</option>
+                                                <option>Bucket</option>
+                                                <option>Crate</option>
+                                                <option>Kg</option>
+                                                <option>Head</option>
+                                                <option>Others</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className={styles.formGroup}>
+                                        <label>Your Price (FCFA)</label>
+                                        <input
+                                            name="price"
+                                            type="number"
+                                            placeholder={`Price per ${form.unit}`}
+                                            value={form.price}
+                                            onChange={handleChange}
+                                            required
+                                            className={`${styles.priceInput} ${styles[`input_${guidanceState}`]} ${styles.numInput}`}
+                                        />
+                                    </div>
+
+                                    {priceInsight && !isPioneer && (
+                                        <div className={styles.intelBox}>
+                                            <div className={styles.intelHeader}>Market Pulse ({profile?.location})</div>
+                                            <div className={styles.intelGrid}>
+                                                <div className={styles.intelStat}><span>Min</span><strong>{priceInsight.min.toLocaleString()}</strong></div>
+                                                <div className={styles.intelStatAvg}><span>Avg</span><strong>{priceInsight.avg.toFixed(0).toLocaleString()}</strong></div>
+                                                <div className={styles.intelStat}><span>Max</span><strong>{priceInsight.max.toLocaleString()}</strong></div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {guidanceState !== 'none' && (
+                                        <div className={`${styles.guidanceAlert} ${styles[`alert_${guidanceState}`]}`}>
+                                            {guidanceMsg}
+                                        </div>
+                                    )}
+
+                                    <div className={styles.formGroup} style={{ marginTop: '16px' }}>
+                                        <label>Availability</label>
+                                        <div className={styles.radioGroup}>
+                                            <label><input type="radio" name="harvest" value="ready" checked={form.harvest === "ready"} onChange={handleChange} /> Ready Now</label>
+                                            <label><input type="radio" name="harvest" value="future" checked={form.harvest === "future"} onChange={handleChange} /> Future Harvest</label>
+                                        </div>
+                                        {form.harvest === "future" && (
+                                            <input type="date" name="available_date" value={form.available_date} onChange={handleChange} required className={styles.dateInput} />
+                                        )}
+                                    </div>
+
+                                    <div className={styles.btnRow}>
+                                        <button type="button" className={styles.backBtn} onClick={prevStep}>Back</button>
+                                        <button type="button" className={styles.nextBtn} onClick={nextStep} disabled={!form.price || !form.quantity}>Next Step</button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* STEP 4: MEDIA & PUBLISH */}
+                            {step === 4 && (
+                                <div className={styles.wizardStep}>
+                                    <h2 className={styles.stepTitle}>Step 4: Media & Details</h2>
+                                    
+                                    <div className={styles.imageUploadBox}>
+                                        <label className={styles.imageLabel}>
+                                            <div className={styles.imagePlaceholder}>
+                                                <span className={styles.placeholderIcon} style={{ display: "flex", justifyContent: "center", marginBottom: "8px" }}>
+                                                    <Camera size={32} style={{ color: "#64748b" }} />
+                                                </span>
+                                                <span className={styles.placeholderText}>Tap to Upload Images</span>
+                                                <small>Max 5 photos</small>
+                                            </div>
+                                            <input type="file" accept="image/*" multiple onChange={handleImageChange} className={styles.hiddenInput} />
+                                        </label>
+
+                                        {imagePreviews.length > 0 && (
+                                            <div className={styles.previewCarousel}>
+                                                {imagePreviews.map((url, idx) => (
+                                                    <div key={idx} className={styles.previewWrapper}>
+                                                        <img src={url} alt={`Preview ${idx}`} className={styles.imagePreview} />
+                                                        <button type="button" className={styles.removeBtn} onClick={() => removeImage(idx)}>✕</button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className={styles.formGroup} style={{ marginTop: '16px' }}>
+                                        <label>Additional Details</label>
+                                        <textarea name="description" placeholder="Describe quality, strain, or logistics..." value={form.description} onChange={handleChange} className={styles.largeTextarea} />
+                                    </div>
+
+                                    <div className={styles.btnRow}>
+                                        <button type="button" className={styles.backBtn} onClick={prevStep} disabled={loading}>Back</button>
+                                        <button className={styles.publishBtn} type="submit" disabled={loading}>
+                                            {loadingText}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </form>
+                    </>
+                ) : (
+                    <>
+                        <h1 className={styles.title}>Add Product</h1>
+
+                        <form className={styles.form} onSubmit={handleSubmit}>
+                            {/* 2. HYBRID CROP LOGIC */}
+                            <div className={styles.formGroup}>
+                                <label>Crop Name</label>
+                                <input 
+                                    name="crop" 
+                                    type="text"
+                                    placeholder="Type crop name (e.g. Maize, Beans...)" 
+                                    value={form.crop} 
+                                    onChange={handleChange} 
+                                    required 
+                                />
+                            </div>
+                            
+                            {manualMode && form.crop && (
+                                <div className={styles.customCropHint} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                    <Sparkles size={16} style={{ color: "#fbbf24" }} /> <strong>Custom Crop Detected:</strong> You are adding a crop not currently in our catalog. Please specify its category below.
+                                </div>
+                            )}
+
+                            <div className={styles.formGroup}>
+                                <label>Crop Category</label>
+                                <select name="category" value={form.category} onChange={handleChange} required>
+                                    <option value="">Select Category</option>
+                                    <option>Cereals</option>
+                                    <option>Tubers</option>
+                                    <option>Vegetables</option>
+                                    <option>Fruits</option>
+                                    <option>Livestock</option>
+                                    <option>Cash Crops</option>
+                                    <option>Others</option>
+                                </select>
+                            </div>
+
+                            {/* MANUAL FIELDS */}
+                            {manualMode && (
+                                <div className={styles.manualFields}>
+                                    <label className={styles.checkboxLabel}>
+                                        <input type="checkbox" checked={form.is_perishable} onChange={(e) => setForm({ ...form, is_perishable: e.target.checked })} />
+                                        <span>Perishable Crop</span>
                                     </label>
+                                </div>
+                            )}
+
+                            {/* MULTI-IMAGE UPLOAD */}
+                            <div className={styles.imageUploadBox}>
+                                <label className={styles.imageLabel}>
+                                    <div className={styles.imagePlaceholder}>
+                                        <span className={styles.placeholderIcon} style={{ display: "flex", justifyContent: "center", marginBottom: "8px" }}>
+                                            <Camera size={32} style={{ color: "#64748b" }} />
+                                        </span>
+                                        <span className={styles.placeholderText}>Upload Product Images</span>
+                                        <small>Add up to 5 photos for better visibility</small>
+                                    </div>
+                                    <input type="file" accept="image/*" multiple onChange={handleImageChange} className={styles.hiddenInput} />
+                                </label>
+
+                                {imagePreviews.length > 0 && (
+                                    <div className={styles.previewGrid}>
+                                        {imagePreviews.map((url, idx) => (
+                                            <div key={idx} className={styles.previewWrapper}>
+                                                <img src={url} alt={`Preview ${idx}`} className={styles.imagePreview} />
+                                                <button type="button" className={styles.removeBtn} onClick={() => removeImage(idx)}>✕</button>
+                                            </div>
+                                        ))}
+                                        {imagePreviews.length < 5 && (
+                                            <label className={styles.addMoreBox}>
+                                                <span>+</span>
+                                                <input type="file" accept="image/*" multiple onChange={handleImageChange} className={styles.hiddenInput} />
+                                            </label>
+                                        )}
+                                    </div>
                                 )}
                             </div>
-                        )}
-                    </div>
 
-                    {/* QUANTITY & UNIT */}
-                    <div className={styles.row}>
-                        <input name="quantity" type="number" placeholder="Quantity" onChange={handleChange} required className={styles.flex2} />
-                        <select name="unit" value={form.unit} onChange={handleChange} className={styles.flex1}>
-                            <option>Bag</option>
-                            <option>Bucket</option>
-                            <option>Crate</option>
-                            <option>Kg</option>
-                            <option>Others</option>
-                        </select>
-                    </div>
-
-                    {/* THE PIONEER STATE */}
-                    {isPioneer && form.crop && (
-                        <div className={styles.pioneerState} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                            <Zap size={18} style={{ color: "#fbbf24" }} /> <strong>Pioneer Alert:</strong> You are the first to price this crop in this neighborhood! You are setting the market pulse.
-                        </div>
-                    )}
-
-                    {/* 3. PRICE INTELLIGENCE CALCULATION */}
-                    {priceInsight && !isPioneer && (
-                        <div className={styles.intelBox}>
-                            <div className={styles.intelHeader}>Market Pulse ({profile?.location})</div>
-                            <div className={styles.intelGrid}>
-                                <div className={styles.intelStat}><span>Min (Quick Sale)</span><strong>{priceInsight.min.toLocaleString()}</strong></div>
-                                <div className={styles.intelStatAvg}><span>Avg (Fair Market)</span><strong>{priceInsight.avg.toFixed(0).toLocaleString()}</strong></div>
-                                <div className={styles.intelStat}><span>Max (Premium)</span><strong>{priceInsight.max.toLocaleString()}</strong></div>
+                            {/* QUANTITY & UNIT */}
+                            <div className={styles.row}>
+                                <input name="quantity" type="number" placeholder="Quantity" onChange={handleChange} required className={styles.flex2} />
+                                <select name="unit" value={form.unit} onChange={handleChange} className={styles.flex1}>
+                                    <option>Bag</option>
+                                    <option>Bucket</option>
+                                    <option>Crate</option>
+                                    <option>Kg</option>
+                                    <option>Others</option>
+                                </select>
                             </div>
-                        </div>
-                    )}
 
-                    {/* 4. REAL-TIME GUIDANCE UI */}
-                    <div className={styles.priceInputWrapper}>
-                        <input
-                            name="price"
-                            type="number"
-                            placeholder={`Your Price per ${form.unit} (FCFA)`}
-                            value={form.price}
-                            onChange={handleChange}
-                            required
-                            className={`${styles.priceInput} ${styles[`input_${guidanceState}`]}`}
-                        />
-                    </div>
+                            {/* THE PIONEER STATE */}
+                            {isPioneer && form.crop && (
+                                <div className={styles.pioneerState} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                    <Zap size={18} style={{ color: "#fbbf24" }} /> <strong>Pioneer Alert:</strong> You are the first to price this crop in this neighborhood! You are setting the market pulse.
+                                </div>
+                            )}
 
-                    {/* GUIDANCE MESSAGE */}
-                    {guidanceState !== 'none' && (
-                        <div className={`${styles.guidanceAlert} ${styles[`alert_${guidanceState}`]}`}>
-                            {guidanceMsg}
-                        </div>
-                    )}
+                            {/* 3. PRICE INTELLIGENCE CALCULATION */}
+                            {priceInsight && !isPioneer && (
+                                <div className={styles.intelBox}>
+                                    <div className={styles.intelHeader}>Market Pulse ({profile?.location})</div>
+                                    <div className={styles.intelGrid}>
+                                        <div className={styles.intelStat}><span>Min (Quick Sale)</span><strong>{priceInsight.min.toLocaleString()}</strong></div>
+                                        <div className={styles.intelStatAvg}><span>Avg (Fair Market)</span><strong>{priceInsight.avg.toFixed(0).toLocaleString()}</strong></div>
+                                        <div className={styles.intelStat}><span>Max (Premium)</span><strong>{priceInsight.max.toLocaleString()}</strong></div>
+                                    </div>
+                                </div>
+                            )}
 
-                    {/* 5. TEMPORAL SIGNALING */}
-                    <div className={styles.radioGroup}>
-                        <label><input type="radio" name="harvest" value="ready" checked={form.harvest === "ready"} onChange={handleChange} /> Ready Now</label>
-                        <label><input type="radio" name="harvest" value="future" checked={form.harvest === "future"} onChange={handleChange} /> Future Harvest Date</label>
-                    </div>
+                            {/* 4. REAL-TIME GUIDANCE UI */}
+                            <div className={styles.priceInputWrapper}>
+                                <input
+                                    name="price"
+                                    type="number"
+                                    placeholder={`Your Price per ${form.unit} (FCFA)`}
+                                    value={form.price}
+                                    onChange={handleChange}
+                                    required
+                                    className={`${styles.priceInput} ${styles[`input_${guidanceState}`]}`}
+                                />
+                            </div>
 
-                    {form.harvest === "future" && (
-                        <input type="date" name="available_date" value={form.available_date} onChange={handleChange} required />
-                    )}
+                            {/* GUIDANCE MESSAGE */}
+                            {guidanceState !== 'none' && (
+                                <div className={`${styles.guidanceAlert} ${styles[`alert_${guidanceState}`]}`}>
+                                    {guidanceMsg}
+                                </div>
+                            )}
 
-                    {/* DESCRIPTION */}
-                    <textarea name="description" placeholder="Describe quality, strain, or logistics..." value={form.description} onChange={handleChange} />
+                            {/* 5. TEMPORAL SIGNALING */}
+                            <div className={styles.radioGroup}>
+                                <label><input type="radio" name="harvest" value="ready" checked={form.harvest === "ready"} onChange={handleChange} /> Ready Now</label>
+                                <label><input type="radio" name="harvest" value="future" checked={form.harvest === "future"} onChange={handleChange} /> Future Harvest Date</label>
+                            </div>
 
-                    <button className={styles.button} type="submit" disabled={loading}>
-                        {loadingText}
-                    </button>
-                </form>
+                            {form.harvest === "future" && (
+                                <input type="date" name="available_date" value={form.available_date} onChange={handleChange} required />
+                            )}
+
+                            {/* DESCRIPTION */}
+                            <textarea name="description" placeholder="Describe quality, strain, or logistics..." value={form.description} onChange={handleChange} />
+
+                            <button className={styles.button} type="submit" disabled={loading}>
+                                {loadingText}
+                            </button>
+                        </form>
+                    </>
+                )}
             </div>
 
             {/* Custom Modal */}
