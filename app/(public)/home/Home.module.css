@@ -687,6 +687,25 @@
     }
 }
 
+/* --- Updating Badge Animations --- */
+@keyframes spinSlow {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.spinIcon {
+    animation: spinSlow 3s linear infinite;
+}
+@keyframes pulseGlow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+.badgeUpdating {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px dashed #cbd5e1;
+    animation: pulseGlow 2s infinite;
+}
+
 /* Details */
 .details { padding: 10px 16px 0; flex: 1; }
 .details p { font-size: 0.84rem; color: #475569; line-height: 1.55; }

@@ -307,25 +307,21 @@ export default function AddProductPage() {
 
         const productId = newProduct?.[0]?.id;
         if (productId) {
-            setLoadingText("Running AI Quality Diagnostics...");
-            try {
-                await fetch('/api/listings/universal-evaluate', {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': token ? `Bearer ${token}` : ''
-                    },
-                    body: JSON.stringify({
-                        productId: productId,
-                        imageUrl: mainImageUrl,
-                        cropKey: form.crop,
-                        location: profile.location,
-                        agricultural_domain: domain
-                    })
-                });
-            } catch (err) {
-                console.error("Universal Evaluate API failed:", err);
-            }
+            // Fire-and-forget: run AI evaluation asynchronously in the background
+            fetch('/api/listings/universal-evaluate', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : ''
+                },
+                body: JSON.stringify({
+                    productId: productId,
+                    imageUrl: mainImageUrl,
+                    cropKey: form.crop,
+                    location: profile.location,
+                    agricultural_domain: domain
+                })
+            }).catch(err => console.error("Universal Evaluate API background task failed:", err));
         }
         
         setLoading(false);

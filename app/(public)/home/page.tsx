@@ -26,6 +26,7 @@ import {
     Lock,
     CheckCircle2,
     Calendar,
+    RefreshCw,
     SlidersHorizontal,
     X
 } from "lucide-react";
@@ -191,6 +192,37 @@ export default function HomePage() {
         setLoading(false);
         setLoadingMore(false);
     };
+
+    // Auto-update products that are currently evaluating AI Quality
+    useEffect(() => {
+        const evaluatingProducts = products.filter(p => p.calculated_quality_score === null || p.calculated_quality_score === undefined);
+        if (evaluatingProducts.length === 0) return;
+
+        const intervalId = setInterval(async () => {
+            const { data } = await supabase
+                .from('products')
+                .select('*')
+                .in('id', evaluatingProducts.map(p => p.id));
+            
+            if (data && data.length > 0) {
+                let hasUpdates = false;
+                const newProducts = products.map(p => {
+                    const updatedP = data.find(newP => newP.id === p.id);
+                    if (updatedP && updatedP.calculated_quality_score !== null) {
+                        hasUpdates = true;
+                        return { ...p, ...updatedP };
+                    }
+                    return p;
+                });
+                
+                if (hasUpdates) {
+                    setProducts(newProducts);
+                }
+            }
+        }, 3000);
+
+        return () => clearInterval(intervalId);
+    }, [products]);
 
     const handleDemandCapture = async (cropParam?: string, locationParam?: string, isFutureHarvest = false) => {
         const cropToSave = cropParam || debouncedSearch;
@@ -402,7 +434,7 @@ export default function HomePage() {
                                             )}
 
                                             {/* Geo-Environmental Quality Engine Trust Badge */}
-                                            {item.calculated_quality_score !== null && item.calculated_quality_score !== undefined && (
+                                            {item.calculated_quality_score !== null && item.calculated_quality_score !== undefined ? (
                                                 <div 
                                                     className={`${styles.trustBadgeContainer} ${
                                                         item.calculated_quality_score >= 90 ? styles.badgeEmerald :
@@ -424,6 +456,13 @@ export default function HomePage() {
                                                     <div className={styles.trustBadgeHeader}>
                                                         <ShieldCheck size={16} />
                                                         <span>Quality: {item.calculated_quality_score}% [{item.quality_status_badge}]</span>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className={`${styles.trustBadgeContainer} ${styles.badgeUpdating}`}>
+                                                    <div className={styles.trustBadgeHeader} style={{ justifyContent: 'center' }}>
+                                                        <RefreshCw size={16} className={styles.spinIcon} style={{ color: '#64748b' }} />
+                                                        <span style={{ color: '#475569', fontWeight: 600 }}>Evaluating AI Quality...</span>
                                                     </div>
                                                 </div>
                                             )}
