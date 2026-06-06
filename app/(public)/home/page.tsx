@@ -14,7 +14,6 @@ import {
     Leaf, 
     Apple, 
     Egg, 
-    DollarSign, 
     Package, 
     MapPin, 
     Clock, 
@@ -28,7 +27,8 @@ import {
     Calendar,
     RefreshCw,
     SlidersHorizontal,
-    X
+    X,
+    Tag
 } from "lucide-react";
 
 // Removed formatTimeAgo in favor of explicit date/time rendering
@@ -302,13 +302,13 @@ export default function HomePage() {
         });
     });
 
-    const categoryIcons: Record<string, React.ComponentType<any>> = {
-        "Cereals": Sprout,
+    const categoryIcons: Record<string, any> = {
         "Tubers": CircleDot,
+        "Cereals": Sprout,
         "Vegetables": Leaf,
         "Fruits": Apple,
         "Livestock": Egg,
-        "Cash Crops": DollarSign,
+        "Cash Crops": Tag,
         "Others": Package
     };
 
@@ -419,7 +419,7 @@ export default function HomePage() {
                                             <h3>{item.crop}</h3>
                                             
                                             <div className={styles.priceRow} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                                                <DollarSign size={14} style={{ color: "#4ade80" }} /> <strong>{Number(item.price).toLocaleString()} FCFA</strong> / {item.unit}
+                                                <Tag size={14} style={{ color: "#4ade80" }} /> <strong>{Number(item.price).toLocaleString()} FCFA</strong> / {item.unit}
                                             </div>
 
                                             {/* Phase 5: Transparency Badges */}

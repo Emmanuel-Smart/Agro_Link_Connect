@@ -18,13 +18,13 @@ import {
     MessageCircle, 
     Phone, 
     Search, 
-    DollarSign, 
     Package,
     Egg,
     Leaf,
     Apple,
     CircleDot,
-    Calendar
+    Calendar,
+    Tag
 } from "lucide-react";
 
 // Removed formatExactDate in favor of inline explicit rendering
@@ -326,7 +326,7 @@ export default function ProfilePage() {
         "Vegetables": Leaf,
         "Fruits": Apple,
         "Livestock": Egg,
-        "Cash Crops": DollarSign,
+        "Cash Crops": Tag,
         "Others": Package
     };
 
@@ -542,9 +542,10 @@ export default function ProfilePage() {
                                 
                                 <h3>{item.crop}</h3>
                                 
-                                <p className={styles.priceLine} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                                    <DollarSign size={14} style={{ color: "#4ade80" }} /> <strong>{item.price?.toLocaleString()} FCFA</strong> / {item.unit}
-                                </p>
+                                <div className={styles.priceRow} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                    <Tag size={14} style={{ color: "#4ade80" }} /> 
+                                    <strong>{item.price?.toLocaleString()} FCFA</strong> / {item.unit}
+                                </div>
 
                                 {/* Market Pulse (Transparency Badge) */}
                                 {pulse && (

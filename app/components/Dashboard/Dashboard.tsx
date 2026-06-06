@@ -18,7 +18,7 @@ import {
     Bell, 
     BellOff, 
     Sprout, 
-    DollarSign, 
+    Tag, 
     Package,
     ShieldCheck,
     Clock,
@@ -286,7 +286,7 @@ export default function Dashboard() {
                     </div>
                     <div className={styles.featureCard}>
                         <div className={styles.icon} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <DollarSign size={32} style={{ color: "#4ade80" }} />
+                            <Tag size={32} style={{ color: "#4ade80" }} />
                         </div>
                         <h3>For Buyers</h3>
                         <p>Access transparent market rates and purchase directly from the source.</p>
