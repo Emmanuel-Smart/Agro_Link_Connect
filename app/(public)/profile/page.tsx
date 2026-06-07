@@ -154,7 +154,15 @@ export default function ProfilePage() {
                         const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`);
                         const data = await response.json();
                         const address = data.address || {};
-                        const specificLocation = address.neighbourhood || address.suburb || address.village || address.hamlet || address.town || address.city || "Unknown Location";
+                        const detail = address.road || address.residential || address.neighbourhood;
+                        const area = address.suburb || address.village || address.town || address.city || address.county;
+                        
+                        let specificLocation = "Unknown Location";
+                        if (detail && area && detail !== area) {
+                            specificLocation = `${detail}, ${area}`;
+                        } else {
+                            specificLocation = detail || area || "Unknown Location";
+                        }
                         setFormData(prev => ({ ...prev, location: specificLocation }));
                     } else {
                         // Google Maps API implementation
@@ -166,13 +174,19 @@ export default function ProfilePage() {
                             const addressComponents = data.results[0].address_components;
                             const getComponent = (type: string) => addressComponents.find((comp: any) => comp.types.includes(type))?.long_name;
 
+                            const route = getComponent('route');
                             const neighborhood = getComponent('neighborhood');
-                            const sublocality1 = getComponent('sublocality_level_1');
-                            const sublocality2 = getComponent('sublocality_level_2');
-                            const subvillage = getComponent('subpremise') || getComponent('administrative_area_level_3');
-                            const locality = getComponent('locality');
+                            const sublocality = getComponent('sublocality_level_1') || getComponent('sublocality_level_2') || getComponent('subpremise');
+                            const locality = getComponent('locality') || getComponent('administrative_area_level_3');
                             
-                            specificLocation = neighborhood || sublocality1 || sublocality2 || subvillage || locality || "Unknown Location";
+                            const detail = route || neighborhood;
+                            const area = sublocality || locality;
+
+                            if (detail && area && detail !== area) {
+                                specificLocation = `${detail}, ${area}`;
+                            } else {
+                                specificLocation = detail || area || "Unknown Location";
+                            }
                         }
                         setFormData(prev => ({ ...prev, location: specificLocation }));
                     }
