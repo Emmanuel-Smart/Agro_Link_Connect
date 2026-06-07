@@ -181,7 +181,16 @@ export default function Dashboard() {
                         <h2>Live Market Preview</h2>
                         <p>Real-time listings from local farmers across the region.</p>
                     </div>
-                    <Link href="/home" className={styles.viewAll}>View Full Marketplace →</Link>
+                    <button 
+                        onClick={(e) => {
+                            if (handleContactGuard(e)) return;
+                            router.push("/home");
+                        }} 
+                        className={styles.viewAll}
+                        style={{ background: 'none', border: 'none', font: 'inherit', cursor: 'pointer', padding: 0 }}
+                    >
+                        View Full Marketplace →
+                    </button>
                 </div>
 
                 {loading ? (

@@ -5,7 +5,7 @@ import styles from "./login.module.css";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Link from "next/link";
-import { Sprout } from "lucide-react";
+import { Sprout, Eye, EyeOff, CheckCircle2, X } from "lucide-react";
 
 export default function LoginPage() {
 
@@ -15,6 +15,8 @@ export default function LoginPage() {
         email: "",
         password: "",
     });
+    const [showPassword, setShowPassword] = useState(false);
+    const [modalState, setModalState] = useState<{show: boolean, type: 'success' | 'error', message: string}>({show: false, type: 'success', message: ''});
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -31,11 +33,9 @@ export default function LoginPage() {
             if (error) throw error;
 
             console.log("Login successful:", data);
-
-            // Redirect to dashboard/home page
-            router.push("/home"); // or "/home" if your file is pages/home/page.tsx
+            router.push("/home");
         } catch (error: any) {
-            alert(error.message);
+            setModalState({ show: true, type: 'error', message: error.message });
         }
     };
 
@@ -69,15 +69,26 @@ export default function LoginPage() {
 
                     <div className={styles.formGroup}>
                         <label htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="••••••••"
-                            value={form.password}
-                            onChange={handleChange}
-                            required
-                        />
+                        <div className={styles.passwordInputWrapper}>
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                id="password"
+                                name="password"
+                                placeholder="••••••••"
+                                className={styles.passwordInput}
+                                value={form.password}
+                                onChange={handleChange}
+                                required
+                            />
+                            <button 
+                                type="button" 
+                                className={styles.passwordToggleBtn}
+                                onClick={() => setShowPassword(!showPassword)}
+                                tabIndex={-1}
+                            >
+                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
                         <Link href="/forgot-password" className={styles.forgotLink}>Forgot Password?</Link>
                     </div>
 
@@ -85,9 +96,25 @@ export default function LoginPage() {
                         Login
                     </button>
                 </form>
-
-
             </div>
+
+            {/* Custom Modal */}
+            {modalState.show && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.authModal}>
+                        <div className={`${styles.authModalIcon} ${modalState.type === 'error' ? styles.authModalIconError : ''}`}>
+                            {modalState.type === 'error' ? <X size={32} /> : <CheckCircle2 size={32} />}
+                        </div>
+                        <h3>{modalState.type === 'error' ? 'Login Failed' : 'Success!'}</h3>
+                        <p>{modalState.message}</p>
+                        <div className={styles.authModalActions}>
+                            <button className={styles.btnModalPrimary} onClick={() => setModalState({...modalState, show: false})}>
+                                Try Again
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

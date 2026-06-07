@@ -68,6 +68,11 @@
     background: #f8fafc;
     transition: all 0.2s;
     outline: none;
+    width: 100%;
+}
+
+.passwordInput {
+    padding-right: 42px !important;
 }
 
 .form input::placeholder {
@@ -157,6 +162,126 @@
 .googleIcon {
     width: 20px;
     height: 20px;
+}
+
+.passwordInputWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.passwordToggleBtn {
+    position: absolute;
+    right: 12px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.passwordToggleBtn:hover {
+    color: #16a34a;
+}
+
+/* --- Modal Styles --- */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.authModal {
+    background: white;
+    width: 90%;
+    max-width: 360px;
+    border-radius: 24px;
+    padding: 32px 24px;
+    text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid #f1f5f9;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.authModalIcon {
+    width: 64px;
+    height: 64px;
+    background: #f0fdf4;
+    color: #22c55e;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.authModalIconError {
+    background: #fef2f2;
+    color: #ef4444;
+}
+
+.authModal h3 {
+    font-size: 1.4rem;
+    color: #0f172a;
+    margin-bottom: 12px;
+    font-weight: 800;
+}
+
+.authModal p {
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 24px;
+}
+
+.authModalActions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btnModalPrimary {
+    width: 100%;
+    background: #0f172a;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btnModalPrimary:hover {
+    background: #1e293b;
+    transform: translateY(-1px);
 }
 
 @media (max-width: 480px) {
