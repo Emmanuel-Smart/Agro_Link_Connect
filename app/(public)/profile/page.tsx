@@ -68,6 +68,7 @@ export default function ProfilePage() {
 
     // Edit Product State - Expanded to edit everything
     const [editingProduct, setEditingProduct] = useState<any>(null);
+    const [productToDelete, setProductToDelete] = useState<any>(null);
     const [editForm, setEditForm] = useState({ 
         crop: "", category: "", price: "", unit: "Bag", 
         quantity: "", description: "", harvest: "ready", 
@@ -218,12 +219,18 @@ export default function ProfilePage() {
     };
 
     // ---------------- PRODUCT CRUD ACTIONS ----------------
-    const handleDeleteProduct = async (id: string) => {
-        if (!confirm("Are you sure you want to permanently delete this listing?")) return;
+    const confirmDeleteListing = (product: any) => {
+        setProductToDelete(product);
+    };
+
+    const executeDeleteProduct = async () => {
+        if (!productToDelete) return;
+        const id = productToDelete.id;
         
         const { error } = await supabase.from("products").delete().eq("id", id);
         if (!error) {
             setProducts(products.filter(p => p.id !== id));
+            setProductToDelete(null);
         } else {
             alert("Error deleting product.");
         }
@@ -415,6 +422,27 @@ export default function ProfilePage() {
                 </div>
             )}
 
+            {/* ---------------- DELETE PRODUCT CONFIRMATION MODAL ---------------- */}
+            {productToDelete && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalContent} style={{ maxWidth: '400px', textAlign: 'center' }}>
+                        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+                            <div style={{ background: 'rgba(239, 68, 68, 0.1)', padding: '16px', borderRadius: '50%' }}>
+                                <Trash2 size={32} style={{ color: '#ef4444' }} />
+                            </div>
+                        </div>
+                        <h2>Delete Listing</h2>
+                        <p style={{ color: '#94a3b8', marginBottom: '24px', lineHeight: '1.5' }}>
+                            Are you sure you want to permanently delete <strong>{productToDelete.crop}</strong>? This action cannot be undone.
+                        </p>
+                        <div className={styles.modalActions}>
+                            <button type="button" className={styles.btnCancel} onClick={() => setProductToDelete(null)}>Cancel</button>
+                            <button type="button" className={styles.btnSave} onClick={executeDeleteProduct} style={{ background: 'linear-gradient(135deg, #dc2626, #ef4444)', boxShadow: '0 4px 14px rgba(239, 68, 68, 0.3)' }}>Delete</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* ---------------- SIDEBAR ---------------- */}
             <aside className={styles.sidebar}>
                 {profile && !isEditingProfile ? (
@@ -593,7 +621,7 @@ export default function ProfilePage() {
                                     {/* Product CRUD Actions */}
                                     <div className={styles.productActions}>
                                         <button className={styles.btnEdit} onClick={() => openEditModal(item)} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Edit size={11} /> Edit</button>
-                                        <button className={styles.btnDelete} onClick={() => handleDeleteProduct(item.id)} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Trash2 size={11} /> Delete</button>
+                                        <button className={styles.btnDelete} onClick={() => confirmDeleteListing(item)} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Trash2 size={11} /> Delete</button>
                                     </div>
                                 </div>
                             </div>
