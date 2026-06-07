@@ -16,33 +16,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        let mounted = true;
+
         const checkUser = async () => {
             try {
-                const { data: { session }, error } = await supabase.auth.getSession();
+                const { data: { user }, error } = await supabase.auth.getUser();
                 if (error) {
-                    console.warn("Auth Session Error:", error.message);
-                    // If refresh token is invalid, force a sign out to clear stale local storage
-                    if (error.message.includes("Refresh Token Not Found")) {
-                        await supabase.auth.signOut();
-                        setUser(null);
-                    }
+                    // Supabase already clears local session if the refresh token is truly invalid.
+                    // We don't need to explicitly call signOut() which might trigger another API error.
+                    if (mounted) setUser(null);
                 } else {
-                    setUser(session?.user || null);
+                    if (mounted) setUser(user);
                 }
             } catch (err) {
-                console.error("Auth check failed:", err);
+                // Ignore unexpected errors quietly
+                if (mounted) setUser(null);
             } finally {
-                setLoading(false);
+                if (mounted) setLoading(false);
             }
         };
 
         checkUser();
 
         const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user || null);
+            if (mounted) {
+                setUser(session?.user || null);
+                setLoading(false);
+            }
         });
 
-        return () => listener.subscription.unsubscribe();
+        return () => {
+            mounted = false;
+            listener.subscription.unsubscribe();
+        };
     }, []);
 
     return (

@@ -291,16 +291,7 @@ export default function HomePage() {
         return acc;
     }, {} as Record<string, any[]>);
 
-    const userLocation = profile?.location;
-    Object.keys(groupedProducts).forEach(cat => {
-        groupedProducts[cat].sort((a: any, b: any) => {
-            const aIsLocal = userLocation && a.location === userLocation;
-            const bIsLocal = userLocation && b.location === userLocation;
-            if (aIsLocal && !bIsLocal) return -1;
-            if (!aIsLocal && bIsLocal) return 1;
-            return 0; // Maintain original order (which is by created_at desc)
-        });
-    });
+    // Maintain original chronological order (which is by created_at desc from Supabase)
 
     const categoryIcons: Record<string, any> = {
         "Tubers": CircleDot,
@@ -315,12 +306,11 @@ export default function HomePage() {
     const sortedCategories = (Object.entries(groupedProducts) as [string, any[]][]).sort(([_catA, itemsA], [_catB, itemsB]) => {
         const arrA = itemsA as any[];
         const arrB = itemsB as any[];
-        const aHasLocal = arrA.some(item => userLocation && item.location === userLocation);
-        const bHasLocal = arrB.some(item => userLocation && item.location === userLocation);
         
-        if (aHasLocal && !bHasLocal) return -1;
-        if (!aHasLocal && bHasLocal) return 1;
-        return arrB.length - arrA.length; // Fallback: sort by number of items descending
+        // Sort categories by the created_at of their newest item (the first item, since they are ordered desc)
+        const dateA = new Date(arrA[0]?.created_at || 0).getTime();
+        const dateB = new Date(arrB[0]?.created_at || 0).getTime();
+        return dateB - dateA;
     });
     // ----------------------------------
 
