@@ -9,15 +9,15 @@ export async function POST(req: Request) {
 
     const authHeader = req.headers.get('Authorization');
     const supabaseClient = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            global: {
-                headers: {
-                    Authorization: authHeader || ''
-                }
-            }
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: {
+          headers: {
+            Authorization: authHeader || ''
+          }
         }
+      }
     );
 
     if (!productId || !cropKey || !location) {
@@ -27,7 +27,8 @@ export async function POST(req: Request) {
     // 1. Fetch live meteorological data
     let temp = 25; // Default baseline
     let humidity = 60; // Default baseline
-    
+    let weatherFailed = false;
+
     if (process.env.OPENWEATHER_API_KEY) {
       try {
         const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(location)}&appid=${process.env.OPENWEATHER_API_KEY}&units=metric`;
@@ -37,13 +38,16 @@ export async function POST(req: Request) {
           temp = weatherData.main.temp;
           humidity = weatherData.main.humidity;
         } else {
-            console.warn("Weather API failed, using baseline.");
+          weatherFailed = true;
+          console.warn("Weather API failed, using baseline.");
         }
       } catch (err) {
+        weatherFailed = true;
         console.warn("Weather API error, using baseline.", err);
       }
     } else {
-        console.warn("No OPENWEATHER_API_KEY found, using baseline weather.");
+      weatherFailed = true;
+      console.warn("No OPENWEATHER_API_KEY found, using baseline weather.");
     }
 
     // 2. Categorize Climate
@@ -56,8 +60,9 @@ export async function POST(req: Request) {
 
     // 3 & 4. Vision Analysis with Gemini
     let visionScore = 85;
+    let geminiFailed = false;
     let diagnosticText = `Evaluated under ${climateCategory} (${temp}°C, ${humidity}% humidity).`;
-    
+
     // Domain Strategy Mapping
     let visionFocus = "";
     const domainStr = agricultural_domain?.toLowerCase() || 'horticulture';
@@ -72,7 +77,7 @@ export async function POST(req: Request) {
     } else {
       visionFocus = "Focus on general quality, intactness, freshness, and absence of visual defects.";
     }
-    
+
     if (process.env.GEMINI_API_KEY) {
       try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -92,84 +97,114 @@ export async function POST(req: Request) {
         // If there's no image provided, we just prompt text.
         let result;
         if (imageUrl) {
-            const imageResp = await fetch(imageUrl);
-            if (!imageResp.ok) {
-                console.warn("Failed to fetch image for Gemini, falling back to text.");
-                result = await model.generateContent(prompt);
-            } else {
-                let mimeType = imageResp.headers.get("content-type") || "image/jpeg";
-                mimeType = mimeType.split(';')[0].trim(); // Remove charset if present
-                const arrayBuffer = await imageResp.arrayBuffer();
-                const buffer = Buffer.from(arrayBuffer);
-                const base64Image = buffer.toString("base64");
-
-                result = await model.generateContent([
-                    prompt,
-                    {
-                        inlineData: {
-                            data: base64Image,
-                            mimeType: mimeType
-                        }
-                    }
-                ]);
-            }
-        } else {
+          const imageResp = await fetch(imageUrl);
+          if (!imageResp.ok) {
+            console.warn("Failed to fetch image for Gemini, falling back to text.");
             result = await model.generateContent(prompt);
+          } else {
+            let mimeType = imageResp.headers.get("content-type") || "image/jpeg";
+            mimeType = mimeType.split(';')[0].trim(); // Remove charset if present
+            const arrayBuffer = await imageResp.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+            const base64Image = buffer.toString("base64");
+
+            result = await model.generateContent([
+              prompt,
+              {
+                inlineData: {
+                  data: base64Image,
+                  mimeType: mimeType
+                }
+              }
+            ]);
+          }
+        } else {
+          result = await model.generateContent(prompt);
         }
 
         const responseText = result.response.text();
         const jsonMatch = responseText.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
-            const parsed = JSON.parse(jsonMatch[0]);
-            visionScore = parsed.score || 85;
-            diagnosticText = parsed.diagnostic || diagnosticText;
+          const parsed = JSON.parse(jsonMatch[0]);
+          if (parsed.score !== undefined) {
+              visionScore = parsed.score;
+          } else {
+              geminiFailed = true;
+          }
+          diagnosticText = parsed.diagnostic || diagnosticText;
+        } else {
+            geminiFailed = true;
         }
       } catch (err) {
-        console.warn("Gemini API error, using default vision score.", err);
+        geminiFailed = true;
+        console.error("[Universal Evaluation] Gemini API error, falling back to default vision score:", err);
       }
     } else {
-        console.warn("No GEMINI_API_KEY found, using default vision score.");
-        diagnosticText = `Default evaluation under ${climateCategory}. Environmental data within regional baseline bounds.`;
+      geminiFailed = true;
+      console.warn("No GEMINI_API_KEY found, using default vision score.");
+      diagnosticText = `Default evaluation under ${climateCategory}. Environmental data within regional baseline bounds.`;
     }
 
     // 5. Score Calculation Formula
-    // Final Score = (0.60 * Vision Analysis Score) + (0.40 * Dynamic Environmental & Logistics Score)
-    
-    // Calculate Environmental Score (0-100)
-    let envScore = 85; 
-    if (climateCategory === "Cold/High-Altitude Zone") envScore = 70; // High turgidity but rot risks
-    else if (climateCategory === "Warm/Low-Altitude Zone") envScore = 60; // Rapid maturity, wilting risks
-    else envScore = 90; // Optimal baseline
+    let finalScore = 0;
+    let statusBadge = 'Evaluating';
 
-    const finalScore = Math.round((0.60 * visionScore) + (0.40 * envScore));
+    if (!weatherFailed && !geminiFailed) {
+      // Both APIs succeeded
+      let envScore = 85;
+      if (climateCategory === "Cold/High-Altitude Zone") envScore = 70;
+      else if (climateCategory === "Warm/Low-Altitude Zone") envScore = 60;
+      else envScore = 90;
 
-    let statusBadge = 'Healthy';
-    if (finalScore >= 90) statusBadge = 'Premium Grade A';
-    else if (finalScore >= 70) statusBadge = 'Healthy';
-    else if (finalScore >= 40) statusBadge = 'Degraded';
-    else statusBadge = 'Critical';
+      finalScore = Math.round((0.60 * visionScore) + (0.40 * envScore));
+
+      if (finalScore >= 90) statusBadge = 'Premium Grade A';
+      else if (finalScore >= 70) statusBadge = 'Healthy';
+      else if (finalScore >= 40) statusBadge = 'Degraded';
+      else statusBadge = 'Critical';
+    } else if (weatherFailed && !geminiFailed) {
+      // Only Weather failed
+      finalScore = Math.round(visionScore);
+      statusBadge = 'Image Condition';
+      diagnosticText = `Weather API unavailable. Score based solely on visual analysis: ${diagnosticText}`;
+    } else if (!weatherFailed && geminiFailed) {
+      // Only Gemini failed
+      let envScore = 85;
+      if (climateCategory === "Cold/High-Altitude Zone") envScore = 70;
+      else if (climateCategory === "Warm/Low-Altitude Zone") envScore = 60;
+      else envScore = 90;
+      
+      finalScore = Math.round(envScore);
+      statusBadge = 'Weather Condition';
+      diagnosticText = `Vision API unavailable. Score based solely on environmental baseline: Evaluated under ${climateCategory}.`;
+    } else {
+      // Both failed
+      finalScore = 0;
+      statusBadge = 'Evaluation Failed';
+      diagnosticText = 'Both Image and Weather evaluation services are currently unavailable.';
+    }
 
     // 6. Save payload results directly into the database row attributes using the authenticated client
     const { error: updateError } = await supabaseClient
-        .from('products')
-        .update({
-            calculated_quality_score: finalScore,
-            quality_status_badge: statusBadge,
-            quality_diagnostic_text: diagnosticText,
-            agricultural_domain: domainStr
-        })
-        .eq('id', productId);
+      .from('products')
+      .update({
+        calculated_quality_score: finalScore,
+        quality_status_badge: statusBadge,
+        quality_diagnostic_text: diagnosticText,
+        agricultural_domain: domainStr
+      })
+      .eq('id', productId);
 
     if (updateError) {
-        console.error("Database update failed:", updateError);
-        return NextResponse.json({ error: "Failed to update database" }, { status: 500 });
+      console.error("Database update failed:", updateError);
+      return NextResponse.json({ error: "Failed to update database" }, { status: 500 });
     }
 
     return NextResponse.json({
-        success: true,
-        calculated_quality_score: finalScore,
-        quality_status_badge: statusBadge,
-        quality_diagnostic_text: diagnosticText
+      success: true,
+      calculated_quality_score: finalScore,
+      quality_status_badge: statusBadge,
+      quality_diagnostic_text: diagnosticText
     });
 
   } catch (error) {

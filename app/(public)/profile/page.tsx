@@ -61,6 +61,8 @@ export default function ProfilePage() {
     const [geoLoading, setGeoLoading] = useState(false);
 
     // Profile Form
+    const [verifiedBaseLocation, setVerifiedBaseLocation] = useState("");
+    const [specificLocation, setSpecificLocation] = useState("");
     const [formData, setFormData] = useState({
         full_name: "", phone: "", whatsapp: "", location: "",
         crops: "", bio: "", is_farmer: false, is_buyer: false, is_provider: false,
@@ -101,6 +103,18 @@ export default function ProfilePage() {
             if (profileData) {
                 setProfile(profileData);
                 setFormData(profileData);
+                
+                if (profileData.location) {
+                    if (profileData.location.includes(" - ")) {
+                        const parts = profileData.location.split(" - ");
+                        setVerifiedBaseLocation(parts[0]);
+                        setSpecificLocation(parts.slice(1).join(" - "));
+                    } else {
+                        setVerifiedBaseLocation(profileData.location);
+                        setSpecificLocation("");
+                    }
+                }
+
                 if (profileData.avatar_url) {
                     const { data } = supabase.storage.from("avatars").getPublicUrl(profileData.avatar_url);
                     setAvatarUrl(data.publicUrl);
@@ -163,7 +177,7 @@ export default function ProfilePage() {
                         } else {
                             specificLocation = detail || area || "Unknown Location";
                         }
-                        setFormData(prev => ({ ...prev, location: specificLocation }));
+                        setVerifiedBaseLocation(specificLocation);
                     } else {
                         // Google Maps API implementation
                         const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`);
@@ -188,7 +202,7 @@ export default function ProfilePage() {
                                 specificLocation = detail || area || "Unknown Location";
                             }
                         }
-                        setFormData(prev => ({ ...prev, location: specificLocation }));
+                        setVerifiedBaseLocation(specificLocation);
                     }
                 } catch (error) {
                     console.error("Geocoding failed:", error);
@@ -207,7 +221,9 @@ export default function ProfilePage() {
 
     const handleProfileSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        if (!formData.location || !formData.whatsapp || (!formData.is_farmer && !formData.is_buyer && !formData.is_provider)) {
+        const finalLocation = specificLocation ? `${verifiedBaseLocation} - ${specificLocation}` : verifiedBaseLocation;
+
+        if (!finalLocation || !formData.whatsapp || (!formData.is_farmer && !formData.is_buyer && !formData.is_provider)) {
             alert("Please complete all required fields (Location, WhatsApp, Role).");
             return;
         }
@@ -215,6 +231,7 @@ export default function ProfilePage() {
         const { error } = await supabase.from("profiles").upsert({
             id: user?.id,
             ...formData,
+            location: finalLocation,
             updated_at: new Date().toISOString()
         });
         if (error) {
@@ -225,7 +242,7 @@ export default function ProfilePage() {
                 alert("Error updating profile. Please try again.");
             }
         } else {
-            setProfile(formData);
+            setProfile({ ...formData, location: finalLocation });
             setIsInitialized(true);
             setIsEditingProfile(false);
         }
@@ -304,12 +321,30 @@ export default function ProfilePage() {
                     </div>
                     <form onSubmit={handleProfileSubmit} className={styles.gateForm}>
                         <div className={styles.formGroup}>
-                            <label>GPS Handshake</label>
-                            <div className={styles.geoBox}>
-                                <button type="button" onClick={handleGetLocation} disabled={geoLoading} className={`${styles.geoBtn} ${formData.location ? styles.geoBtnSuccess : ''}`}>
-                                    {geoLoading ? "Acquiring Coordinates..." : formData.location ? `Verified: ${formData.location}` : "Verify Location"}
+                            <label>1. Verified Base Location (GPS Required)</label>
+                            <div className={styles.geoBox} style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "8px", flexWrap: "wrap" }}>
+                                <input 
+                                    type="text" 
+                                    readOnly 
+                                    value={verifiedBaseLocation} 
+                                    placeholder="Click 'Auto GPS' to verify..."
+                                    style={{ flex: "1 1 200px", backgroundColor: "#f1f5f9", color: "#64748b", cursor: "not-allowed", minWidth: 0 }}
+                                />
+                                <button type="button" onClick={handleGetLocation} disabled={geoLoading} className={`${styles.geoBtn} ${verifiedBaseLocation ? styles.geoBtnSuccess : ''}`} style={{ flex: "0 1 auto", padding: "0 16px", height: "42px", minWidth: "120px" }}>
+                                    {geoLoading ? "Fetching..." : <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}><MapPin size={16} /> Auto GPS</div>}
                                 </button>
                             </div>
+                            
+                            <label>2. Specific Address (Optional)</label>
+                            <input 
+                                type="text" 
+                                value={specificLocation}
+                                onChange={e => setSpecificLocation(e.target.value)}
+                                placeholder="e.g. mile 4 new council"
+                                disabled={!verifiedBaseLocation}
+                                style={{ width: "100%" }}
+                            />
+                            {!verifiedBaseLocation && <small style={{ color: "#ef4444", display: "block", marginTop: "4px" }}>* You must verify GPS before entering specific details.</small>}
                         </div>
                         <div className={styles.formGroup}>
                             <label>Primary P2P Channel (WhatsApp)</label>
@@ -514,10 +549,28 @@ export default function ProfilePage() {
                                 <input type="tel" value={formData.phone || ""} onChange={e => setFormData({...formData, phone: e.target.value})} placeholder="+237..." />
                             </div>
                             <div className={styles.formGroup}>
-                                <label>Location</label>
-                                <button type="button" onClick={handleGetLocation} className={styles.geoBtnSmall} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                                    {formData.location ? <><MapPin size={12} /> {formData.location} (Update)</> : "Fetch GPS"}
-                                </button>
+                                <label>1. Verified Base Location</label>
+                                <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "8px", flexWrap: "wrap" }}>
+                                    <input 
+                                        type="text" 
+                                        readOnly 
+                                        value={verifiedBaseLocation} 
+                                        placeholder="Click 'Auto GPS' to verify..."
+                                        style={{ flex: "1 1 150px", backgroundColor: "#f1f5f9", color: "#64748b", cursor: "not-allowed", minWidth: 0 }}
+                                    />
+                                    <button type="button" onClick={handleGetLocation} disabled={geoLoading} className={styles.geoBtnSmall} style={{ flex: "0 1 auto", padding: "0 12px", height: "42px", minWidth: "100px" }}>
+                                        {geoLoading ? "..." : <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}><MapPin size={12} /> Auto GPS</div>}
+                                    </button>
+                                </div>
+                                <label>2. Specific Address</label>
+                                <input 
+                                    type="text" 
+                                    value={specificLocation}
+                                    onChange={e => setSpecificLocation(e.target.value)}
+                                    placeholder="e.g. mile 4 new council"
+                                    disabled={!verifiedBaseLocation}
+                                    style={{ width: "100%" }}
+                                />
                             </div>
                             <div className={styles.formGroup}>
                                 <label>Roles</label>
