@@ -32,7 +32,8 @@ export async function POST(req: Request) {
     if (process.env.OPENWEATHER_API_KEY) {
       try {
         const baseLocation = location.split(' - ')[0].trim();
-        const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(baseLocation)}&appid=${process.env.OPENWEATHER_API_KEY}&units=metric`;
+        const city = baseLocation.split(',').pop().trim();
+        const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${process.env.OPENWEATHER_API_KEY}&units=metric`;
         const weatherRes = await fetch(weatherUrl);
         if (weatherRes.ok) {
           const weatherData = await weatherRes.json();
