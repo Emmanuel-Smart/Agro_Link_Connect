@@ -193,6 +193,7 @@ export default function ProfilePage() {
 
                             const baseLoc = area || detail || "Unknown Location";
                             setVerifiedBaseLocation(baseLoc);
+                        }
                     }
                 } catch (error) {
                     console.error("Geocoding failed:", error);
