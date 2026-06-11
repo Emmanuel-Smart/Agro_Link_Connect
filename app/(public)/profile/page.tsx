@@ -171,13 +171,8 @@ export default function ProfilePage() {
                         const detail = address.road || address.residential || address.neighbourhood;
                         const area = address.suburb || address.village || address.town || address.city || address.county;
                         
-                        let specificLocation = "Unknown Location";
-                        if (detail && area && detail !== area) {
-                            specificLocation = `${detail}, ${area}`;
-                        } else {
-                            specificLocation = detail || area || "Unknown Location";
-                        }
-                        setVerifiedBaseLocation(specificLocation);
+                        const baseLoc = area || detail || "Unknown Location";
+                        setVerifiedBaseLocation(baseLoc);
                     } else {
                         // Google Maps API implementation
                         const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`);
@@ -196,13 +191,8 @@ export default function ProfilePage() {
                             const detail = route || neighborhood;
                             const area = sublocality || locality;
 
-                            if (detail && area && detail !== area) {
-                                specificLocation = `${detail}, ${area}`;
-                            } else {
-                                specificLocation = detail || area || "Unknown Location";
-                            }
-                        }
-                        setVerifiedBaseLocation(specificLocation);
+                            const baseLoc = area || detail || "Unknown Location";
+                            setVerifiedBaseLocation(baseLoc);
                     }
                 } catch (error) {
                     console.error("Geocoding failed:", error);
