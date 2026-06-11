@@ -83,7 +83,10 @@ export async function POST(req: Request) {
     if (process.env.GEMINI_API_KEY) {
       try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = genAI.getGenerativeModel({ 
+          model: "gemini-2.5-flash",
+          generationConfig: { responseMimeType: "application/json" }
+        });
 
         const prompt = `
           You are an expert Agronomic Systems Engineer.
@@ -101,7 +104,7 @@ export async function POST(req: Request) {
         if (imageUrl) {
           const imageResp = await fetch(imageUrl);
           if (!imageResp.ok) {
-            console.warn("Failed to fetch image for Gemini, falling back to text.");
+            console.warn(`[Universal Evaluation] Failed to fetch image for Gemini (Status: ${imageResp.status}), falling back to text.`);
             result = await model.generateContent(prompt);
           } else {
             let mimeType = imageResp.headers.get("content-type") || "image/jpeg";
@@ -127,19 +130,26 @@ export async function POST(req: Request) {
         const responseText = result.response.text();
         const jsonMatch = responseText.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          if (parsed.score !== undefined) {
-              visionScore = parsed.score;
-          } else {
-              geminiFailed = true;
+          try {
+            const parsed = JSON.parse(jsonMatch[0]);
+            if (parsed.score !== undefined) {
+                visionScore = parsed.score;
+            } else {
+                geminiFailed = true;
+                console.error("[Universal Evaluation] Gemini returned JSON without a 'score' field:", parsed);
+            }
+            diagnosticText = parsed.diagnostic || diagnosticText;
+          } catch(e) {
+            geminiFailed = true;
+            console.error("[Universal Evaluation] Failed to parse Gemini JSON:", e, "Raw text:", responseText);
           }
-          diagnosticText = parsed.diagnostic || diagnosticText;
         } else {
             geminiFailed = true;
+            console.error("[Universal Evaluation] Gemini did not return valid JSON format. Raw text:", responseText);
         }
       } catch (err) {
         geminiFailed = true;
-        console.error("[Universal Evaluation] Gemini API error, falling back to default vision score:", err);
+        console.error("[Universal Evaluation] Gemini API error (Safety block or Network error):", err);
       }
     } else {
       geminiFailed = true;
@@ -181,9 +191,9 @@ export async function POST(req: Request) {
       diagnosticText = `Vision API unavailable. Score based solely on environmental baseline: Evaluated under ${climateCategory}.`;
     } else {
       // Both failed
-      finalScore = 0;
-      statusBadge = 'Evaluation Failed';
-      diagnosticText = 'Both Image and Weather evaluation services are currently unavailable.';
+      finalScore = 75; // Graceful baseline fallback
+      statusBadge = 'Baseline Condition';
+      diagnosticText = 'Both APIs unavailable. Assigned baseline regional score.';
     }
 
     // 6. Save payload results directly into the database row attributes using the authenticated client
